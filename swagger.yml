@@ -1,0 +1,45 @@
+openapi: 3.0.0
+info:
+  version: '1.0.0'
+  title: 'App Nizi Api'
+  description: 'The Api for the Nizi-app'
+  contact:
+    email: 579850@student.inholland.nl
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+paths:
+  /test:
+    get:
+      tags:
+        - test
+      summary: test call
+      operationId: TestCall
+      description: Calling this allows you to fetch the test data
+      responses:
+        '200':
+          description: the test data
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TestObject'
+        '400':
+          description: bad input parameter
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/jaccoklouwer/App_Nizi/1.0.0
+components:
+  schemas:
+    TestObject:
+      type: object
+      required:
+        - id
+        - description
+      properties:
+        id:
+          type: integer
+        description:
+          type: string
+          example: This is object number X
