@@ -3,17 +3,6 @@ info:
   version: '1.0.0'
   title: 'App Nizi Api'
   description: 'The Api for the Nizi-app'
-  contact:
-      name: Jacco Klouwer
-      email: 579850@student.inholland.nl
-      name: Kevin van Eijk
-      email: 579724@student.inholland.nl
-      name: Mitch Heijmann
-      email: 526756@student.inholland.nl
-      name: Martin Stork
-      email: 560831@student.inholland.nl
-      name: Anne Vries
-      email: 585723@student.inhholland.nl
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
@@ -41,6 +30,16 @@ servers:
     url: https://virtserver.swaggerhub.com/jaccoklouwer/App_Nizi/1.0.0
 components:
   schemas:
+    Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      required:
+        - code
+        - message
     TestObject:
       type: object
       required:
@@ -52,3 +51,10 @@ components:
         description:
           type: string
           example: This is object number X
+  responses:
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
