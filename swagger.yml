@@ -6,6 +6,11 @@ info:
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+servers:
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/McSmoker/NierZiektenConcept/1.0.0/
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/jaccoklouwer/App_Nizi/1.0.0
 paths:
   /test:
     get:
@@ -25,9 +30,6 @@ paths:
                   $ref: '#/components/schemas/TestObject'
         '400':
           description: bad input parameter
-servers:
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/jaccoklouwer/App_Nizi/1.0.0
 components:
   schemas:
     Error:
@@ -51,6 +53,155 @@ components:
         description:
           type: string
           example: This is object number X
+    Account:
+      type: object
+      required:
+        - account_id
+        - doctor_id
+        - name
+        - password
+        - passwordSalt
+        - email
+      properties:
+        account_id:
+          type: integer
+        patient_id:
+          type: integer
+        doctor_id:
+          type: integer
+        name:
+          type: string
+        password:
+          type: string
+        passwordSalt:
+          type: string
+        email:
+          type: string
+    Patient:
+      type: object
+      required:
+        - patient_id
+        - birthdate
+        - doctor_id
+        - weight
+        - dairy_id
+      properties:
+        account:
+          $ref: 'components/schema/Account'
+        patient_id:
+         type: integer
+        birthdate:
+         type: string
+        doctor_id:
+         type: integer
+        weight:
+         type: integer
+        dairy_id:
+         type: integer
+    Doctor:
+      type: object
+      required:
+        - doctor_id
+        - location
+      properties:
+        account:
+          $ref: 'components/schema/Account'
+        doctor_id:
+         type: integer
+        birthdate:
+         type: integer
+    PersonalDietaryManagement:
+      type: object
+      required:
+        - personalDietaryManagement_id
+        - maxAmount
+        - patient_id
+        - dietaryManagement_id
+        - active
+        - desirableAmount
+      properties:
+        personalDietaryManagement_id:
+         type: integer
+        maxAmount:
+         type: string
+        patient_id:
+         type: integer
+        dietaryManagement_id:
+         type: integer
+        active:
+         type: boolean
+        desirableAmount:
+         type: string
+    DietaryManagement:
+      type: object
+      required:
+        - dietaryManagement_id
+        - description
+      properties:
+        dietaryManagement_id:
+         type: integer
+        description:
+         type: string
+    WaterConsumption:
+      type: object
+      required:
+        - water_id
+        - date
+        - amount
+        - patient_id
+      properties:
+        water_id:
+         type: integer
+        date:
+         type: string
+        amount:
+         type: string
+        patient_id:
+         type: integer
+    Dairy:
+      type: object
+      required:
+        - dairy_id
+        - patient_id
+      properties:
+        dairy_id:
+          type: integer
+        patient_id:
+          type: integer
+    Food:
+      type: object
+      required:
+        - food_id
+        - dairy_id
+        - foodName
+        - amount
+        - date
+        - kcal
+        - protein
+        - fiber
+        - calcium
+        - sodium
+      properties:
+        food_id:
+         type: integer
+        dairy_id:
+         type: integer
+        foodName:
+         type: string
+        amount: 
+         type: string
+        date:
+         type: string
+        kcal:
+         type: string
+        protein:
+         type: string
+        fiber:
+         type: string
+        calcium:
+         type: string
+        sodium:
+         type: string
   responses:
     NotFound:
       description: Not found
