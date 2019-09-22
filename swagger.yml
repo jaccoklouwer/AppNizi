@@ -11,7 +11,41 @@ servers:
     url: https://virtserver.swaggerhub.com/McSmoker/NierZiektenConcept/1.0.0/
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/jaccoklouwer/App_Nizi/1.0.0
+  - description: Martin SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/martinstork/AppNiZi/1.0.0
 paths:
+  /login:
+    post:
+      tags:
+        - account
+      description: Logs user in
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    example: johndoe@mail.com
+                  password:
+                    type: string
+                    example: supersecretpassword
+      responses:
+        '200':
+          description: User login finished
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  AuthToken:
+                    type: string
+                    example: "1-4343-47637-43764383-4637673"
+        '401':
+          description: not authorized to login
+          
   /test:
     get:
       tags:
@@ -202,6 +236,13 @@ components:
          type: string
         sodium:
          type: string
+  # securitySchemes:
+  #   oauth2:
+  #     type: oauth2
+  #     flows:
+  #       authorizationCode:
+  #         authorizationUrl: /oauth/dialog
+  #         tokenUrl: /oauth/token
   responses:
     NotFound:
       description: Not found
