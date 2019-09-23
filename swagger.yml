@@ -14,6 +14,154 @@ servers:
   - description: Martin SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/martinstork/AppNiZi/1.0.0
 paths:
+  
+  # patients
+  /patients:
+    get:
+      tags:
+        - patients
+      description: Retrieve an array of patients.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/patients'
+    post:
+      tags:
+        - patients
+      description: Create a new patient.
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/patient'
+      responses:
+        '200':
+          description: (200) OK!
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/patient'
+  /patients/me:
+    get:
+      tags:
+        - patients
+      description: Retrieve the current user's patient data.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/patient'                
+  /patients/{patientId}:
+    get:
+      tags:
+        - patients
+      description: Retrieve an existing patient.
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/patient'
+    delete:
+      description: Delete an existing patient.
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+      responses:
+        '200':
+          description: (200) Removed!
+    patch:
+      description: Patch an existing patient.
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+      responses:
+        '200':
+          description: (200) Updated!
+  /patients/{doctorId}:
+    get:
+      tags:
+        - patients
+      description: Retrieve all patients listed under a given doctor.
+      parameters:
+        - $ref: '#/components/parameters/doctorId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/patients'
+
+  # diaries
+  /diaries/today/me:
+    get:
+      tags:
+        - diaries
+      description: Retrieve the user-patient's diary for today.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/diary'
+  /diaries/today/{patientId}:
+    get:
+      tags:
+        - diaries
+      description: Retrieve a given patient's diary for today.
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/diary'
+  /diaries/{date}/{patientId}:
+    get:
+      tags:
+        - diaries
+      description: Retrieve a given patient's diary for today.
+      parameters:
+        - $ref: '#/components/parameters/date'
+        - $ref: '#/components/parameters/patientId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/diary'                
+
+
   /WaterConsumption:
     post:
       description: insert the WaterConsumption
@@ -318,6 +466,63 @@ paths:
           description: bad input parameter
 components:
   schemas:
+    weight:
+      type: object
+      required:
+        - amount
+        - unit
+      properties:
+        amount:
+         type: string
+         example: "83.50"
+        unit:
+         type: string
+         example: "kg"
+    patient:
+      type: object
+      properties:
+        patientId:
+         type: integer
+         example: 4334
+        doctorId:
+         type: integer
+         example: 123
+        birthdate:
+         type: string
+         example: "2019-08-30"
+        weight:
+         type: object
+         items:
+          $ref: '#/components/schemas/weight'
+    patients:
+      type: object
+      properties:
+      results:
+        type: array
+        items:
+          $ref: '#/components/schemas/patient'
+        nextId:
+          type: integer
+          example: 4005
+    diary:
+      type: object
+      required:
+        - patientId
+      properties:
+        diaryId:
+         type: integer
+         example: 4334
+        patientId:
+         type: integer
+         example: 4334
+        consumedFoods:
+         type: array
+         items:
+           $ref: '#/components/schemas/foodConsumption'
+        representingDate:
+         type: string
+         example: "2019-08-30"
+
     updatedDietmangement:
       type: object
       properties:
@@ -392,27 +597,27 @@ components:
         accountId:
           type: integer
           example: 1
-    Patient:
-      type: object
-      required:
-        - patient_id
-        - birthdate
-        - doctor_id
-        - weight
-        - dairy_id
-      properties:
-        account:
-          $ref: 'components/schema/Account'
-        patient_id:
-         type: integer
-        birthdate:
-         type: string
-        doctor_id:
-         type: integer
-        weight:
-         type: integer
-        dairy_id:
-         type: integer
+    # Patient:
+    #   type: object
+    #   required:
+    #     - patient_id
+    #     - birthdate
+    #     - doctor_id
+    #     - weight
+    #     - dairy_id
+    #   properties:
+    #     account:
+    #       $ref: 'components/schema/Account'
+    #     patient_id:
+    #      type: integer
+    #     birthdate:
+    #      type: string
+    #     doctor_id:
+    #      type: integer
+    #     weight:
+    #      type: integer
+    #     dairy_id:
+    #      type: integer
     Doctor:
       type: object
       required:
@@ -457,7 +662,7 @@ components:
          type: integer
         description:
          type: string
-    WaterConsumption:
+    waterConsumption:
       type: object
       required:
         - water_id
@@ -473,7 +678,7 @@ components:
          type: string
         patient_id:
          type: integer
-    Dairy:
+    diary:
       type: object
       required:
         - dairy_id
@@ -484,7 +689,7 @@ components:
         patient_id:
           type: integer
 
-    Food:
+    food:
       type: array
       required:
         - foodName
@@ -501,7 +706,7 @@ components:
         - foodId: 3308
           foodName: Aardbei
 
-    AddingFood:
+    addingFood:
       type: object
       required:
         - foodConsumptionId
@@ -522,7 +727,7 @@ components:
          type: string
          example: "2018-06-13"
 
-    FoodConsumption:
+    foodConsumption:
       type: object
       required:
         - foodConsumptionId
@@ -566,15 +771,23 @@ components:
             $ref: '#/components/schemas/Error'
   
   parameters:
-    patient_id:
-      name: patient_id
+    patientId:
+      name: patientId
       in: path
       required: true
-      description: the id of the patient
+      description: The id of the patient
       schema:
         type: integer
+    date:
+      name: date
+      in: path
+      required: true
+      description: A date value.
+      schema:
+        type: string
+        example: "2019-08-30"
     DietId:
-      name: DietId
+      name: dietId
       in: path
       required: true
       description: the id of the diet
