@@ -208,7 +208,7 @@ paths:
         '400':
           description: Bad input parameter
         '401':
-          description: Not authorized to get patients       
+          description: Not authorized to get week-diary of patient       
   /food:
     get:
       tags:
@@ -279,7 +279,6 @@ paths:
         404: 
           description: Failed
 
-             
   /test:
     get:
       tags:
