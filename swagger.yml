@@ -10,7 +10,7 @@ paths:
   /test:
     get:
       tags:
-        - test
+        - testAccount
       summary: test call
       operationId: TestCall
       description: Calling this allows you to fetch the test data
@@ -22,10 +22,13 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TestObject'
+                  $ref: '#/components/schemas/Account'
         '400':
           description: bad input parameter
 servers:
+# Added by API Auto Mocking Plugin
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/McSmoker/NierZiektenConcept/1.0.0
   - description: SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/jaccoklouwer/App_Nizi/1.0.0
 components:
@@ -40,17 +43,155 @@ components:
       required:
         - code
         - message
-    TestObject:
+    Account:
       type: object
       required:
-        - id
+        - account_id
+        - doctor_id
+        - name
+        - password
+        - passwordSalt
+        - email
+      properties:
+        account_id:
+          type: integer
+        patient_id:
+          type: integer
+        doctor_id:
+          type: integer
+        name:
+          type: string
+        password:
+          type: string
+        passwordSalt:
+          type: string
+        email:
+          type: string
+    Patient:
+      #allof: 
+      # $ref:'components/schema/Account'
+      type: object
+      required:
+        - patient_id
+        - birthdate
+        - doctor_id
+        - weight
+        - dairy_id
+      properties:
+        patient_id:
+         type: integer
+        birthdate:
+         type: string
+        doctor_id:
+         type: integer
+        weight:
+         type: integer
+        dairy_id:
+         type: integer
+    Doctor:
+      #allof:
+      #- $ref:'components/schema/Account'
+      type: object
+      required:
+        - doctor_id
+        - location
+      properties:
+        doctor_id:
+         type: integer
+        birthdate:
+         type: integer
+    PersonalDietaryManagement:
+      type: object
+      required:
+        - personalDietaryManagement_id
+        - maxAmount
+        - patient_id
+        - dietaryManagement_id
+        - active
+        - desirableAmount
+      properties:
+        personalDietaryManagement_id:
+         type: integer
+        maxAmount:
+         type: string
+        patient_id:
+         type: integer
+        dietaryManagement_id:
+         type: integer
+        active:
+         type: boolean
+        desirableAmount:
+         type: string
+    DietaryManagement:
+      type: object
+      required:
+        - dietaryManagement_id
         - description
       properties:
-        id:
-          type: integer
+        dietaryManagement_id:
+         type: integer
         description:
-          type: string
-          example: This is object number X
+         type: string
+    WaterConsumption:
+      type: object
+      required:
+        - water_id
+        - date
+        - amount
+        - patient_id
+      properties:
+        water_id:
+         type: integer
+        date:
+         type: string
+        amount:
+         type: string
+        patient_id:
+         type: integer
+    Dairy:
+      type: object
+      required:
+        - dairy_id
+        - patient_id
+      properties:
+        dairy_id:
+          type: integer
+        patient_id:
+          type: integer
+    Food:
+      type: object
+      required:
+        - food_id
+        - dairy_id
+        - foodName
+        - amount
+        - date
+        - kcal
+        - protein
+        - fiber
+        - calcium
+        - sodium
+      properties:
+        food_id:
+         type: integer
+        dairy_id:
+         type: integer
+        foodName:
+         type: string
+        amount: 
+         type: string
+        date:
+         type: string
+        kcal:
+         type: string
+        protein:
+         type: string
+        fiber:
+         type: string
+        calcium:
+         type: string
+        sodium:
+         type: string
   responses:
     NotFound:
       description: Not found
