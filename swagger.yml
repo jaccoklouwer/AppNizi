@@ -60,7 +60,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Nutrient'
-  /login:
+  /account/login:
     post:
       tags:
         - account
@@ -77,7 +77,7 @@ paths:
                     example: johndoe@mail.com
                   password:
                     type: string
-                    example: supersecretpassword
+                    example: supersecretpassword1
       responses:
         '200':
           description: User login finished
@@ -90,8 +90,77 @@ paths:
                     type: string
                     example: "1-4343-47637-43764383-4637673"
         '401':
-          description: not authorized to login
-
+          description: not authorized to login? maybe you made a typo?
+  /account/registerPatient:
+    post:
+      tags:
+        - account
+      description: Registers a new patient
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    example: johndoe@mail.com
+                  password:
+                    type: string
+                    example: supersecretpassword1
+                  name:
+                    type: string
+                    example: benito franco
+      responses:
+        '200':
+          description: Patient registered and ready to party
+        '401':
+          description: not authorized to register a patient(are you logged in as a doctor?)
+  /account/registerDoctor:
+    post:
+      tags:
+        - account
+      description: Registers a new doctor
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  email:
+                    type: string
+                    example: johndoe@mail.com
+                  password:
+                    type: string
+                    example: supersecretpassword
+      responses:
+        '200':
+          description: Doctor registered
+        '401':
+          description: not authorized to update             
+  /account/updatePatient:
+    put:
+      tags:
+        - account
+      description: sets the patients new password
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  password:
+                    type: string
+                    example: supersecretpassword2
+      responses:
+        '200':
+          description: Patient updated
+        '401':
+          description: not authorized to login 
+         
   /food:
     get:
       tags:
