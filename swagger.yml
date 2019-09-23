@@ -112,7 +112,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/FoodItemDatabase'
+                $ref: '#/components/schemas/Food'
         400:
           description: Failed
           content:
@@ -133,6 +133,27 @@ paths:
         - oAuth2: [patient]    
       requestBody:
         $ref: '#/components/requestBodies/AddFood'
+      responses:
+        200:
+          description: Succesful
+        401: 
+          description: No authorization
+        404: 
+          description: Failed
+
+    delete:
+      tags:
+        - food
+      summary: Delete a food item from the diary of the user
+      description: Get method that returns a food name from the input of the user. This method can be called while the user types the name.
+      security:
+        - oAuth2: [patient, doctor]
+      parameters:
+        - in: path
+          name: foodConsumptionId
+          required: true
+          schema:
+            type: integer
       responses:
         200:
           description: Succesful
@@ -319,7 +340,7 @@ components:
         patient_id:
           type: integer
 
-    FoodItemDatabase:
+    Food:
       type: array
       required:
         - foodName
@@ -339,7 +360,7 @@ components:
     AddingFood:
       type: object
       required:
-        - foodId
+        - foodConsumptionId
         - diaryId
         - amount
         - date
@@ -357,11 +378,11 @@ components:
          type: string
          example: "2018-06-13"
 
-    Food:
+    FoodConsumption:
       type: object
       required:
-        - food_id
-        - dairy_id
+        - foodConsumptionId
+        - dairyId
         - foodName
         - amount
         - date
