@@ -160,7 +160,55 @@ paths:
           description: Patient updated
         '401':
           description: not authorized to login 
-         
+  /doctor/patients:
+    get:
+      tags:
+        - doctor
+      summary: returns patient id's from doctor
+      description: Retrieves all patients for logged-in doctor
+      security:
+        - oAuth2: [doctor]
+      responses:
+        '200':
+          description: Succesfully retrieved patients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  items:
+                    $ref: '#/components/schemas/AccountNameAndId'
+                example:    # Child of media type
+                  - name: 'John Doe'
+                    id: 1
+                  - name: 'Susan Smith'
+                    id: 2
+        '401':
+          description: Not authorized to get patients
+  /doctor/patients/{patient_id}/weekDiary:
+    get:
+      tags:
+        - doctor
+      summary: returns weekdiary from patient
+      description: Retrieves all patients for logged-in doctor
+      security:
+        - oAuth2: [doctor]
+      parameters:
+        - $ref: '#/components/parameters/patient_id'
+      responses:
+        '200':
+          description: Succesfully retrieved patients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dairy'
+        '400':
+          description: Bad input parameter
+        '401':
+          description: Not authorized to get patients       
   /food:
     get:
       tags:
@@ -317,6 +365,15 @@ components:
           type: string
         email:
           type: string
+    AccountNameAndId:
+      type: object
+      properties:
+        name:
+          type: string
+          example: 'John Doe'
+        accountId:
+          type: integer
+          example: 1
     Patient:
       type: object
       required:
