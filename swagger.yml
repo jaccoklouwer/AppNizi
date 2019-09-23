@@ -236,13 +236,6 @@ components:
          type: string
         sodium:
          type: string
-  # securitySchemes:
-  #   oauth2:
-  #     type: oauth2
-  #     flows:
-  #       authorizationCode:
-  #         authorizationUrl: /oauth/dialog
-  #         tokenUrl: /oauth/token
   responses:
     NotFound:
       description: Not found
@@ -250,3 +243,12 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+  securitySchemes:
+    name:
+      type: oauth2
+      flows:
+        implicit:
+          authorizationUrl: 'https://domain.test/api/oauth/dialog'
+          scopes:
+            read: example read scope
+            write: example write scope
