@@ -14,6 +14,52 @@ servers:
   - description: Martin SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/martinstork/AppNiZi/1.0.0
 paths:
+  /WaterConsumption:
+    post:
+      description: insert the WaterConsumption
+      requestBody:
+        $ref: '#/components/requestBodies/WaterConsumption'
+      responses:
+        '200':
+          description: OK
+  /WaterConsumption/{patient_id}:
+    get:
+      description: get the WaterConsumption of a patient
+      parameters:
+        - $ref: '#/components/parameters/patient_id' 
+      responses:
+        '200':
+          description: OK
+  /personaldietarymanagement/{DietId}:
+    delete:
+      description: Deletes the dietarymanagement of a patient
+      parameters:
+        - $ref: '#/components/parameters/DietId'
+      responses:
+        '200':
+          description: OK
+  /dietaryManagement:
+    put:
+      description: Edits the dietarymanagement of a patient
+      requestBody:
+        $ref: '#/components/requestBodies/dietarymanagment'
+      responses:
+        '200':
+          description: OK
+  /dietaryManagement/{patient_id}:
+    get:
+      description: Retrieves all dietarymanagment of the patient
+      parameters:
+        - $ref: '#/components/parameters/patient_id'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Nutrient'
   /login:
     post:
       tags:
@@ -66,6 +112,26 @@ paths:
           description: bad input parameter
 components:
   schemas:
+    updatedDietmangement:
+      type: object
+      properties:
+        DietId:
+          type: integer
+        Amount:
+          type: integer
+        patientId:
+          type: integer
+        doctorId:
+          type: integer
+    Nutrient:
+      type: object
+      properties:
+        Name:
+          type: string
+        Amount:
+          type: integer
+        Active:
+          type: boolean
     Error:
       type: object
       properties:
@@ -243,6 +309,36 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+  parameters:
+    patient_id:
+      name: patient_id
+      in: path
+      required: true
+      description: the id of the patient
+      schema:
+        type: integer
+    DietId:
+      name: DietId
+      in: path
+      required: true
+      description: the id of the diet
+      schema:
+        type: integer
+  requestBodies:
+    dietarymanagment:
+      description: the diet management that needs to be updated
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/updatedDietmangement'
+    WaterConsumption:
+      description: the water consumption of that day
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/WaterConsumption'
   securitySchemes:
     name:
       type: oauth2
