@@ -312,7 +312,7 @@ paths:
     get:
       tags:
         - doctor
-      summary: returns patient id's from doctor
+      summary: Returns patient id's from doctor
       description: Retrieves all patients for logged-in doctor
       security:
         - oAuth2: [doctor]
@@ -327,18 +327,37 @@ paths:
                   type: object
                   items:
                     $ref: '#/components/schemas/AccountNameAndId'
-                example:    # Child of media type
+                example:
                   - name: 'John Doe'
                     id: 1
                   - name: 'Susan Smith'
                     id: 2
         '401':
           description: Not authorized to get patients
+  /doctor/patients/{patient_id}:
+    get:
+      tags:
+        - doctor
+      summary: Returns patient
+      description: Retrieves specific patient for logged-in doctor
+      security:
+        - oAuth2: [doctor]
+      parameters:
+        - $ref: '#/components/parameters/patient_id'
+      responses:
+        '200':
+          description: Succesfully retrieved patient
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        '401':
+          description: Not authorized to get patient
   /doctor/patients/{patient_id}/weekDiary:
     get:
       tags:
         - doctor
-      summary: returns weekdiary from patient
+      summary: Returns weekdiary from patient
       description: Retrieves all patients for logged-in doctor
       security:
         - oAuth2: [doctor]
