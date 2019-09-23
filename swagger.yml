@@ -92,14 +92,14 @@ paths:
         '401':
           description: not authorized to login
 
-  /foodDatabase:
+  /food:
     get:
       tags:
         - food
       summary: Get the name and ID from the database
       description: Get method that returns a food name from the input of the user. This method can be called while the user types the name.
-      #security:
-        # Moet nog gebeuren
+      security:
+        - oAuth2: [patient, doctor]
       parameters:
         - in: path
           name: foodName
@@ -121,6 +121,25 @@ paths:
                 $ref: '#/components/schemas/Error'
         401:
           description: No authorization
+        404:
+          description: No food item available
+
+    post:
+      tags:
+        - food
+      summary: Add amount of a food item to the diary
+      description: The user can put an amount of food (in grams) in their diary.
+      security:
+        - oAuth2: [patient]    
+      requestBody:
+        $ref: '#/components/requestBodies/AddFood'
+      responses:
+        200:
+          description: Succesful
+        401: 
+          description: No authorization
+        404: 
+          description: Failed
 
              
   /test:
@@ -309,10 +328,34 @@ components:
         properties:
           foodId:
             type: integer
-            example: 3307
           foodName:
             type: string
-            example: Banaan
+      example:
+        - foodId: 3307
+          foodName: Aardappel
+        - foodId: 3308
+          foodName: Aardbei
+
+    AddingFood:
+      type: object
+      required:
+        - foodId
+        - diaryId
+        - amount
+        - date
+      properties:
+        foodId:
+         type: integer
+         example: 4334
+        diaryId:
+         type: integer
+         example: 742
+        amount:
+          type: integer
+          example: 200
+        date:
+         type: string
+         example: "2018-06-13"
 
     Food:
       type: object
@@ -348,6 +391,7 @@ components:
          type: string
         sodium:
          type: string
+  
   responses:
     NotFound:
       description: Not found
@@ -355,6 +399,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Error'
+  
   parameters:
     patient_id:
       name: patient_id
@@ -370,6 +415,7 @@ components:
       description: the id of the diet
       schema:
         type: integer
+  
   requestBodies:
     dietarymanagment:
       description: the diet management that needs to be updated
@@ -385,12 +431,22 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/WaterConsumption'
+    AddFood:
+      description: Add the amount of a specific food Item to the diary
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AddingFood'
+
   securitySchemes:
-    name:
+    oAuth2: 
       type: oauth2
       flows:
         implicit:
           authorizationUrl: 'https://domain.test/api/oauth/dialog'
           scopes:
             read: example read scope
+            patient: Only patients
+            doctor: Only Doctors
             write: example write scope
