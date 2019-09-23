@@ -1,8 +1,8 @@
 openapi: 3.0.0
 info:
   version: '1.0.0'
-  title: 'App Nizi Api'
-  description: 'The Api for the Nizi-app'
+  title: 'App Nizi API'
+  description: 'The API for the Nizi-app'
   license:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
@@ -45,7 +45,38 @@ paths:
                     example: "1-4343-47637-43764383-4637673"
         '401':
           description: not authorized to login
-          
+
+  /foodDatabase:
+    get:
+      tags:
+        - food
+      summary: Get the name and ID from the database
+      description: Get method that returns a food name from the input of the user. This method can be called while the user types the name.
+      #security:
+        # Moet nog gebeuren
+      parameters:
+        - in: path
+          name: foodName
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Succesful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FoodItemDatabase'
+        400:
+          description: Failed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        401:
+          description: No authorization
+
+             
   /test:
     get:
       tags:
@@ -202,6 +233,21 @@ components:
           type: integer
         patient_id:
           type: integer
+
+    FoodItemDatabase:
+      type: array
+      required:
+        - foodName
+      items:
+        type: object
+        properties:
+          foodId:
+            type: integer
+            example: 3307
+          foodName:
+            type: string
+            example: Banaan
+
     Food:
       type: object
       required:
