@@ -250,22 +250,30 @@ paths:
         - waterConsumption
       operationId: PostWaterConsumption
       description: insert the WaterConsumption
+      security:
+        - oAuth2: [patient]
       requestBody:
         $ref: '#/components/requestBodies/WaterConsumption'
       responses:
         '200':
           description: OK
+        401:
+          description: you are unauthorized to do this
   /WaterConsumption/{patientId}:
     get:
       tags:
         - waterConsumption
       operationId: GetWaterConsumptionByPatientId
       description: get the WaterConsumption of a patient
+      security:
+        - oAuth2: [patient, doctor]
       parameters:
         - $ref: '#/components/parameters/patientId' 
       responses:
         '200':
           description: OK
+        401:
+          description: you are unauthorized to do this
           
   #dietaryManagement
   /personaldietarymanagement/{DietId}:
@@ -274,28 +282,40 @@ paths:
         - dietaryManagement
       operationId: DeleteMyDietaryManagement
       description: Deletes the dietarymanagement of a patient
+      security:
+        - oAuth2: [doctor]
       parameters:
         - $ref: '#/components/parameters/DietId'
       responses:
         '200':
           description: OK
+        401:
+          description: you are unauthorized to do this
   /dietaryManagement:
     put:
       tags:
         - dietaryManagement
       operationId: PutDietaryManagement
       description: Edits the dietarymanagement of a patient
+      security:
+        - oAuth2: [doctor]
       requestBody:
         $ref: '#/components/requestBodies/dietarymanagment'
       responses:
         '200':
           description: OK
+        401:
+          description: you are unauthorized to do this
+        404:
+          description: this patient is not found
   /dietaryManagement/{patientId}:
     get:
       tags:
         - dietaryManagement
       operationId: GetAllDietaryManagementForPatient
       description: Retrieves all dietarymanagment of the patient
+      security:
+        - oAuth2: [patient, doctor]
       parameters:
         - $ref: '#/components/parameters/patientId'
       responses:
@@ -307,7 +327,12 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Nutrient'
-
+        401:
+          description: you are unauthorized to see these patients dietary manegment
+        403:
+          description: this is not your dietary management
+        404:
+          description: this patient is not found
   #account
   /account/login:
     post:
