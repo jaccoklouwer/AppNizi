@@ -485,6 +485,8 @@ components:
     patient:
       type: object
       properties:
+        account:
+          $ref: '#/components/schemas/Account'
         patientId:
          type: integer
          example: 4334
@@ -499,15 +501,9 @@ components:
          items:
           $ref: '#/components/schemas/weight'
     patients:
-      type: object
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/patient'
-        nextId:
-          type: integer
-          example: 4005
+      type: array
+      items:
+        $ref: '#/components/schemas/patient'
     diary:
       type: object
       required:
@@ -601,27 +597,6 @@ components:
         accountId:
           type: integer
           example: 1
-    # patient:
-    #   type: object
-    #   required:
-    #     - patientId
-    #     - birthdate
-    #     - doctor_id
-    #     - weight
-    #     - diary_id
-    #   properties:
-    #     account:
-    #       $ref: 'components/schema/Account'
-    #     patientId:
-    #      type: integer
-    #     birthdate:
-    #      type: string
-    #     doctor_id:
-    #      type: integer
-    #     weight:
-    #      type: integer
-    #     diary_id:
-    #      type: integer
     Doctor:
       type: object
       required:
@@ -629,7 +604,7 @@ components:
         - location
       properties:
         account:
-          $ref: 'components/schema/Account'
+          $ref: '#/components/schemas/Account'
         doctor_id:
          type: integer
         birthdate:
