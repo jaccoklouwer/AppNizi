@@ -244,6 +244,8 @@ paths:
       tags:
         - account
       description: Registers a new patient
+      security:
+        - oAuth2: [doctor]
       requestBody:
         required: true
         content:
@@ -293,6 +295,8 @@ paths:
       tags:
         - account
       description: sets the patients new password
+      security:
+        - oAuth2: [patient, doctor]
       requestBody:
         required: true
         content:
