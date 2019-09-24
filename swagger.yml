@@ -20,6 +20,7 @@ paths:
     get:
       tags:
         - patients
+      operationId: GetPatients
       description: Retrieve an array of patients.
       responses:
         '200':
@@ -33,6 +34,7 @@ paths:
     post:
       tags:
         - patients
+      operationId: PostPatient
       description: Create a new patient.
       requestBody:
         required: true
@@ -55,6 +57,7 @@ paths:
     get:
       tags:
         - patients
+      operationId: GetMyPatient
       description: Retrieve the current user's patient data.
       responses:
         '200':
@@ -69,6 +72,7 @@ paths:
     get:
       tags:
         - patients
+      operationId: GetPatientByPatientId
       description: Retrieve an existing patient.
       parameters:
         - $ref: '#/components/parameters/patientId'
@@ -82,6 +86,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/patient'
     delete:
+      tags:
+        - patients
+      operationId: DeletePatient
       description: Delete an existing patient.
       parameters:
         - $ref: '#/components/parameters/patientId'
@@ -95,28 +102,11 @@ paths:
       responses:
         '200':
           description: (200) Updated!
-  /patients/{doctorId}:
+  /patients/diary/today:
     get:
       tags:
         - patients
-      description: Retrieve all patients listed under a given doctor.
-      parameters:
-        - $ref: '#/components/parameters/doctorId'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/patients'
-
-  # diaries
-  /diaries/today/me:
-    get:
-      tags:
-        - diaries
+      operationId: GetDiaryForToday
       description: Retrieve the user-patient's diary for today.
       responses:
         '200':
@@ -127,10 +117,11 @@ paths:
                 type: object
                 items:
                   $ref: '#/components/schemas/diary'
-  /diaries/today/{patientId}:
+  /patients/diary/today/{patientId}:
     get:
       tags:
-        - diaries
+        - patients
+      operationId: GetDiaryForTodayByPatientId
       description: Retrieve a given patient's diary for today.
       parameters:
         - $ref: '#/components/parameters/patientId'
@@ -143,11 +134,12 @@ paths:
                 type: object
                 items:
                   $ref: '#/components/schemas/diary'
-  /diaries/{date}/{patientId}:
+  /patients/diary/{date}/{patientId}:
     get:
       tags:
-        - diaries
-      description: Retrieve a given patient's diary for today.
+        - patients
+      operationId: GetDiaryForDateByPatientId
+      description: Retrieve a given patient's diary for a given date.
       parameters:
         - $ref: '#/components/parameters/date'
         - $ref: '#/components/parameters/patientId'
@@ -160,7 +152,25 @@ paths:
                 type: object
                 items:
                   $ref: '#/components/schemas/diary'                
-
+  
+  #doctors
+  /doctors/{doctorId}/patients:
+    get:
+      tags:
+        - doctors
+      operationId: GetPatientsForDoctorId
+      description: Retrieve all patients listed under a given doctor.
+      parameters:
+        - $ref: '#/components/parameters/doctorId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                items:
+                  $ref: '#/components/schemas/patients'
 
   /WaterConsumption:
     post:
@@ -244,8 +254,6 @@ paths:
       tags:
         - account
       description: Registers a new patient
-      security:
-        - oAuth2: [doctor]
       requestBody:
         required: true
         content:
@@ -295,8 +303,6 @@ paths:
       tags:
         - account
       description: sets the patients new password
-      security:
-        - oAuth2: [patient, doctor]
       requestBody:
         required: true
         content:
@@ -485,8 +491,6 @@ components:
     patient:
       type: object
       properties:
-        account:
-          $ref: '#/components/schemas/Account'
         patientId:
          type: integer
          example: 4334
@@ -501,9 +505,15 @@ components:
          items:
           $ref: '#/components/schemas/weight'
     patients:
-      type: array
-      items:
-        $ref: '#/components/schemas/patient'
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/patient'
+        nextId:
+          type: integer
+          example: 4005
     diary:
       type: object
       required:
@@ -564,7 +574,7 @@ components:
         description:
           type: string
           example: This is object number X
-    Account:
+    account:
       type: object
       required:
         - account_id
@@ -597,19 +607,40 @@ components:
         accountId:
           type: integer
           example: 1
-    Doctor:
+    # patient:
+    #   type: object
+    #   required:
+    #     - patientId
+    #     - birthdate
+    #     - doctor_id
+    #     - weight
+    #     - diary_id
+    #   properties:
+    #     account:
+    #       $ref: 'components/schema/Account'
+    #     patientId:
+    #      type: integer
+    #     birthdate:
+    #      type: string
+    #     doctor_id:
+    #      type: integer
+    #     weight:
+    #      type: integer
+    #     diary_id:
+    #      type: integer
+    doctor:
       type: object
       required:
         - doctor_id
         - location
       properties:
         account:
-          $ref: '#/components/schemas/Account'
+          $ref: 'components/schema/Account'
         doctor_id:
          type: integer
         birthdate:
          type: integer
-    PersonalDietaryManagement:
+    personalDietaryManagement:
       type: object
       required:
         - personalDietaryManagement_id
