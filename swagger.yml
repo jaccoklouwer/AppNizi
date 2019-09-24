@@ -13,6 +13,8 @@ servers:
     url: https://virtserver.swaggerhub.com/jaccoklouwer/App_Nizi/1.0.0
   - description: Martin SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/martinstork/AppNiZi/1.0.0
+  - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/KEVIN73/app-nizi_api/1.0.0
 paths:
   
   # patients
@@ -23,6 +25,8 @@ paths:
       operationId: GetPatients
       summary: Returns patients
       description: Retrieve an array of patients.
+      security:
+        - oAuth2: [admin]
       responses:
         '200':
           description: OK
@@ -32,6 +36,12 @@ paths:
                 type: object
                 items:
                   $ref: '#/components/schemas/patients'
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
     post:
       tags:
         - patients
@@ -62,15 +72,23 @@ paths:
       operationId: GetMyPatient
       summary: Returns users's patient
       description: Retrieve the current user's patient data.
+      security:
+        - oAuth2: [patient]
       responses:
         '200':
-          description: OK
+          description: (200) Success.
           content:
             application/json:
               schema:
                 type: object
                 items:
-                  $ref: '#/components/schemas/patient'                
+                  $ref: '#/components/schemas/patient'  
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
   /patients/{patientId}:
     get:
       tags:
@@ -78,6 +96,8 @@ paths:
       operationId: GetPatientByPatientId
       summary: Returns patient with id
       description: Retrieve an existing patient.
+      security:
+        - oAuth2: [doctor]
       parameters:
         - $ref: '#/components/parameters/patientId'
       responses:
@@ -89,6 +109,12 @@ paths:
                 type: object
                 items:
                   $ref: '#/components/schemas/patient'
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
     delete:
       tags:
         - patients
@@ -111,13 +137,15 @@ paths:
       responses:
         '200':
           description: (200) Updated!
-  /patients/diary/today:
+  /patients/me/diary/today:
     get:
       tags:
         - patients
       operationId: GetDiaryForToday
       summary: Returns the user's diary from today
       description: Retrieve the user-patient's diary for today.
+      security:
+        - oAuth2: [patient]
       responses:
         '200':
           description: OK
@@ -127,13 +155,21 @@ paths:
                 type: object
                 items:
                   $ref: '#/components/schemas/diary'
-  /patients/diary/today/{patientId}:
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
+  /patients/{patientId}/diary/today:
     get:
       tags:
         - patients
       operationId: GetDiaryForTodayByPatientId
       summary: Returns a patient's diary from today
       description: Retrieve a given patient's diary for today.
+      security:
+        - oAuth2: [admin]
       parameters:
         - $ref: '#/components/parameters/patientId'
       responses:
@@ -145,6 +181,12 @@ paths:
                 type: object
                 items:
                   $ref: '#/components/schemas/diary'
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
   /patients/diary/{date}/{patientId}:
     get:
       tags:
@@ -163,7 +205,13 @@ paths:
               schema:
                 type: object
                 items:
-                  $ref: '#/components/schemas/diary'                
+                  $ref: '#/components/schemas/diary' 
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
   
   #doctors
   /doctors/{doctorId}/patients:
