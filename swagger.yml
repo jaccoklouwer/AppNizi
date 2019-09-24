@@ -21,6 +21,7 @@ paths:
       tags:
         - patients
       operationId: GetPatients
+      summary: Returns patients
       description: Retrieve an array of patients.
       responses:
         '200':
@@ -35,6 +36,7 @@ paths:
       tags:
         - patients
       operationId: PostPatient
+      summary: Creates a patient
       description: Create a new patient.
       requestBody:
         required: true
@@ -58,6 +60,7 @@ paths:
       tags:
         - patients
       operationId: GetMyPatient
+      summary: Returns users's patient
       description: Retrieve the current user's patient data.
       responses:
         '200':
@@ -73,6 +76,7 @@ paths:
       tags:
         - patients
       operationId: GetPatientByPatientId
+      summary: Returns patient with id
       description: Retrieve an existing patient.
       parameters:
         - $ref: '#/components/parameters/patientId'
@@ -89,6 +93,7 @@ paths:
       tags:
         - patients
       operationId: DeletePatient
+      summary: Deletes a patient
       description: Delete an existing patient.
       parameters:
         - $ref: '#/components/parameters/patientId'
@@ -96,6 +101,10 @@ paths:
         '200':
           description: (200) Removed!
     patch:
+      tags:
+        - patients
+      operationId: PatchPatient
+      summary: Patches a patient
       description: Patch an existing patient.
       parameters:
         - $ref: '#/components/parameters/patientId'
@@ -107,6 +116,7 @@ paths:
       tags:
         - patients
       operationId: GetDiaryForToday
+      summary: Returns the user's diary from today
       description: Retrieve the user-patient's diary for today.
       responses:
         '200':
@@ -122,6 +132,7 @@ paths:
       tags:
         - patients
       operationId: GetDiaryForTodayByPatientId
+      summary: Returns a patient's diary from today
       description: Retrieve a given patient's diary for today.
       parameters:
         - $ref: '#/components/parameters/patientId'
@@ -139,6 +150,7 @@ paths:
       tags:
         - patients
       operationId: GetDiaryForDateByPatientId
+      summary: Returns a patient's diary for a given date
       description: Retrieve a given patient's diary for a given date.
       parameters:
         - $ref: '#/components/parameters/date'
@@ -159,6 +171,7 @@ paths:
       tags:
         - doctors
       operationId: GetPatientsForDoctorId
+      summary: Returns all patients from a doctor
       description: Retrieve all patients listed under a given doctor.
       parameters:
         - $ref: '#/components/parameters/doctorId'
@@ -177,7 +190,7 @@ paths:
         - doctors
       operationId: GetAllPatientsForDoctor
       summary: Returns patient id's from doctor
-      description: Retrieves all patients for logged-in doctor
+      description: Retrieves all patients for logged-in doctor.
       security:
         - oAuth2: [doctor]
       responses:
@@ -203,8 +216,8 @@ paths:
       tags:
         - doctors
       operationId: GetPatientByPatientIdForLoggedInDoctor
-      summary: Returns patient
-      description: Retrieves specific patient for logged-in doctor
+      summary: Returns a patient
+      description: Retrieves specific patient for logged-in doctor.
       security:
         - oAuth2: [doctor]
       parameters:
@@ -223,8 +236,8 @@ paths:
       tags:
         - doctors
       operationId: GetWeekdiaryForPatientId
-      summary: Returns weekdiary from patient
-      description: Retrieves all patients for logged-in doctor
+      summary: Returns the weekdiary from a patient
+      description: Retrieves the weekdiary for a patient for the logged-in doctor.
       security:
         - oAuth2: [doctor]
       parameters:
@@ -249,7 +262,8 @@ paths:
       tags:
         - waterConsumption
       operationId: PostWaterConsumption
-      description: insert the WaterConsumption
+      summary: Inserts the waterconsumption
+      description: Insert the WaterConsumption.
       security:
         - oAuth2: [patient]
       requestBody:
@@ -264,7 +278,8 @@ paths:
       tags:
         - waterConsumption
       operationId: GetWaterConsumptionByPatientId
-      description: get the WaterConsumption of a patient
+      summary: Returns the waterconsumption of a patient
+      description: get the WaterConsumption of a patient.
       security:
         - oAuth2: [patient, doctor]
       parameters:
@@ -281,7 +296,8 @@ paths:
       tags:
         - dietaryManagement
       operationId: DeleteMyDietaryManagement
-      description: Deletes the dietarymanagement of a patient
+      summary: Deletes the diatarymanagement of a patient
+      description: Deletes the dietarymanagement of a patient.
       security:
         - oAuth2: [doctor]
       parameters:
@@ -296,7 +312,8 @@ paths:
       tags:
         - dietaryManagement
       operationId: PutDietaryManagement
-      description: Edits the dietarymanagement of a patient
+      summary: Edits the dietarymanagement of a patient
+      description: Edits the dietarymanagement of a patient.
       security:
         - oAuth2: [doctor]
       requestBody:
@@ -313,7 +330,8 @@ paths:
       tags:
         - dietaryManagement
       operationId: GetAllDietaryManagementForPatient
-      description: Retrieves all dietarymanagment of the patient
+      summary: Returns all nutrients of a patient
+      description: Retrieves all dietarymanagment of the patient.
       security:
         - oAuth2: [patient, doctor]
       parameters:
@@ -339,7 +357,8 @@ paths:
       tags:
         - account
       operationId: Login
-      description: Logs user in
+      summary: Logs user in
+      description: Logs user in.
       requestBody:
         required: true
         content:
@@ -371,7 +390,8 @@ paths:
       tags:
         - account
       operationId: Register
-      description: Registers a new patient
+      summary: Registers a patient
+      description: Registers a new patient.
       requestBody:
         required: true
         content:
@@ -398,7 +418,8 @@ paths:
       tags:
         - account
       operationId: RegisterDoctor
-      description: Registers a new doctor
+      summary: Registers a doctor
+      description: Registers a new doctor.
       requestBody:
         required: true
         content:
@@ -422,7 +443,8 @@ paths:
       tags:
         - account
       operationId: PutPassword
-      description: sets the patients new password
+      summary: Sets a patient's password
+      description: Sets the patient's new password.
       requestBody:
         required: true
         content:
