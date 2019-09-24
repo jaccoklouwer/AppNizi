@@ -170,11 +170,11 @@ paths:
       responses:
         '200':
           description: OK
-  /WaterConsumption/{patient_id}:
+  /WaterConsumption/{patientId}:
     get:
       description: get the WaterConsumption of a patient
       parameters:
-        - $ref: '#/components/parameters/patient_id' 
+        - $ref: '#/components/parameters/patientId' 
       responses:
         '200':
           description: OK
@@ -194,11 +194,11 @@ paths:
       responses:
         '200':
           description: OK
-  /dietaryManagement/{patient_id}:
+  /dietaryManagement/{patientId}:
     get:
       description: Retrieves all dietarymanagment of the patient
       parameters:
-        - $ref: '#/components/parameters/patient_id'
+        - $ref: '#/components/parameters/patientId'
       responses:
         '200':
           description: OK
@@ -239,7 +239,7 @@ paths:
                     example: "1-4343-47637-43764383-4637673"
         '401':
           description: not authorized to login? maybe you made a typo?
-  /account/registerPatient:
+  /account/registerpatient:
     post:
       tags:
         - account
@@ -262,7 +262,7 @@ paths:
                     example: benito franco
       responses:
         '200':
-          description: Patient registered and ready to party
+          description: patient registered and ready to party
         '401':
           description: not authorized to register a patient(are you logged in as a doctor?)
   /account/registerDoctor:
@@ -288,7 +288,7 @@ paths:
           description: Doctor registered
         '401':
           description: not authorized to update             
-  /account/updatePatient:
+  /account/updatepatient:
     put:
       tags:
         - account
@@ -305,7 +305,7 @@ paths:
                     example: supersecretpassword2
       responses:
         '200':
-          description: Patient updated
+          description: patient updated
         '401':
           description: not authorized to login 
   /doctor/patients:
@@ -334,7 +334,7 @@ paths:
                     id: 2
         '401':
           description: Not authorized to get patients
-  /doctor/patients/{patient_id}:
+  /doctor/patients/{patientId}:
     get:
       tags:
         - doctor
@@ -343,17 +343,17 @@ paths:
       security:
         - oAuth2: [doctor]
       parameters:
-        - $ref: '#/components/parameters/patient_id'
+        - $ref: '#/components/parameters/patientId'
       responses:
         '200':
           description: Succesfully retrieved patient
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Patient'
+                $ref: '#/components/schemas/patient'
         '401':
           description: Not authorized to get patient
-  /doctor/patients/{patient_id}/weekDiary:
+  /doctor/patients/{patientId}/weekDiary:
     get:
       tags:
         - doctor
@@ -362,7 +362,7 @@ paths:
       security:
         - oAuth2: [doctor]
       parameters:
-        - $ref: '#/components/parameters/patient_id'
+        - $ref: '#/components/parameters/patientId'
       responses:
         '200':
           description: Succesfully retrieved patients
@@ -371,7 +371,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Dairy'
+                  $ref: '#/components/schemas/diary'
         '400':
           description: Bad input parameter
         '401':
@@ -396,7 +396,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Food'
+                $ref: '#/components/schemas/food'
         400:
           description: Failed
           content:
@@ -416,7 +416,7 @@ paths:
       security:
         - oAuth2: [patient]    
       requestBody:
-        $ref: '#/components/requestBodies/AddFood'
+        $ref: '#/components/requestBodies/Addfood'
       responses:
         200:
           description: Succesful
@@ -497,10 +497,10 @@ components:
     patients:
       type: object
       properties:
-      results:
-        type: array
-        items:
-          $ref: '#/components/schemas/patient'
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/patient'
         nextId:
           type: integer
           example: 4005
@@ -515,7 +515,7 @@ components:
         patientId:
          type: integer
          example: 4334
-        consumedFoods:
+        consumedfoods:
          type: array
          items:
            $ref: '#/components/schemas/foodConsumption'
@@ -576,7 +576,7 @@ components:
       properties:
         account_id:
           type: integer
-        patient_id:
+        patientId:
           type: integer
         doctor_id:
           type: integer
@@ -597,18 +597,18 @@ components:
         accountId:
           type: integer
           example: 1
-    # Patient:
+    # patient:
     #   type: object
     #   required:
-    #     - patient_id
+    #     - patientId
     #     - birthdate
     #     - doctor_id
     #     - weight
-    #     - dairy_id
+    #     - diary_id
     #   properties:
     #     account:
     #       $ref: 'components/schema/Account'
-    #     patient_id:
+    #     patientId:
     #      type: integer
     #     birthdate:
     #      type: string
@@ -616,7 +616,7 @@ components:
     #      type: integer
     #     weight:
     #      type: integer
-    #     dairy_id:
+    #     diary_id:
     #      type: integer
     Doctor:
       type: object
@@ -635,7 +635,7 @@ components:
       required:
         - personalDietaryManagement_id
         - maxAmount
-        - patient_id
+        - patientId
         - dietaryManagement_id
         - active
         - desirableAmount
@@ -644,7 +644,7 @@ components:
          type: integer
         maxAmount:
          type: string
-        patient_id:
+        patientId:
          type: integer
         dietaryManagement_id:
          type: integer
@@ -668,7 +668,7 @@ components:
         - water_id
         - date
         - amount
-        - patient_id
+        - patientId
       properties:
         water_id:
          type: integer
@@ -676,19 +676,8 @@ components:
          type: string
         amount:
          type: string
-        patient_id:
+        patientId:
          type: integer
-    diary:
-      type: object
-      required:
-        - dairy_id
-        - patient_id
-      properties:
-        dairy_id:
-          type: integer
-        patient_id:
-          type: integer
-
     food:
       type: array
       required:
@@ -706,7 +695,7 @@ components:
         - foodId: 3308
           foodName: Aardbei
 
-    addingFood:
+    addingfood:
       type: object
       required:
         - foodConsumptionId
@@ -731,7 +720,7 @@ components:
       type: object
       required:
         - foodConsumptionId
-        - dairyId
+        - diaryId
         - foodName
         - amount
         - date
@@ -743,7 +732,7 @@ components:
       properties:
         food_id:
          type: integer
-        dairy_id:
+        diary_id:
          type: integer
         foodName:
          type: string
@@ -787,13 +776,19 @@ components:
         type: string
         example: "2019-08-30"
     DietId:
-      name: dietId
+      name: DietId
       in: path
       required: true
       description: the id of the diet
       schema:
         type: integer
-  
+    doctorId:
+      name: doctorId
+      in: path
+      required: true
+      description: the id of the doctor
+      schema:
+        type: integer
   requestBodies:
     dietarymanagment:
       description: the diet management that needs to be updated
@@ -808,14 +803,14 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/WaterConsumption'
-    AddFood:
+            $ref: '#/components/schemas/waterConsumption'
+    Addfood:
       description: Add the amount of a specific food Item to the diary
       required: true
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/AddingFood'
+            $ref: '#/components/schemas/addingfood'
 
   securitySchemes:
     oAuth2: 
