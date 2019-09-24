@@ -173,6 +173,8 @@ paths:
       operationId: GetPatientsForDoctorId
       summary: Returns patient id's from a doctor
       description: Retrieve all patients listed under a given doctor.
+      security:
+        - oAuth2: [admin]
       parameters:
         - $ref: '#/components/parameters/doctorId'
       responses:
@@ -921,4 +923,5 @@ components:
             read: example read scope
             patient: Only patients
             doctor: Only Doctors
+            admin: Only for administrators
             write: example write scope
