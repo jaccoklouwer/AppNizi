@@ -171,7 +171,7 @@ paths:
       tags:
         - doctors
       operationId: GetPatientsForDoctorId
-      summary: Returns all patients from a doctor
+      summary: Returns patient id's from a doctor
       description: Retrieve all patients listed under a given doctor.
       parameters:
         - $ref: '#/components/parameters/doctorId'
@@ -181,9 +181,18 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: array
                 items:
-                  $ref: '#/components/schemas/patients'
+                  type: object
+                  items:
+                    $ref: '#/components/schemas/AccountNameAndId'
+                example:
+                  - name: 'John Doe'
+                    id: 1
+                  - name: 'Susan Smith'
+                    id: 2
+        '401':
+          description: Not authorized to get patients
   /doctor/patients:
     get:
       tags:
