@@ -171,9 +171,84 @@ paths:
                 type: object
                 items:
                   $ref: '#/components/schemas/patients'
-
-  /WaterConsumption:
+  /doctor/patients:
+    get:
+      tags:
+        - doctors
+      operationId: GetAllPatientsForDoctor
+      summary: Returns patient id's from doctor
+      description: Retrieves all patients for logged-in doctor
+      security:
+        - oAuth2: [doctor]
+      responses:
+        '200':
+          description: Succesfully retrieved patients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  items:
+                    $ref: '#/components/schemas/AccountNameAndId'
+                example:
+                  - name: 'John Doe'
+                    id: 1
+                  - name: 'Susan Smith'
+                    id: 2
+        '401':
+          description: Not authorized to get patients
+  /doctor/patients/{patientId}:
+    get:
+      tags:
+        - doctors
+      operationId: GetPatientByPatientIdForLoggedInDoctor
+      summary: Returns patient
+      description: Retrieves specific patient for logged-in doctor
+      security:
+        - oAuth2: [doctor]
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+      responses:
+        '200':
+          description: Succesfully retrieved patient
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/patient'
+        '401':
+          description: Not authorized to get patient
+  /doctor/patients/{patientId}/weekDiary:
+    get:
+      tags:
+        - doctors
+      operationId: GetWeekdiaryForPatientId
+      summary: Returns weekdiary from patient
+      description: Retrieves all patients for logged-in doctor
+      security:
+        - oAuth2: [doctor]
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+      responses:
+        '200':
+          description: Succesfully retrieved patients
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/diary'
+        '400':
+          description: Bad input parameter
+        '401':
+          description: Not authorized to get week-diary of patient       
+  
+  #waterConsumption
+  /waterConsumption:
     post:
+      tags:
+        - waterConsumption
+      operationId: PostWaterConsumption
       description: insert the WaterConsumption
       requestBody:
         $ref: '#/components/requestBodies/WaterConsumption'
@@ -182,14 +257,22 @@ paths:
           description: OK
   /WaterConsumption/{patientId}:
     get:
+      tags:
+        - waterConsumption
+      operationId: GetWaterConsumptionByPatientId
       description: get the WaterConsumption of a patient
       parameters:
         - $ref: '#/components/parameters/patientId' 
       responses:
         '200':
           description: OK
+          
+  #dietaryManagement
   /personaldietarymanagement/{DietId}:
     delete:
+      tags:
+        - dietaryManagement
+      operationId: DeleteMyDietaryManagement
       description: Deletes the dietarymanagement of a patient
       parameters:
         - $ref: '#/components/parameters/DietId'
@@ -198,6 +281,9 @@ paths:
           description: OK
   /dietaryManagement:
     put:
+      tags:
+        - dietaryManagement
+      operationId: PutDietaryManagement
       description: Edits the dietarymanagement of a patient
       requestBody:
         $ref: '#/components/requestBodies/dietarymanagment'
@@ -206,6 +292,9 @@ paths:
           description: OK
   /dietaryManagement/{patientId}:
     get:
+      tags:
+        - dietaryManagement
+      operationId: GetAllDietaryManagementForPatient
       description: Retrieves all dietarymanagment of the patient
       parameters:
         - $ref: '#/components/parameters/patientId'
@@ -218,10 +307,13 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Nutrient'
+
+  #account
   /account/login:
     post:
       tags:
         - account
+      operationId: Login
       description: Logs user in
       requestBody:
         required: true
@@ -253,6 +345,7 @@ paths:
     post:
       tags:
         - account
+      operationId: Register
       description: Registers a new patient
       requestBody:
         required: true
@@ -279,6 +372,7 @@ paths:
     post:
       tags:
         - account
+      operationId: RegisterDoctor
       description: Registers a new doctor
       requestBody:
         required: true
@@ -302,6 +396,7 @@ paths:
     put:
       tags:
         - account
+      operationId: PutPassword
       description: sets the patients new password
       requestBody:
         required: true
@@ -318,78 +413,14 @@ paths:
           description: patient updated
         '401':
           description: not authorized to login 
-  /doctor/patients:
-    get:
-      tags:
-        - doctor
-      summary: Returns patient id's from doctor
-      description: Retrieves all patients for logged-in doctor
-      security:
-        - oAuth2: [doctor]
-      responses:
-        '200':
-          description: Succesfully retrieved patients
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  items:
-                    $ref: '#/components/schemas/AccountNameAndId'
-                example:
-                  - name: 'John Doe'
-                    id: 1
-                  - name: 'Susan Smith'
-                    id: 2
-        '401':
-          description: Not authorized to get patients
-  /doctor/patients/{patientId}:
-    get:
-      tags:
-        - doctor
-      summary: Returns patient
-      description: Retrieves specific patient for logged-in doctor
-      security:
-        - oAuth2: [doctor]
-      parameters:
-        - $ref: '#/components/parameters/patientId'
-      responses:
-        '200':
-          description: Succesfully retrieved patient
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/patient'
-        '401':
-          description: Not authorized to get patient
-  /doctor/patients/{patientId}/weekDiary:
-    get:
-      tags:
-        - doctor
-      summary: Returns weekdiary from patient
-      description: Retrieves all patients for logged-in doctor
-      security:
-        - oAuth2: [doctor]
-      parameters:
-        - $ref: '#/components/parameters/patientId'
-      responses:
-        '200':
-          description: Succesfully retrieved patients
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/diary'
-        '400':
-          description: Bad input parameter
-        '401':
-          description: Not authorized to get week-diary of patient       
+          
+          
+  #food
   /food:
     get:
       tags:
         - food
+      operationId: GetFood
       summary: Get the name and ID from the database
       description: Get method that returns a food name from the input of the user. This method can be called while the user types the name.
       security:
@@ -421,6 +452,7 @@ paths:
     post:
       tags:
         - food
+      operationId: PostFoodItem
       summary: Add amount of a food item to the diary
       description: The user can put an amount of food (in grams) in their diary.
       security:
@@ -438,6 +470,7 @@ paths:
     delete:
       tags:
         - food
+      operationId: DeleteFoodItem
       summary: Delete a food item from the diary of the user
       description: Get method that returns a food name from the input of the user. This method can be called while the user types the name.
       security:
