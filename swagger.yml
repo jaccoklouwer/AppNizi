@@ -48,6 +48,8 @@ paths:
       operationId: PostPatient
       summary: Creates a patient
       description: Create a new patient.
+      security:
+        - oAuth2: [admin]
       requestBody:
         required: true
         content:
@@ -121,6 +123,8 @@ paths:
       operationId: DeletePatient
       summary: Deletes a patient
       description: Delete an existing patient.
+      security:
+        - oAuth2: [admin]
       parameters:
         - $ref: '#/components/parameters/patientId'
       responses:
@@ -132,6 +136,8 @@ paths:
       operationId: PatchPatient
       summary: Patches a patient
       description: Patch an existing patient.
+      security:
+        - oAuth2: [doctor]
       parameters:
         - $ref: '#/components/parameters/patientId'
       responses:
@@ -187,13 +193,15 @@ paths:
           description: (401) Not authorized.
         '404':
           description: (404) Resource not found.
-  /patients/diary/{date}/{patientId}:
+  /patients/{patientId}/diary/{date}/:
     get:
       tags:
         - patients
       operationId: GetDiaryForDateByPatientId
       summary: Returns a patient's diary for a given date
       description: Retrieve a given patient's diary for a given date.
+      security:
+        - oAuth2: [doctor]
       parameters:
         - $ref: '#/components/parameters/date'
         - $ref: '#/components/parameters/patientId'
@@ -451,6 +459,8 @@ paths:
       operationId: Register
       summary: Registers a patient
       description: Registers a new patient.
+      security:
+        - oAuth2: [doctor]
       requestBody:
         required: true
         content:
@@ -479,6 +489,8 @@ paths:
       operationId: RegisterDoctor
       summary: Registers a doctor
       description: Registers a new doctor.
+      security:
+        - oAuth2: [admin]
       requestBody:
         required: true
         content:
@@ -494,9 +506,9 @@ paths:
                     example: supersecretpassword
       responses:
         '200':
-          description: Doctor registered
+          description: doctor registered
         '401':
-          description: not authorized to update             
+          description: not authorized to register a doctor             
   /account/updatepatient:
     put:
       tags:
@@ -504,6 +516,8 @@ paths:
       operationId: PutPassword
       summary: Sets a patient's password
       description: Sets the patient's new password.
+      security:
+        - oAuth2: [patient]
       requestBody:
         required: true
         content:
