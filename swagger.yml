@@ -324,17 +324,19 @@ paths:
                 $ref: '#/components/schemas/patient'
         '401':
           description: Not authorized to get patient
-  /doctor/patients/{patientId}/weekDiary:
+  /doctor/patients/{patientId}/periodDiary:
     get:
       tags:
         - doctors
-      operationId: GetWeekdiaryForPatientId
-      summary: Returns the weekdiary from a patient
-      description: Retrieves the weekdiary for a patient for the logged-in doctor.
+      operationId: GetperioddiaryForPatientId
+      summary: Returns the perioddiary from a patient
+      description: Retrieves the perioddiary for a patient for the logged-in doctor.
       security:
         - oAuth2: [doctor]
       parameters:
         - $ref: '#/components/parameters/patientId'
+        - $ref: '#/components/parameters/beginDate'
+        - $ref: '#/components/parameters/endDate'
       responses:
         '200':
           description: Succesfully retrieved patients
@@ -347,7 +349,7 @@ paths:
         '400':
           description: Bad input parameter
         '401':
-          description: Not authorized to get week-diary of patient       
+          description: Not authorized to get period-diary of patient       
   
   #waterConsumption
   /waterConsumption:
@@ -939,7 +941,6 @@ components:
          type: string
         sodium:
          type: string
-  
   responses:
     NotFound:
       description: Not found
@@ -949,6 +950,22 @@ components:
             $ref: '#/components/schemas/Error'
   
   parameters:
+    endDate:
+      name: endDate
+      in: query
+      required: true
+      description: the end of a period
+      schema:
+        type: string
+        example: "2019-09-30"
+    beginDate:
+      name: beginDate
+      in: query
+      required: true
+      description: the beginning of a period
+      schema:
+        type: string
+        example: "2019-08-30"
     patientId:
       name: patientId
       in: path
