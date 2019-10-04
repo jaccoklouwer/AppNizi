@@ -7,13 +7,13 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
-  - description: SwaggerHub API Auto Mocking
+  - description: Anne SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/McSmoker/NierZiektenConcept/1.0.0/
-  - description: SwaggerHub API Auto Mocking
+  - description: Jacco SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/jaccoklouwer/App_Nizi/1.0.0
   - description: Martin SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/martinstork/AppNiZi/1.0.0
-  - description: SwaggerHub API Auto Mocking
+  - description: Kevin SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/KEVIN73/app-nizi_api/1.0.0
 paths:
   
@@ -672,6 +672,8 @@ components:
     patient:
       type: object
       properties:
+        account:
+         $ref: 'components/schema/Account'
         patientId:
          type: integer
          example: 4334
@@ -788,27 +790,6 @@ components:
         accountId:
           type: integer
           example: 1
-    # patient:
-    #   type: object
-    #   required:
-    #     - patientId
-    #     - birthdate
-    #     - doctor_id
-    #     - weight
-    #     - diary_id
-    #   properties:
-    #     account:
-    #       $ref: 'components/schema/Account'
-    #     patientId:
-    #      type: integer
-    #     birthdate:
-    #      type: string
-    #     doctor_id:
-    #      type: integer
-    #     weight:
-    #      type: integer
-    #     diary_id:
-    #      type: integer
     doctor:
       type: object
       required:
