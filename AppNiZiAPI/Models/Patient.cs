@@ -9,7 +9,7 @@ namespace AppNiZiAPI.Models
         public int PatientId { get; set; }
         public int DoctorId { get; set; }
         public DateTime Birthday { get; set; }
-        // TODO: public Weight weight { get; set; }
+        public Weight Weight { get; set; }
 
     }
 }
