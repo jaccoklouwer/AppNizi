@@ -16,9 +16,9 @@ namespace AppNiZiAPI
     {
         // Functie naam zelfde als Methode naam (Normaal staat er "Run", deze kan je gewoon veranderen naar iets anders)
         // Zet in de HttpTrigger de Route op de goede route van Routes.cs. Zet altijd eerst Routes.APIVersion ervoor. Zodat het dus "api/v1/patients/me" wordt
-        [FunctionName("GetMe")]
-        public static async Task<IActionResult> GetMe(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.Me))] HttpRequest req,
+        [FunctionName("GetMyPatient")]
+        public static async Task<IActionResult> GetMyPatient(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.Patients + Routes.Me))] HttpRequest req,
             ILogger log)
         {
             var connString = Environment.GetEnvironmentVariable("sqldb_connection");
