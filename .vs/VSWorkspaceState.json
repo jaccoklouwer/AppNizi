@@ -1,13 +1,6 @@
 {
   "ExpandedNodes": [
-    "",
-    "\\AppNiZiAPI",
-    "\\AppNiZiAPI\\Models",
-    "\\MockAppNizi",
-    "\\MockAppNizi\\src",
-    "\\MockAppNizi\\src\\IO.Swagger",
-    "\\MockAppNizi\\src\\IO.Swagger\\Models"
+    ""
   ],
-  "SelectedNode": "\\AppNiZiAPI\\Models\\Patient.cs",
   "PreviewInSolutionExplorer": false
 }
