@@ -859,31 +859,31 @@ components:
          type: string
         patientId:
          type: integer
-    food:
-      type: object
-      required:
-        - foodConsumptionId
-        - diaryId
-        - amount
-        - date
-      properties:
-        foodId:
-         type: integer
-         example: 4334
-        diaryId:
-         type: integer
-         example: 742
-        amount:
-          type: integer
-          example: 200
-        date:
-         type: string
-         example: "2018-06-13"
+    # food:
+    #   type: object
+    #   required:
+    #     - foodConsumptionId
+    #     - diaryId
+    #     - amount
+    #     - date
+    #   properties:
+    #     foodId:
+    #      type: integer
+    #      example: 4334
+    #     diaryId:
+    #      type: integer
+    #      example: 742
+    #     amount:
+    #       type: integer
+    #       example: 200
+    #     date:
+    #      type: string
+    #      example: "2018-06-13"
 
-    foodConsumption:
+    consumption:
       type: object
       required:
-        - foodConsumptionId
+        - id
         - diaryId
         - foodName
         - amount
