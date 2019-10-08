@@ -30,7 +30,7 @@ namespace IO.Swagger.Models
         /// Gets or Sets Account
         /// </summary>
         [DataMember(Name="account")]
-        public ComponentsschemaAccount Account { get; set; }
+        public Account Account { get; set; }
 
         /// <summary>
         /// Gets or Sets DoctorId
