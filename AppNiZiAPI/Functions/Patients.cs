@@ -21,11 +21,8 @@ namespace AppNiZiAPI
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.Me))] HttpRequest req,
             ILogger log)
         {
-            // Connectie string naar Azure SQL Datebase, deze moet nog aangemaakt worden in Portal. Daarna de Database toevoegen via
-            // Publish -> Add Depencies. Daarna de connection string toevoegen via Publish -> Edit Azure App Service Settings -> Add
-            // Dan de setting noemen naar "sqldb_connection", daarna in local en remote de ADO.NET connection string plakken (wijzig nog wel wachtwoord in de string)
             var connString = Environment.GetEnvironmentVariable("sqldb_connection");
-            int accountId = 0;
+            var accountId = 0;
 
             using (SqlConnection conn = new SqlConnection(connString))
             {
