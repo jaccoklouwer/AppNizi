@@ -25,7 +25,7 @@ namespace AppNiZiAPI
             // Publish -> Add Depencies. Daarna de connection string toevoegen via Publish -> Edit Azure App Service Settings -> Add
             // Dan de setting noemen naar "sqldb_connection", daarna in local en remote de ADO.NET connection string plakken (wijzig nog wel wachtwoord in de string)
             var connString = Environment.GetEnvironmentVariable("sqldb_connection");
-            int accountId = 0;
+            var accountId = 0;
 
             using (SqlConnection conn = new SqlConnection(connString))
             {

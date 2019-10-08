@@ -20,5 +20,8 @@ namespace AppNiZiAPI.Variables
         // Water Consumption
         public const string PostWaterConsumption = "/waterConsumption";
         public const string GetWaterConsumption = "/waterconsumption/{patientId: int}";
+
+        // DietaryManagement
+        public const string DietaryManagement = "/dietaryManagement";
     }
 }
