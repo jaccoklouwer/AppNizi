@@ -1,6 +1,10 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\AppNiZiAPI",
+    "\\AppNiZiAPI\\Functions",
+    "\\AppNiZiAPI\\Variables"
   ],
+  "SelectedNode": "\\AppNiZiAPI\\Functions\\Patients.cs",
   "PreviewInSolutionExplorer": false
 }

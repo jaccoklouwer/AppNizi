@@ -135,6 +135,12 @@ paths:
       responses:
         '200':
           description: (200) Removed!
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
     patch:
       tags:
         - patients
@@ -148,6 +154,12 @@ paths:
       responses:
         '200':
           description: (200) Updated!
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
   /patients/me/diary/today:
     get:
       tags:
@@ -281,35 +293,6 @@ paths:
           description: (404) Resource not found.
   
   #doctors
-  /doctors/{doctorId}/patients:
-    get:
-      tags:
-        - doctors
-      operationId: GetPatientsForDoctorId
-      summary: Returns patient id's from a doctor
-      description: Retrieve all patients listed under a given doctor.
-      security:
-        - oAuth2: [admin]
-      parameters:
-        - $ref: '#/components/parameters/doctorId'
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: object
-                  items:
-                    $ref: '#/components/schemas/AccountNameAndId'
-                example:
-                  - name: 'John Doe'
-                    id: 1
-                  - name: 'Susan Smith'
-                    id: 2
-        '401':
-          description: Not authorized to get patients
   /doctor/patients:
     get:
       tags:
@@ -327,14 +310,7 @@ paths:
               schema:
                 type: array
                 items:
-                  type: object
-                  items:
-                    $ref: '#/components/schemas/AccountNameAndId'
-                example:
-                  - name: 'John Doe'
-                    id: 1
-                  - name: 'Susan Smith'
-                    id: 2
+                  $ref: '#/components/schemas/patient'
         '401':
           description: Not authorized to get patients
   /doctor/patients/{patientId}:
@@ -355,8 +331,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/patient'
+        '400':
+          description: (400) Bad request. Data malformed?
         '401':
-          description: Not authorized to get patient
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
   /doctor/patients/{patientId}/periodDiary:
     get:
       tags:
@@ -380,10 +360,11 @@ paths:
                 items:
                   $ref: '#/components/schemas/diary'
         '400':
-          description: Bad input parameter
+          description: (400) Bad request. Data malformed?
         '401':
-          description: Not authorized to get period-diary of patient       
-  
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
   #waterConsumption
   /waterConsumption:
     post:
@@ -399,8 +380,12 @@ paths:
       responses:
         '200':
           description: OK
-        401:
-          description: you are unauthorized to do this
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
   /WaterConsumption/{patientId}:
     get:
       tags:
@@ -415,11 +400,14 @@ paths:
       responses:
         '200':
           description: OK
-        401:
-          description: you are unauthorized to do this
-          
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
   #dietaryManagement
-  /personaldietarymanagement/{dietId}:
+  /dietarymanagement/{DietId}:
     delete:
       tags:
         - dietaryManagement
@@ -433,8 +421,12 @@ paths:
       responses:
         '200':
           description: OK
-        401:
-          description: you are unauthorized to do this
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
   /dietaryManagement:
     put:
       tags:
@@ -449,10 +441,12 @@ paths:
       responses:
         '200':
           description: OK
-        401:
-          description: you are unauthorized to do this
-        404:
-          description: this patient is not found
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
   /dietaryManagement/{patientId}:
     get:
       tags:
@@ -542,7 +536,11 @@ paths:
         '200':
           description: patient registered and ready to party
         '401':
-          description: not authorized to register a patient(are you logged in as a doctor?)
+          description: not authorized to register a patient
+        '400':
+          description: (400) Bad request. Data malformed?
+        '404':
+          description: (404) Resource not found.
   /account/registerDoctor:
     post:
       tags:
@@ -569,7 +567,11 @@ paths:
         '200':
           description: doctor registered
         '401':
-          description: not authorized to register a doctor             
+          description: not authorized to register a doctor     
+        '400':
+          description: (400) Bad request. Data malformed?
+        '404':
+          description: (404) Resource not found.
   /account/updatepatient:
     put:
       tags:
@@ -594,8 +596,10 @@ paths:
           description: patient updated
         '401':
           description: not authorized to login 
-          
-          
+        '400':
+          description: (400) Bad request. Data malformed?
+        '404':
+          description: (404) Resource not found.
   #food
   /food:
     get:
@@ -687,7 +691,11 @@ paths:
                 items:
                   $ref: '#/components/schemas/TestObject'
         '400':
-          description: bad input parameter
+          description: (400) Bad request.
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
 components:
   schemas:
     weight:
@@ -701,27 +709,29 @@ components:
          example: "83.50"
         unit:
          type: string
+         enum:
+           - "kg"
+           - "g"
+           - "mg"
+           - "lb"
+           - "oz"
          example: "kg"
     patient:
-      type: object
-      properties:
-        account:
-         type: object
-         items:
-          $ref: '#/components/schemas/account'
-        patientId:
-         type: integer
-         example: 4334
-        doctorId:
-         type: integer
-         example: 123
-        birthdate:
-         type: string
-         example: "2019-08-30"
-        weight:
-         type: object
-         items:
-          $ref: '#/components/schemas/weight'
+      allOf:
+        - $ref: '#/components/schemas/account'
+        - type: object
+          properties:
+            patientId:
+              type: integer
+              example: 4334
+            doctorId:
+              type: integer
+              example: 123
+            birthdate:
+              type: string
+              example: "2019-08-30"
+            weight:
+              $ref: '#/components/schemas/weight'
     diary:
       type: object
       required:
@@ -740,18 +750,6 @@ components:
         representingDate:
          type: string
          example: "2019-08-30"
-
-    updatedDietmangement:
-      type: object
-      properties:
-        DietId:
-          type: integer
-        Amount:
-          type: integer
-        patientId:
-          type: integer
-        doctorId:
-          type: integer
     Nutrient:
       type: object
       properties:
@@ -786,7 +784,6 @@ components:
       type: object
       required:
         - account_id
-        - doctor_id
         - name
         - password
         - passwordSalt
@@ -796,8 +793,6 @@ components:
           type: integer
         patientId:
           type: integer
-        doctor_id:
-          type: integer
         name:
           type: string
         password:
@@ -806,56 +801,45 @@ components:
           type: string
         email:
           type: string
-    AccountNameAndId:
-      type: object
-      properties:
-        name:
-          type: string
-          example: 'John Doe'
-        accountId:
-          type: integer
-          example: 1
     doctor:
+      allOf:
+        - $ref: '#/components/schemas/account'
+        - type: object
+          required:
+            - doctor_id
+            - location
+          properties:
+            doctor_id:
+             type: integer
+            birthdate:
+             type: integer
+    dietarymanagement:
       type: object
       required:
-        - doctor_id
-        - location
-      properties:
-        account:
-          $ref: '#/components/schemas/account'
-        doctor_id:
-         type: integer
-        birthdate:
-         type: integer
-    personalDietaryManagement:
-      type: object
-      required:
-        - personalDietaryManagement_id
+        - dietarymanagement_id
         - maxAmount
         - patientId
         - dietaryManagement_id
         - active
         - desirableAmount
       properties:
-        personalDietaryManagement_id:
+        id:
          type: integer
-        maxAmount:
+        amount:
          type: string
         patientId:
          type: integer
-        dietaryManagement_id:
+        dietaryRestrictionid:
          type: integer
         active:
          type: boolean
-        desirableAmount:
-         type: string
-    DietaryManagement:
+    DietaryRestriction:
       type: object
       required:
-        - dietaryManagement_id
+        - id
         - description
       properties:
-        dietaryManagement_id:
+        id:
          type: integer
         description:
          type: string
@@ -876,23 +860,6 @@ components:
         patientId:
          type: integer
     food:
-      type: array
-      required:
-        - foodName
-      items:
-        type: object
-        properties:
-          foodId:
-            type: integer
-          foodName:
-            type: string
-      example:
-        - foodId: 3307
-          foodName: Aardappel
-        - foodId: 3308
-          foodName: Aardbei
-
-    addingfood:
       type: object
       required:
         - foodConsumptionId
