@@ -7,13 +7,16 @@ info:
     name: Apache 2.0
     url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
 servers:
+# Added by API Auto Mocking Plugin
   - description: SwaggerHub API Auto Mocking
+    url: https://virtserver.swaggerhub.com/KEVIN73/nizi/1.0.0
+  - description: Anne SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/McSmoker/NierZiektenConcept/1.0.0/
-  - description: SwaggerHub API Auto Mocking
+  - description: Jacco SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/jaccoklouwer/App_Nizi/1.0.0
   - description: Martin SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/martinstork/AppNiZi/1.0.0
-  - description: SwaggerHub API Auto Mocking
+  - description: Kevin SwaggerHub API Auto Mocking
     url: https://virtserver.swaggerhub.com/KEVIN73/app-nizi_api/1.0.0
 paths:
   
@@ -33,9 +36,9 @@ paths:
           content:
             application/json:
               schema:
-                type: object
+                type: array
                 items:
-                  $ref: '#/components/schemas/patients'
+                  $ref: '#/components/schemas/patient'
         '400':
           description: (400) Bad request. Data malformed?
         '401':
@@ -55,18 +58,20 @@ paths:
         content:
             application/json:
               schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/patient'
+                $ref: '#/components/schemas/patient'
       responses:
         '200':
           description: (200) OK!
           content:
             application/json:
               schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/patient'
+                $ref: '#/components/schemas/patient'
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
   /patients/me:
     get:
       tags:
@@ -167,6 +172,34 @@ paths:
           description: (401) Not authorized.
         '404':
           description: (404) Resource not found.
+    post:
+      tags:
+        - patients
+      operationId: PostPatientDiary
+      summary: Creates a patient's diary
+      description: Create a new patient diary.
+      security:
+        - oAuth2: [admin]
+      requestBody:
+        required: true
+        content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/diary'
+      responses:
+        '200':
+          description: (200) OK!
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/diary'
+        '400':
+          description: (400) Bad request. Data malformed?
+        '401':
+          description: (401) Not authorized.
+        '404':
+          description: (404) Resource not found.
+    
   /patients/me/diary/{date}:
     get:
       tags:
@@ -386,7 +419,7 @@ paths:
           description: you are unauthorized to do this
           
   #dietaryManagement
-  /personaldietarymanagement/{DietId}:
+  /personaldietarymanagement/{dietId}:
     delete:
       tags:
         - dietaryManagement
@@ -396,7 +429,7 @@ paths:
       security:
         - oAuth2: [doctor]
       parameters:
-        - $ref: '#/components/parameters/DietId'
+        - $ref: '#/components/parameters/dietId'
       responses:
         '200':
           description: OK
@@ -480,7 +513,7 @@ paths:
                     example: "1-4343-47637-43764383-4637673"
         '401':
           description: not authorized to login? maybe you made a typo?
-  /account/registerpatient:
+  /account/registerPatient:
     post:
       tags:
         - account
@@ -672,6 +705,10 @@ components:
     patient:
       type: object
       properties:
+        account:
+         type: object
+         items:
+          $ref: '#/components/schemas/account'
         patientId:
          type: integer
          example: 4334
@@ -685,16 +722,6 @@ components:
          type: object
          items:
           $ref: '#/components/schemas/weight'
-    patients:
-      type: object
-      properties:
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/patient'
-        nextId:
-          type: integer
-          example: 4005
     diary:
       type: object
       required:
@@ -788,27 +815,6 @@ components:
         accountId:
           type: integer
           example: 1
-    # patient:
-    #   type: object
-    #   required:
-    #     - patientId
-    #     - birthdate
-    #     - doctor_id
-    #     - weight
-    #     - diary_id
-    #   properties:
-    #     account:
-    #       $ref: 'components/schema/Account'
-    #     patientId:
-    #      type: integer
-    #     birthdate:
-    #      type: string
-    #     doctor_id:
-    #      type: integer
-    #     weight:
-    #      type: integer
-    #     diary_id:
-    #      type: integer
     doctor:
       type: object
       required:
@@ -816,7 +822,7 @@ components:
         - location
       properties:
         account:
-          $ref: 'components/schema/Account'
+          $ref: '#/components/schemas/account'
         doctor_id:
          type: integer
         birthdate:
@@ -981,8 +987,8 @@ components:
       schema:
         type: string
         example: "2019-08-30"
-    DietId:
-      name: DietId
+    dietId:
+      name: dietId
       in: path
       required: true
       description: the id of the diet
