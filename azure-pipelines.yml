@@ -16,6 +16,18 @@ variables:
 
 steps:
 - task: NuGetToolInstaller@1
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: 'Python-tests'
+    Contents: '**'
+    TargetFolder: '$(build.artifactStagingDirectory)/tests’
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish Artifact'
+  inputs:
+  PathtoPublish: '$(build.artifactstagingdirectory)'
+  ArtifactName: 'NiZiArtifact’
+
 
 - task: NuGetCommand@2
   inputs:
