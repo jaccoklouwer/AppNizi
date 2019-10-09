@@ -25,8 +25,8 @@ steps:
 - task: PublishBuildArtifacts@1
   displayName: 'Publish Artifact'
   inputs:
-  PathtoPublish: '$(build.artifactstagingdirectory)'
-  ArtifactName: 'NiZiArtifact’
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+    ArtifactName: 'NiZiArtifact’
 
 
 - task: NuGetCommand@2
