@@ -57,7 +57,7 @@ steps:
   inputs:
     SourceFolder: 'Python-tests'
     Contents: '**'
-    TargetFolder: $(build.artifactStagingDirectory)/tests'
+    TargetFolder: $(build.artifactStagingDirectory)/tests
 
 - task: PublishBuildArtifacts@1
   inputs:
