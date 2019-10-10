@@ -31,6 +31,8 @@ steps:
     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
     ArtifactName: 'NiZiArtifact'
     publishLocation: 'Container'
+    displayName: NiZiArtifact
+    
 - task: NuGetCommand@2
   inputs:
     restoreSolution: '$(solution)'
