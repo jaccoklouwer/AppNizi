@@ -31,7 +31,6 @@ namespace AppNiZiAPI.Functions
                 //Haal info uit de Body, moet nog worden aangepast vanwege Oauth enzo.
                 try
                 {
-
                     var content = await new StreamReader(req.Body).ReadToEndAsync();
                     log.LogInformation(content); // Log het in console
                     patient = JsonConvert.DeserializeObject<TestPatient>(content);

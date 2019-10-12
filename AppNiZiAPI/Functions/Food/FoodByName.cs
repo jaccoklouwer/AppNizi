@@ -55,6 +55,12 @@ namespace AppNiZiAPI.Functions.FoodByName
                             food.Sodium = (float)reader["sodium"];
                             food.PortionSize = (float)reader["portion_size"];
                             //dit kan ik gebruiken om enum weightunit te pakken?
+                            // Mitch - Zou het via een inner join doen al direct uit db
+                            /*
+                             * SELECT *.f, description.w
+                             * FROM Food as f, WeightUnit? as w
+                             * WHERE f.weight_unit_id = w.id
+                             */
                             food.WeightUnitId = (int)reader["weight_unit_id"];
                         }
                     }
