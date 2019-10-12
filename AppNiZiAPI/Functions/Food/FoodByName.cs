@@ -60,6 +60,8 @@ namespace AppNiZiAPI.Functions.FoodByName
                              * SELECT *.f, description.w
                              * FROM Food as f, WeightUnit? as w
                              * WHERE f.weight_unit_id = w.id
+                             * 
+                             * en dan food.WeightUnitDescription = reader[description];
                              */
                             food.WeightUnitId = (int)reader["weight_unit_id"];
                         }
