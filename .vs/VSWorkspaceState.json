@@ -1,6 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\AppNiZiAPI",
+    "\\Python-tests"
   ],
+  "SelectedNode": "\\Python-tests\\Python-tests.sln",
   "PreviewInSolutionExplorer": false
 }
