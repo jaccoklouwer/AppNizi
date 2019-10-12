@@ -1,7 +1,14 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\AppNiZiAPI",
+    "\\AppNiZiAPI\\Functions",
+    "\\AppNiZiAPI\\Models",
+    "\\AppNiZiAPI\\Models\\Views",
+    "\\AppNiZiAPI\\Variables",
+    "\\Python-tests",
+    "\\swagger"
   ],
-  "SelectedNode": "\\swagger",
+  "SelectedNode": "\\AppNiZiAPI\\Variables\\Routes.cs",
   "PreviewInSolutionExplorer": false
 }
