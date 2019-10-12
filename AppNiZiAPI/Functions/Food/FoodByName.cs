@@ -56,7 +56,6 @@ namespace AppNiZiAPI.Functions.FoodByName
                             food.PortionSize = (float)reader["portion_size"];
                             //dit kan ik gebruiken om enum weightunit te pakken?
                             food.WeightUnitId = (int)reader["weight_unit_id"];
-
                         }
                     }
                     catch (Exception)
