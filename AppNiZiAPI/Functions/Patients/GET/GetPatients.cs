@@ -28,7 +28,7 @@ namespace AppNiZiAPI.Functions.Patients
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            int count = new QueryHandler().ExtractIntegerFromRequest("count", req);
+            int count = new QueryHandler().ExtractIntegerFromRequestQuery("count", req);
 
             List<PatientView> patients = new PatientRepository().List(count);
 

@@ -12,11 +12,18 @@ using System.Net.Http;
 using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
 using System.Net;
+using AppNiZiAPI.Models.Handlers;
 
 namespace AppNiZiAPI.Functions.Patients.POST
 {
+
+
     public static class CreatePatient
     {
+
+
+
+
         [FunctionName("CreatePatient")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Patients))] HttpRequestMessage req,
@@ -46,28 +53,11 @@ namespace AppNiZiAPI.Functions.Patients.POST
             }
             catch (Exception ex)
             {
-                // Provide the user with some feedback as to the cause of the error
-                string callbackMessage = "";
-                if (ex.InnerException != null)
-                    callbackMessage = ex.InnerException.Message;
-                else if (ex.Message != null)
-                    callbackMessage = ex.Message;
-
-                // Only get first part
-                callbackMessage = callbackMessage.Split('.')[0];
-                callbackMessage += ". ";
-
-                // Extra feedback for datetime
-                if (callbackMessage.ToLower().Contains("datetime"))
-                    callbackMessage += "Please use format YYYY-MM-DD.";
-
-                // Due to security
-                if (callbackMessage.ToLower().Contains("stacktrace"))
-                    callbackMessage = "An error occurred.";
-
-                // Return response
+                // Build error message and return it.
+                string callbackMessage = new MessageHandler().BuildErrorMessage(ex);
                 return req.CreateResponse(HttpStatusCode.BadRequest, callbackMessage);
             }
         }
     }
+
 }

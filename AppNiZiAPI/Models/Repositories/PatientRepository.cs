@@ -43,6 +43,36 @@ namespace AppNiZiAPI.Models.Repositories
             return patient;
         }
 
+        public PatientObject Select(string guid)
+        {
+            if (string.IsNullOrEmpty(guid))
+                return null;
+
+            PatientObject patient = null;
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                sqlConn.Open();
+                string sqlQuery = $"SELECT * FROM patient WHERE guid=@GUID";
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = guid;
+                SqlDataReader reader = sqlCmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    patient = new PatientObject()
+                    {
+                        guid = reader["guid"].ToString(),
+                        dateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
+                        weightInKilograms = Convert.ToInt32(reader["weight"])
+                    };
+                }
+            }
+
+            return patient;
+        }
+
         /// <summary>
         /// Select all patients, up to count amount.
         /// </summary>
@@ -104,6 +134,29 @@ namespace AppNiZiAPI.Models.Repositories
             }
 
             return createdObjectId;
+        }
+
+        public bool Delete(string guid)
+        {
+            if (string.IsNullOrEmpty(guid)) return false;
+
+            bool success = false;
+
+            string sqlQuery = "DELETE FROM patient WHERE guid=@GUID";
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                sqlConn.Open();
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = guid;
+
+                int rows = sqlCmd.ExecuteNonQuery();
+                if (rows > 0)
+                    success = true;
+            }
+
+            return success;
         }
     }
 }
