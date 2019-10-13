@@ -11,11 +11,42 @@ namespace AppNiZiAPI.Models.Repositories
     class PatientRepository
     {
         /// <summary>
-        /// Fetch 
+        /// Select patient by ID.
         /// </summary>
-        /// <param name="count"></param>
-        /// <returns></returns>
-        public List<PatientView> Select(int count)
+        public PatientObject Select(int id)
+        {
+            if (id == 0)
+                return null;
+
+            PatientObject patient = null;
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                sqlConn.Open();
+                string sqlQuery = $"SELECT * FROM patient WHERE id=@ID";
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+                SqlDataReader reader = sqlCmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    patient = new PatientObject()
+                    {
+                        guid = reader["guid"].ToString(),
+                        dateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
+                        weightInKilograms = Convert.ToInt32(reader["weight"])
+                    };
+                }
+            }
+
+            return patient;
+        }
+
+        /// <summary>
+        /// Select all patients, up to count amount.
+        /// </summary>
+        public List<PatientView> List(int count)
         {
             if (count == 0)
                 count = 999999;
@@ -47,6 +78,32 @@ namespace AppNiZiAPI.Models.Repositories
             }
 
             return patients;
+        }
+
+        public int Insert(PatientObject patient)
+        {
+            if (patient == null) return 0;
+
+            int createdObjectId = 0;
+
+            StringBuilder sqlQuery = new StringBuilder();
+            sqlQuery.Append("INSERT INTO patient (date_of_birth, weight, guid) ");
+            sqlQuery.Append("OUTPUT INSERTED.id ");
+            sqlQuery.Append("VALUES (@DATEOFBIRTH, @WEIGHT, @GUID) ");
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                sqlConn.Open();
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery.ToString(), sqlConn);
+                sqlCmd.Parameters.Add("@DATEOFBIRTH", SqlDbType.DateTime).Value = patient.dateOfBirth;
+                sqlCmd.Parameters.Add("@WEIGHT", SqlDbType.Int).Value = patient.weightInKilograms;
+                sqlCmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = Guid.NewGuid().ToString();
+
+                createdObjectId = (int) sqlCmd.ExecuteScalar();
+            }
+
+            return createdObjectId;
         }
     }
 }

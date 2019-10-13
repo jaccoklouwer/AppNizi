@@ -30,7 +30,7 @@ namespace AppNiZiAPI.Functions.Patients
 
             int count = new QueryHandler().ExtractIntegerFromRequest("count", req);
 
-            List<PatientView> patients = new PatientRepository().Select(count);
+            List<PatientView> patients = new PatientRepository().List(count);
 
             dynamic data = JsonConvert.SerializeObject(patients);
             
