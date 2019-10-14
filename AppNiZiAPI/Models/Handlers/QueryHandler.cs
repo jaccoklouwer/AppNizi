@@ -7,7 +7,7 @@ namespace AppNiZiAPI.Models.Handler
 {
     class QueryHandler
     {
-        public int ExtractIntegerFromRequest(string variableName, HttpRequest req)
+        public int ExtractIntegerFromRequestQuery(string variableName, HttpRequest req)
         {
             int data = 0;
 
