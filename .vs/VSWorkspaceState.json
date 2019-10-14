@@ -2,8 +2,13 @@
   "ExpandedNodes": [
     "",
     "\\AppNiZiAPI",
-    "\\Python-tests"
+    "\\AppNiZiAPI\\Functions",
+    "\\AppNiZiAPI\\Models",
+    "\\AppNiZiAPI\\Models\\Views",
+    "\\AppNiZiAPI\\Variables",
+    "\\Python-tests",
+    "\\swagger"
   ],
-  "SelectedNode": "\\Python-tests\\Python-tests.sln",
+  "SelectedNode": "\\AppNiZiAPI\\Variables\\Routes.cs",
   "PreviewInSolutionExplorer": false
 }
