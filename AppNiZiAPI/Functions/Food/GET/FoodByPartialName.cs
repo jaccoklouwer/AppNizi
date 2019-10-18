@@ -8,17 +8,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
-using System.Data.SqlClient;
-using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
+using System.Collections.Generic;
 
-namespace AppNiZiAPI.Functions.FoodByName
+namespace AppNiZiAPI.Functions.Food
 {
-    public static class FoodByName
+    public static class FoodByPartialName
     {
-        [FunctionName("Food")]
+        [FunctionName("FoodByPartialName")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", (Routes.APIVersion + Routes.FoodByName))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodByPartialname))] HttpRequest req,
             ILogger log)
         {
             //get foodname om te vinden uit query
@@ -26,15 +25,16 @@ namespace AppNiZiAPI.Functions.FoodByName
             string foodname;
             try
             {
-                foodname = req.Query["foodname"];
+                foodname = req.Query["foodName"];
             }
             catch (Exception)
             {
                 return new BadRequestObjectResult(Messages.ErrorMissingValues);
             }
             //TODO maak dit minder lelijk
-            AppNiZiAPI.Models.Food food = new FoodRepository().Select(foodname);
+            List<Models.Food> food = new FoodRepository().Search(foodname);
             //TODO convert to JSON
+            var jsonFood = JsonConvert.SerializeObject(food);
             return food != null
                 ? (ActionResult)new OkObjectResult(food)
                 : new BadRequestObjectResult(Messages.ErrorMissingValues);

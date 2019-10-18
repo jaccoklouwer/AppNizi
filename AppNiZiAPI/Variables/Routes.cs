@@ -28,5 +28,9 @@ namespace AppNiZiAPI.Variables
 
         //Food
         public const string FoodByName = "/food/{foodName: string}";
+        public const string FoodByPartialname = "/food/{foodName: string}";
+        //TODO verbeter deze fantastische naamgeving 
+        public const string FavoriteFoods = "/food/{id:int}";
+        public const string FavoriteFood = "/food/{foodId: int}{patient_Id:int}";
     }
 }

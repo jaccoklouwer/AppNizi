@@ -9,30 +9,32 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
+using System.Collections.Generic;
 
 namespace AppNiZiAPI.Functions.Food
 {
-    public static class FoodByPartialName
+    public static class GetFavoriteFood
     {
-        [FunctionName("FoodByPartialName")]
+        [FunctionName("GetFavoriteFood")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion + Routes.FavoriteFoods))] HttpRequest req,
             ILogger log)
         {
-            //get foodname om te vinden uit query
-            //generic queary handler gebruiken hier?TODO
-            string foodname;
+            int patientId;
             try
             {
-                foodname = req.Query["foodname"];
+                //TODO je hebt vies en dan heb je wat ik hier doe moet op een christelijke manier 
+                patientId = Convert.ToInt32(req.Query["id"].ToString());
             }
             catch (Exception)
             {
                 return new BadRequestObjectResult(Messages.ErrorMissingValues);
             }
             //TODO maak dit minder lelijk
-            AppNiZiAPI.Models.Food food = new FoodRepository().Search(foodname);
+            List<Models.Food> food = new FoodRepository().Favorites(patientId);
             //TODO convert to JSON
+            var jsonFood = JsonConvert.SerializeObject(food);
+
             return food != null
                 ? (ActionResult)new OkObjectResult(food)
                 : new BadRequestObjectResult(Messages.ErrorMissingValues);
