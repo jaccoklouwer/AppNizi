@@ -16,7 +16,8 @@ using AppNiZiAPI.Security;
 using Microsoft.Net.Http.Headers;
 using System.Net.Http.Headers;
 
-namespace AppNiZiAPI.Functions.FoodByName
+
+namespace AppNiZiAPI
 {
     public static class FoodByName
     {
@@ -26,7 +27,7 @@ namespace AppNiZiAPI.Functions.FoodByName
             ILogger log, string foodName)
         {
             //TODO maak dit minder lelijk(iets minder lelijk nu maar wil graag van de specificatie models.food af)
-            AppNiZiAPI.Models.Food food = new FoodRepository().Select(foodName);
+            Food food = new FoodRepository().Select(foodName);
 
             var jsonFood = JsonConvert.SerializeObject(food);
             return jsonFood != null

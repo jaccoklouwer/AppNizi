@@ -4,7 +4,7 @@ using System.Text;
 
 namespace AppNiZiAPI.Models
 {
-    class Food
+    public class Food
     {
         public int FoodId { get; set; }
         public string Name { get; set; }
