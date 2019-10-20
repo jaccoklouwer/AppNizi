@@ -13,6 +13,11 @@ using AppNiZiAPI.Models.Views;
 using System.Collections.Generic;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models.Handler;
+using System.Security.Claims;
+using Microsoft.Net.Http.Headers;
+using System.Net.Http.Headers;
+using AppNiZiAPI.Security;
+using Microsoft.IdentityModel.Logging;
 
 namespace AppNiZiAPI.Functions.Patients
 {
@@ -26,6 +31,9 @@ namespace AppNiZiAPI.Functions.Patients
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.Patients))] HttpRequest req,
             ILogger log)
         {
+            // Authorization
+            if (!await Authorization.CheckAuthorization(req.Headers)){ return new BadRequestObjectResult(Messages.AuthNoAcces);}
+
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             int count = new QueryHandler().ExtractIntegerFromRequestQuery("count", req);

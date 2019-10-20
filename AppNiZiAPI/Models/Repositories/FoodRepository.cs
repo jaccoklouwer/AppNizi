@@ -20,7 +20,7 @@ namespace AppNiZiAPI.Models.Repositories
             {
 
                 conn.Open();
-                var text = $"SELECT * FROM Food WHERE name=" + foodname;
+                var text = $"SELECT * FROM Food WHERE name = '{foodname}'";
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {
