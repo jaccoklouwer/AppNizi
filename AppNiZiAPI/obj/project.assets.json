@@ -6744,23 +6744,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\user\\.nuget\\packages\\": {},
+    "C:\\Users\\jacco\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\user\\Documents\\School\\4.1 Cloudingz\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
+      "projectUniqueName": "D:\\documenten\\cloud\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
       "projectName": "AppNiZiAPI",
-      "projectPath": "C:\\Users\\user\\Documents\\School\\4.1 Cloudingz\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
-      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\user\\Documents\\School\\4.1 Cloudingz\\AppNizi\\AppNiZiAPI\\obj\\",
+      "projectPath": "D:\\documenten\\cloud\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
+      "packagesPath": "C:\\Users\\jacco\\.nuget\\packages\\",
+      "outputPath": "D:\\documenten\\cloud\\AppNizi\\AppNiZiAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\jacco\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -6804,10 +6804,16 @@
           }
         },
         "imports": [
-          "net461"
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
         ],
         "assetTargetFallback": true,
-        "warn": true
+        "warn": true,
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }
