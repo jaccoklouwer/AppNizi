@@ -25,22 +25,6 @@ namespace AppNiZiAPI.Functions.FoodByName
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodByName))] HttpRequest req,
             ILogger log, string foodName)
         {
-
-
-
-            //get foodname om te vinden uit query
-            //generic queary handler gebruiken hier?TODO
-            log.LogInformation(foodName);
-            string foodname;
-            try
-            {
-                foodname = req.Query["foodName"];
-                log.LogInformation(foodname);
-            }
-            catch (Exception)
-            {
-                return new BadRequestObjectResult(Messages.ErrorMissingValues);
-            }
             //TODO maak dit minder lelijk(iets minder lelijk nu maar wil graag van de specificatie models.food af)
             AppNiZiAPI.Models.Food food = new FoodRepository().Select(foodName);
 
