@@ -12,18 +12,19 @@ using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models;
 using System.Collections.Generic;
 using AppNiZiAPI.Models.Repositories;
+using AppNiZiAPI.Security;
 
-namespace AppNiZiAPI.Functions
+namespace AppNiZiAPI.Functions.DietaryManagement
 {
     public static class DietaryManagement
     {
-        [FunctionName("GetDietaryManagement")]
-        public static async Task<IActionResult> GetDietaryManagement(
+        [FunctionName("DietaryManagement")]
+        public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, int patientId,
             ILogger log)
         {
+            if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
-            
             List<DietaryManagementModel> dietaryManagementModels = null;
             try
             {

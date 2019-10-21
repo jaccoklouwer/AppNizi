@@ -10,6 +10,7 @@ using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
+using AppNiZiAPI.Security;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.PUT
 {
@@ -21,6 +22,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.PUT
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
+            if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }      
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             if (string.IsNullOrEmpty(requestBody))

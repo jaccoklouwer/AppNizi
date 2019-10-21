@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
+using AppNiZiAPI.Security;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
 {
@@ -20,6 +21,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
+            if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
             DietaryManagementRepository repository = new DietaryManagementRepository();
             bool success = false;
             try
