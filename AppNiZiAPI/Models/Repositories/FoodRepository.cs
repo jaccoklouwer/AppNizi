@@ -10,7 +10,7 @@ namespace AppNiZiAPI.Models.Repositories
 {
     class FoodRepository
     {
-        const string cheatConnectionString = "geheim voor outsiders"
+        const string cheatConnectionString = "geheim voor outsiders";
         //change to Id
         public Food Select(string foodname)
         {
