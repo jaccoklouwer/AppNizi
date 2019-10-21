@@ -25,6 +25,8 @@ namespace AppNiZiAPI.Variables
 
         // DietaryManagement
         public const string DietaryManagement = "/dietaryManagement";
+        public const string GetDietaryManagement = "/dietaryManagement/{patientId}";
+        public const string DietaryManagementById = "/dietaryManagement/{dietId}";
 
         //Food
         public const string FoodByName = "/food/{foodName}";
