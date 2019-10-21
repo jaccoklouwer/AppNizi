@@ -20,16 +20,18 @@ namespace AppNiZiAPI.Functions.DietaryManagement
     {
         [FunctionName("DietaryManagement")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, int patientId,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, string patientId,
             ILogger log)
         {
             if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            int id = 0;
+            if (!int.TryParse(patientId, out id)) { return new BadRequestObjectResult(Messages.ErrorMissingValues); }
 
             List<DietaryManagementModel> dietaryManagementModels = null;
             try
             {
                 DietaryManagementRepository repository = new DietaryManagementRepository();
-                dietaryManagementModels = repository.GetDietaryManagementByPatient(patientId);
+                dietaryManagementModels = repository.GetDietaryManagementByPatient(id);
             }
             catch (Exception e)
             {
@@ -37,7 +39,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement
                 return new BadRequestObjectResult(Messages.ErrorMissingValues);
             }
 
-            if(dietaryManagementModels == null)
+            if (dietaryManagementModels == null)
                 return new BadRequestObjectResult("No Dietarymanagement was found!");
 
             string json = JsonConvert.SerializeObject(dietaryManagementModels);
@@ -47,5 +49,5 @@ namespace AppNiZiAPI.Functions.DietaryManagement
                 : new BadRequestObjectResult(Messages.ErrorMissingValues);
         }
     }
-    }
+}
 

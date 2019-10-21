@@ -10,13 +10,27 @@ namespace AppNiZiAPI.Models.Repositories
 {
     class FoodRepository
     {
+        const string cheatConnectionString = "geheim voor outsiders";
         //change to Id
         public Food Select(string foodname)
         {
             Food food = new Food();
 
+            SqlConnection conn = new SqlConnection();
 
-            using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            if (Environment.GetEnvironmentVariable("sqldb_connection") == null)
+            {
+                
+                conn.ConnectionString = cheatConnectionString;
+            }
+            else
+            {
+                conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
+            }
+
+
+            //new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")
+            using (conn)
             {
 
                 conn.Open();
@@ -24,16 +38,18 @@ namespace AppNiZiAPI.Models.Repositories
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {
-                        SqlDataReader reader = cmd.ExecuteReader();
-                        while (reader.Read())
-                        {
-                            // Uit lezen bijv
-                            food.KCal = (float)reader["kcal"];
-                            food.Protein = (float)reader["protein"];
-                            food.Fiber = (float)reader["fiber"];
-                            food.Calcium = (float)reader["calcium"];
-                            food.Sodium = (float)reader["sodium"];
-                            food.PortionSize = (float)reader["portion_size"];
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        // TODO OOOH doe dit anders indexes zo gevaarlijk
+                        food.FoodId = (int)reader["id"];
+                        food.Name = reader.GetString(1);
+                        food.KCal = (float)reader.GetDouble(2);
+                        food.Protein = (float)reader.GetDouble(3);
+                        food.Fiber = (float)reader.GetDouble(4);
+                        food.Calcium = (float)reader.GetDouble(5);
+                        food.Sodium = (float)reader.GetDouble(6);
+                        food.PortionSize = (float)reader.GetDouble(7);
                         //dit kan ik gebruiken om enum weightunit te pakken?
                         // Mitch - Zou het via een inner join doen al direct uit db
                         /*
@@ -43,9 +59,9 @@ namespace AppNiZiAPI.Models.Repositories
                          * 
                          * en dan food.WeightUnitDescription = reader[description];
                          */
-                        //TODO
-                            food.WeightUnitId = (int)reader["weight_unit_id"];
-                        }
+                        //TODO dit zo doen weightunitid(int) moet een weighunit(string) worden
+                        food.WeightUnitId = (int)reader["weight_unit_id"];
+                    }
                 }
                 conn.Close();
             }
@@ -56,12 +72,24 @@ namespace AppNiZiAPI.Models.Repositories
             
             List<Food> foods = new List<Food>();
 
+            SqlConnection conn = new SqlConnection();
+
+            if (Environment.GetEnvironmentVariable("sqldb_connection") == null)
+            {
+
+                conn.ConnectionString = cheatConnectionString;
+            }
+            else
+            {
+                conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
+            }
+
             //Todo controleer op lengte (moet minstens 2 zijn)
-            using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            using (conn)
             {
 
                 conn.Open();
-                var text = $"SELECT * FROM Food Where name LIKE " + foodname +"%";
+                var text = $"SELECT * FROM Food Where name LIKE  '{foodname}%'";
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {
@@ -72,12 +100,14 @@ namespace AppNiZiAPI.Models.Repositories
                         Food food = new Food
                         {
                             // Uit lezen bijv
-                            KCal = (float)reader["kcal"],
-                            Protein = (float)reader["protein"],
-                            Fiber = (float)reader["fiber"],
-                            Calcium = (float)reader["calcium"],
-                            Sodium = (float)reader["sodium"],
-                            PortionSize = (float)reader["portion_size"],
+                            FoodId = (int)reader["id"],
+                            Name = reader.GetString(1),
+                            KCal = (float)reader.GetDouble(2),
+                            Protein = (float)reader.GetDouble(3),
+                            Fiber = (float)reader.GetDouble(4),
+                            Calcium = (float)reader.GetDouble(5),
+                            Sodium = (float)reader.GetDouble(6),
+                            PortionSize = (float)reader.GetDouble(7),
                             //dit kan ik gebruiken om enum weightunit te pakken?
                             // Mitch - Zou het via een inner join doen al direct uit db
                             /*
@@ -100,7 +130,20 @@ namespace AppNiZiAPI.Models.Repositories
         public List<Food> Favorites(int id)
         {
             List<Food> foods = new List<Food>();
-            using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+
+            SqlConnection conn = new SqlConnection();
+
+            if (Environment.GetEnvironmentVariable("sqldb_connection") == null)
+            {
+
+                conn.ConnectionString = cheatConnectionString;
+            }
+            else
+            {
+                conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
+            }
+
+            using (conn)
             {
 
                 conn.Open();
@@ -114,12 +157,14 @@ namespace AppNiZiAPI.Models.Repositories
                         Food food = new Food
                         {
                             // Uit lezen bijv
-                            KCal = (float)reader["kcal"],
-                            Protein = (float)reader["protein"],
-                            Fiber = (float)reader["fiber"],
-                            Calcium = (float)reader["calcium"],
-                            Sodium = (float)reader["sodium"],
-                            PortionSize = (float)reader["portion_size"],
+                            FoodId = (int)reader["id"],
+                            Name = reader.GetString(1),
+                            KCal = (float)reader.GetDouble(2),
+                            Protein = (float)reader.GetDouble(3),
+                            Fiber = (float)reader.GetDouble(4),
+                            Calcium = (float)reader.GetDouble(5),
+                            Sodium = (float)reader.GetDouble(6),
+                            PortionSize = (float)reader.GetDouble(7),
                             //dit kan ik gebruiken om enum weightunit te pakken?
                             // Mitch - Zou het via een inner join doen al direct uit db
                             /*
@@ -143,24 +188,45 @@ namespace AppNiZiAPI.Models.Repositories
         public bool Favorite(int patient_id,int food_id)
         {
             bool succes = true;
-            //TODO beetje overdreven constructie "geleend" van create patient 
+
+            SqlConnection conn = new SqlConnection();
+
+            if (Environment.GetEnvironmentVariable("sqldb_connection") == null)
+            {
+                conn.ConnectionString = cheatConnectionString;
+            }
+            else
+            {
+                conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
+            }
+
             //TODO patient_id kan uit ingelogde user komen
             StringBuilder sqlQuery = new StringBuilder();
             sqlQuery.Append("INSERT INTO MyFood (food_id, patient_id) ");
             sqlQuery.Append("VALUES (@FOODID, @PATIENTID) ");
+            // ff als een loser doen
+            // als een loser werkt het wel :)
+            // TODO doe dit als een winner
+            SqlParameter param1 = new SqlParameter();
+            param1.ParameterName = "@FOODID";
+            param1.Value = food_id;
 
+            SqlParameter param2 = new SqlParameter();
+            param2.ParameterName = "@PATIENTID";
+            param2.Value = patient_id;
             try
             {
-                using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+                using (conn)
                 {
-                    sqlConn.Open();
+                    conn.Open();
 
-                    SqlCommand sqlCmd = new SqlCommand(sqlQuery.ToString(), sqlConn);
-                    sqlCmd.Parameters.Add("@FOODID", SqlDbType.Int).Value = patient_id;
-                    sqlCmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = food_id;
+                    SqlCommand sqlCmd = new SqlCommand(sqlQuery.ToString(), conn);
+                    sqlCmd.Parameters.Add(param1);
+                    sqlCmd.Parameters.Add(param2);
                     //TODO TEST DIT
                     sqlCmd.ExecuteNonQuery();
                 }
+                conn.Close();
             }
             catch
             {

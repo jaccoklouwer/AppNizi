@@ -28,17 +28,15 @@ namespace AppNiZiAPI.Variables
 
         // DietaryManagement
         public const string DietaryManagement = "/dietaryManagement";
-        public const string GetDietaryManagement = "/dietaryManagement/{patientId: int}";
-        public const string DietaryManagementById = "/dietaryManagement/{dietId: int}";
+        public const string GetDietaryManagement = "/dietaryManagement/{patientId}";
+        public const string DietaryManagementById = "/dietaryManagement/{dietId}";
 
         //Food
         public const string FoodByName = "/food/{foodName}";
         public const string FoodByPartialname = "/food/partial/{foodName}";
         //TODO verbeter deze fantastische naamgeving 
-        public const string FavoriteFoods = "/food/{patientId: int}";
 
-        //public const string FavoriteFood = "/food/{foodId: int}{patient_Id:int}";
-        public const string FavoriteFood = "/food/{foodId: int}";
-        public const string PostFavoriteFood = "/food/post/{foodId: int}";
+        public const string GetFavoriteFood = "/food/favorite/{patientId}";
+        public const string PostFavoriteFood = "/test/postfavorite";
     }
 }

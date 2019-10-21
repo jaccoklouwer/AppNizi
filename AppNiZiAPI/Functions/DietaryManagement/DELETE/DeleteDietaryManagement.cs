@@ -17,16 +17,20 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
     {
         [FunctionName("DeleteDietaryManagement")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId,
+            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, string dietId,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
             if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+
+            int id = 0;
+            if (!int.TryParse(dietId, out id)) { return new BadRequestObjectResult(Messages.ErrorMissingValues); }
+
             DietaryManagementRepository repository = new DietaryManagementRepository();
             bool success = false;
             try
             {
-                success = repository.DeleteDietaryManagement(dietId);
+                success = repository.DeleteDietaryManagement(id);
             }
             catch (Exception)
             {
