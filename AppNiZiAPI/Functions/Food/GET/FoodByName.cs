@@ -26,6 +26,8 @@ namespace AppNiZiAPI
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodByName))] HttpRequest req,
             ILogger log, string foodName)
         {
+
+            if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
             //TODO maak dit minder lelijk(iets minder lelijk nu maar wil graag van de specificatie models.food af)
             Food food = new FoodRepository().Select(foodName);
 

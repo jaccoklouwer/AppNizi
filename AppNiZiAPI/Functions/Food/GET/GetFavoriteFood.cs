@@ -10,34 +10,27 @@ using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
 using System.Collections.Generic;
+using AppNiZiAPI.Security;
 
 namespace AppNiZiAPI.Functions.Food
 {
     public static class GetFavoriteFood
     {
-        //[FunctionName("GetFavoriteFood")]
-        //public static async Task<IActionResult> Run(
-        //    [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion + Routes.FavoriteFood))] HttpRequest req,
-        //    ILogger log, int patientId)
-        //{
-        //    //int patientId;
-        //    try
-        //    {
-        //        //TODO je hebt vies en dan heb je wat ik hier doe moet op een christelijke manier 
-                
-        //    }
-        //    catch (Exception)
-        //    {
-        //        return new BadRequestObjectResult(Messages.ErrorMissingValues);
-        //    }
-        //    //TODO maak dit minder lelijk
-        //    List<Models.Food> food = new FoodRepository().Favorites(patientId);
-        //    //TODO convert to JSON
-        //    var jsonFood = JsonConvert.SerializeObject(food);
+        [FunctionName("GetFavoriteFood")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function,  "get", Route = (Routes.APIVersion + Routes.GetFavoriteFood))] HttpRequest req,
+            ILogger log, int patientId)
+        {
 
-        //    return food != null
-        //        ? (ActionResult)new OkObjectResult(food)
-        //        : new BadRequestObjectResult(Messages.ErrorMissingValues);
-        //}
+            if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            //TODO maak dit minder lelijk
+            List<Models.Food> food = new FoodRepository().Favorites(patientId);
+            //TODO convert to JSON
+            var jsonFood = JsonConvert.SerializeObject(food);
+
+            return food != null
+                ? (ActionResult)new OkObjectResult(food)
+                : new BadRequestObjectResult(Messages.ErrorMissingValues);
+        }
     }
 }
