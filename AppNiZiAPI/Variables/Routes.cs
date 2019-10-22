@@ -9,6 +9,10 @@ namespace AppNiZiAPI.Variables
         // API info
         public const string APIVersion = "v1";
 
+        //Swagger
+        public const string SwaggerUI = "swagger/ui";
+        public const string SwaggerJson = "swagger/json";
+
         // Patients
         public const string Patients = "/patients";
         public const string Me = "/me";

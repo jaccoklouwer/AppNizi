@@ -11,25 +11,42 @@ using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Security;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using System.Net;
+using Authorization = AppNiZiAPI.Security.Authorization;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.PUT
 {
     public static class UpdateDietaryManagement
     {
-        [FunctionName("UpdateDietaryManagement")]
+        /// <summary>
+        /// Update a dietaryManagment
+        /// </summary>
+        /// <param name="dietId"></param>
+        /// <param name="req"></param>
+        /// <returns>list of dietarymanagement</returns>
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
+        [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(Error))]
+        [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(Error))]
+        [ProducesResponseType((int)HttpStatusCode.Unauthorized, Type = typeof(Error))]
+        [RequestHttpHeader("Authorization", isRequired: false)]
+        [FunctionName("Update DietaryManagement")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, string dietId,
+            [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.DietaryManagementById))]
+            [RequestBodyType(typeof(DietaryManagementModel), "Dietary management")]HttpRequest req, string dietId,
             ILogger log)
         {
+
+            //link voor swagger https://medium.com/@yuka1984/open-api-swagger-and-swagger-ui-on-azure-functions-v2-c-a4a460b34b55
             log.LogInformation("C# HTTP trigger function processed a request.");
-            if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            if (!await Authorization.CheckAuthorization(req.Headers)) { return new UnauthorizedResult(); }
 
             int id = 0;
             if (!int.TryParse(dietId, out id)) { return new BadRequestObjectResult(Messages.ErrorMissingValues); }
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             if (string.IsNullOrEmpty(requestBody))
-                return new BadRequestObjectResult(Messages.ErrorMissingValues);
+                return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues);
 
             DietaryManagementModel dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
 
@@ -50,7 +67,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.PUT
             catch (Exception)
             {
 
-                return new BadRequestObjectResult(Messages.ErrorServer);
+                return new NotFoundObjectResult(Messages.ErrorMissingValues);
             }
         }
     }
