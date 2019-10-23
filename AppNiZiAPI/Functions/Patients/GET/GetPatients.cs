@@ -32,7 +32,7 @@ namespace AppNiZiAPI.Functions.Patients
             ILogger log)
         {
             // Authorization
-            if (!await Authorization.CheckAuthorization(req.Headers)){ return new BadRequestObjectResult(Messages.AuthNoAcces);}
+            //if (!await Authorization.CheckAuthorization(req.Headers)){ return new BadRequestObjectResult(Messages.AuthNoAcces);}
 
             log.LogInformation("C# HTTP trigger function processed a request.");
 

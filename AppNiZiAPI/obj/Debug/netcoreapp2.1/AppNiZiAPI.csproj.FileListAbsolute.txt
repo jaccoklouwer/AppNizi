@@ -149,6 +149,9 @@ C:\Users\user\Documents\School\4.1 Cloudingz\AppNizi\AppNiZiAPI\obj\Debug\netcor
 C:\Users\user\Documents\School\4.1 Cloudingz\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.csproj.CopyComplete
 C:\Users\user\Documents\School\4.1 Cloudingz\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.dll
 C:\Users\user\Documents\School\4.1 Cloudingz\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.pdb
+C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.csproj.CoreCompileInputs.cache
+C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.AssemblyInfoInputs.cache
+C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.AssemblyInfo.cs
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\host.json
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\local.settings.json
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\AppNiZiAPI.deps.json
@@ -203,11 +206,17 @@ C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\M
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.Extensions.Options.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.Extensions.Options.ConfigurationExtensions.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.Extensions.Primitives.dll
+C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.JsonWebTokens.dll
+C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.Logging.dll
+C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.Protocols.dll
+C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
+C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.Tokens.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.Net.Http.Headers.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\NCrontab.Signed.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Newtonsoft.Json.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Newtonsoft.Json.Bson.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\System.Data.SqlClient.dll
+C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\System.Runtime.CompilerServices.Unsafe.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\System.Text.Encoding.CodePages.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\System.Text.Encodings.Web.dll
@@ -219,15 +228,6 @@ C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\r
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\runtimes\win\lib\netcoreapp2.1\System.Data.SqlClient.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\runtimes\win\lib\netcoreapp2.0\System.Text.Encoding.CodePages.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.csprojAssemblyReference.cache
-C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.csproj.CoreCompileInputs.cache
-C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.AssemblyInfoInputs.cache
-C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.AssemblyInfo.cs
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.csproj.CopyComplete
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.dll
 C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\obj\Debug\netcoreapp2.1\AppNiZiAPI.pdb
-C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.Logging.dll
-C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.Protocols.dll
-C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.Tokens.dll
-C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.JsonWebTokens.dll
-C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
-C:\Users\Mitch\Documents\GitHub\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\System.IdentityModel.Tokens.Jwt.dll
