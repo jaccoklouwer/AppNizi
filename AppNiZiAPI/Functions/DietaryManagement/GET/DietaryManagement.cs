@@ -29,7 +29,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(Error))]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized, Type = typeof(Error))]
         [RequestHttpHeader("Authorization", isRequired: false)]
-        [FunctionName("Get DietaryManagement By Patient")]
+        [FunctionName("GetDietaryManagementByPatient")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, string patientId,
             ILogger log)

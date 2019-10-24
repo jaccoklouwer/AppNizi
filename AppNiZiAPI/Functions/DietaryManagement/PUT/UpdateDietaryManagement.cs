@@ -30,7 +30,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.PUT
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(Error))]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized, Type = typeof(Error))]
         [RequestHttpHeader("Authorization", isRequired: false)]
-        [FunctionName("Update DietaryManagement")]
+        [FunctionName("UpdateDietaryManagement")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.DietaryManagementById))]
             [RequestBodyType(typeof(DietaryManagementModel), "Dietary management")]HttpRequest req, string dietId,
