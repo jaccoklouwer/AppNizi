@@ -1,23 +1,23 @@
 {
   "format": 1,
   "restore": {
-    "D:\\documenten\\cloud\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj": {}
+    "C:\\Users\\McSmoker\\source\\repos\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj": {}
   },
   "projects": {
-    "D:\\documenten\\cloud\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj": {
+    "C:\\Users\\McSmoker\\source\\repos\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\documenten\\cloud\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
+        "projectUniqueName": "C:\\Users\\McSmoker\\source\\repos\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
         "projectName": "AppNiZiAPI",
-        "projectPath": "D:\\documenten\\cloud\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
-        "packagesPath": "C:\\Users\\jacco\\.nuget\\packages\\",
-        "outputPath": "D:\\documenten\\cloud\\AppNizi\\AppNiZiAPI\\obj\\",
+        "projectPath": "C:\\Users\\McSmoker\\source\\repos\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
+        "packagesPath": "C:\\Users\\McSmoker\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\McSmoker\\source\\repos\\AppNizi\\AppNiZiAPI\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\jacco\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\McSmoker\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
@@ -77,20 +77,14 @@
             },
             "System.Data.SqlClient": {
               "target": "Package",
-              "version": "[4.7.0, )"
+              "version": "[4.6.0, )"
             }
           },
           "imports": [
-            "net461",
-            "net462",
-            "net47",
-            "net471",
-            "net472",
-            "net48"
+            "net461"
           ],
           "assetTargetFallback": true,
-          "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100\\RuntimeIdentifierGraph.json"
+          "warn": true
         }
       }
     }
