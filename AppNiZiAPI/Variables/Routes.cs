@@ -43,5 +43,11 @@ namespace AppNiZiAPI.Variables
 
         public const string GetFavoriteFood = "/food/favorite/{patientId}";
         public const string PostFavoriteFood = "/test/postfavorite";
+
+        //Meal
+        public const string AddMeal = "/meal/add/{patientId}";
+        public const string DeleteMeal = "/meal/delete/{patientId}/{mealId}";
+        public const string GetMeals = "/meal/get/{patientId}";
+
     }
 }

@@ -4,10 +4,11 @@ using System.Text;
 
 namespace AppNiZiAPI.Models
 {
-    public class Food
+    class Meal
     {
-        public int FoodId { get; set; }
+        public int MealId { get; set; }
         public string Name { get; set; }
+        public int PatientId { get; set; }
         public float KCal { get; set; }
         public float Protein { get; set; }
         public float Fiber { get; set; }
