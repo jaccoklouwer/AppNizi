@@ -21,9 +21,12 @@ namespace AppNiZiAPI.Functions.Meal.POST
         {
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            //no way dat dit werkt
-            Models.Meal meal = (Models.Meal)JsonConvert.DeserializeObject(requestBody);
-            bool succes = new MealRepository().AddMeal(patientId, meal);
+            //no way dat dit werkt WAT? wrm zo easy al me ingewikkelde shit :(
+            Models.Meal meal = new Models.Meal();
+            JsonConvert.PopulateObject(requestBody, meal);
+
+            
+            bool succes = new MealRepository().AddMeal(meal);
 
             return succes != null
                 ? (ActionResult)new OkObjectResult(succes)

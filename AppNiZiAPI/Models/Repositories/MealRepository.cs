@@ -9,7 +9,7 @@ namespace AppNiZiAPI.Models.Repositories
     class MealRepository : Repository, IMealRepository
     {
         //TODO laat add en delete iets teruggeven
-        public bool AddMeal(int patient_id, Meal meal)
+        public bool AddMeal(Meal meal)
         {
             //TODO get rid of weightunitid das beetje viezigheid zoals het nu is
             StringBuilder sqlQuery = new StringBuilder();
@@ -31,6 +31,7 @@ namespace AppNiZiAPI.Models.Repositories
                 sqlCmd.Parameters.Add("@SODIUM", SqlDbType.Float).Value = meal.Sodium;
                 sqlCmd.Parameters.Add("@PORTION_SIZE", SqlDbType.Int).Value = meal.PortionSize;
                 sqlCmd.Parameters.Add("@WEIGHT_UNIT_ID", SqlDbType.Int).Value = meal.WeightUnitId;
+                int rows = sqlCmd.ExecuteNonQuery();
             }
             conn.Close();
             return true;
@@ -40,7 +41,7 @@ namespace AppNiZiAPI.Models.Repositories
         {
             bool success = false;
             //kan technisch gezien zonder patient_id
-            string sqlQuery = "DELETE FROM meal WHERE patient_id=@PATIENT_ID AND meal_id=@MEAL_ID";
+            string sqlQuery = "DELETE FROM meal WHERE patient_id=@PATIENT_ID AND id=@MEAL_ID";
 
             using (conn)
             {
@@ -64,35 +65,38 @@ namespace AppNiZiAPI.Models.Repositories
             {
 
                 conn.Open();
-                var text = $"SELECT * FROM Food WHERE patient_id = '{patient_id}'";
+                var text = $"SELECT * FROM Meal WHERE patient_id = '{patient_id}'";
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {
                     SqlDataReader reader = cmd.ExecuteReader();
-                    Meal meal = new Meal
+                    while (reader.Read())
                     {
-                        // Uit lezen bijv
-                        MealId = (int)reader["id"],
-                        Name = reader.GetString(1),
-                        KCal = (float)reader.GetDouble(2),
-                        Protein = (float)reader.GetDouble(3),
-                        Fiber = (float)reader.GetDouble(4),
-                        Calcium = (float)reader.GetDouble(5),
-                        Sodium = (float)reader.GetDouble(6),
-                        PortionSize = (float)reader.GetDouble(7),
-                        //dit kan ik gebruiken om enum weightunit te pakken?
-                        // Mitch - Zou het via een inner join doen al direct uit db
-                        /*
-                         * SELECT *.f, description.w
-                         * FROM Food as f, WeightUnit? as w
-                         * WHERE f.weight_unit_id = w.id
-                         * 
-                         * en dan food.WeightUnitDescription = reader[description];
-                         */
-                        //TODO
-                        WeightUnitId = (int)reader["weight_unit_id"]
-                    };
-                    meals.Add(meal);
+                        Meal meal = new Meal
+                        {
+                            // Uit lezen bijv
+                            MealId = (int)reader["id"],
+                            Name = reader.GetString(2),
+                            KCal = (float)reader.GetDouble(3),
+                            Protein = (float)reader.GetDouble(4),
+                            Fiber = (float)reader.GetDouble(5),
+                            Calcium = (float)reader.GetDouble(6),
+                            Sodium = (float)reader.GetDouble(7),
+                            PortionSize = (float)reader.GetDouble(8),
+                            //dit kan ik gebruiken om enum weightunit te pakken?
+                            // Mitch - Zou het via een inner join doen al direct uit db
+                            /*
+                             * SELECT *.f, description.w
+                             * FROM Food as f, WeightUnit? as w
+                             * WHERE f.weight_unit_id = w.id
+                             * 
+                             * en dan food.WeightUnitDescription = reader[description];
+                             */
+                            //TODO
+                            WeightUnitId = (int)reader["weight_unit_id"]
+                        };
+                        meals.Add(meal);
+                    }
                 }
                 conn.Close();
             }

@@ -18,7 +18,7 @@ namespace AppNiZiAPI.Functions.Meal.GET
     {
         [FunctionName("GetMeals")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = (Routes.APIVersion+Routes.GetMeals))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion+Routes.GetMeals))] HttpRequest req,
             ILogger log,int patientId)
         {
             List<Models.Meal> meals = new MealRepository().GetMyMeals(patientId);
