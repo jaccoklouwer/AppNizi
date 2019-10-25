@@ -8,28 +8,13 @@ using System.Text;
 
 namespace AppNiZiAPI.Models.Repositories
 {
-    class FoodRepository
+    class FoodRepository: Repository
     {
-        const string cheatConnectionString = "geheim voor outsiders";
         //change to Id
         public Food Select(string foodname)
         {
             Food food = new Food();
 
-            SqlConnection conn = new SqlConnection();
-
-            if (Environment.GetEnvironmentVariable("sqldb_connection") == null)
-            {
-                
-                conn.ConnectionString = cheatConnectionString;
-            }
-            else
-            {
-                conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
-            }
-
-
-            //new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")
             using (conn)
             {
 
@@ -71,18 +56,6 @@ namespace AppNiZiAPI.Models.Repositories
         {
             
             List<Food> foods = new List<Food>();
-
-            SqlConnection conn = new SqlConnection();
-
-            if (Environment.GetEnvironmentVariable("sqldb_connection") == null)
-            {
-
-                conn.ConnectionString = cheatConnectionString;
-            }
-            else
-            {
-                conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
-            }
 
             //Todo controleer op lengte (moet minstens 2 zijn)
             using (conn)
@@ -131,17 +104,6 @@ namespace AppNiZiAPI.Models.Repositories
         {
             List<Food> foods = new List<Food>();
 
-            SqlConnection conn = new SqlConnection();
-
-            if (Environment.GetEnvironmentVariable("sqldb_connection") == null)
-            {
-
-                conn.ConnectionString = cheatConnectionString;
-            }
-            else
-            {
-                conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
-            }
 
             using (conn)
             {
@@ -188,17 +150,6 @@ namespace AppNiZiAPI.Models.Repositories
         public bool Favorite(int patient_id,int food_id)
         {
             bool succes = true;
-
-            SqlConnection conn = new SqlConnection();
-
-            if (Environment.GetEnvironmentVariable("sqldb_connection") == null)
-            {
-                conn.ConnectionString = cheatConnectionString;
-            }
-            else
-            {
-                conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
-            }
 
             //TODO patient_id kan uit ingelogde user komen
             StringBuilder sqlQuery = new StringBuilder();

@@ -8,18 +8,18 @@ using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models;
-using AppNiZiAPI.Models.Handler;
+using AppNiZiAPI.Security;
 
 namespace AppNiZiAPI
 {
     public static class GetConsumptionById
     {
         [FunctionName("GetConsumptionById")]
-        public static async Task<IActionResult> GetConsumptionByConsumptionId(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetConsumptionById))] HttpRequest req,
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.Consumption))] HttpRequest req,
             ILogger log, string consumptionId)
         {
-            if (!int.TryParse(consumptionId, out int id)) return new BadRequestObjectResult(Messages.ErrorMissingValues);
+            if (!int.TryParse(consumptionId, out int id)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
             
             Consumption consumption = new ConsumptionRespository().GetConsumptionByConsumptionId(id);
             

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace AppNiZiAPI.Models.Repositories
 {
@@ -9,11 +8,11 @@ namespace AppNiZiAPI.Models.Repositories
         Consumption GetConsumptionByConsumptionId(int consumptionId);
         List<Consumption> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate);
 
-        void AddConsumption(Consumption consumption);
+        bool AddConsumption(Consumption consumption);
 
-        void DeleteConsumption(int consumptionId);
+        bool DeleteConsumption(int consumptionId);
 
-        void UpdateConsumption(Consumption consumption);
+        bool UpdateConsumption(int consumptionId, Consumption consumption);
 
     }
 }
