@@ -270,17 +270,8 @@ D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.Ide
 D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.IdentityModel.Tokens.dll
 D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.OpenApi.dll
-D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Microsoft.Win32.Registry.dll
 D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Swashbuckle.AspNetCore.dll
 D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Swashbuckle.AspNetCore.Swagger.dll
 D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Swashbuckle.AspNetCore.SwaggerGen.dll
 D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\Swashbuckle.AspNetCore.SwaggerUI.dll
-D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\System.Diagnostics.DiagnosticSource.dll
 D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\System.IdentityModel.Tokens.Jwt.dll
-D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\System.Security.AccessControl.dll
-D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\System.Security.Principal.Windows.dll
-D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\runtimes\unix\lib\netstandard2.0\Microsoft.Win32.Registry.dll
-D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\runtimes\win\lib\netstandard2.0\Microsoft.Win32.Registry.dll
-D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\runtimes\win\lib\netcoreapp2.0\System.Security.AccessControl.dll
-D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\runtimes\unix\lib\netcoreapp2.1\System.Security.Principal.Windows.dll
-D:\documenten\cloud\AppNizi\AppNiZiAPI\bin\Debug\netcoreapp2.1\bin\runtimes\win\lib\netcoreapp2.1\System.Security.Principal.Windows.dll

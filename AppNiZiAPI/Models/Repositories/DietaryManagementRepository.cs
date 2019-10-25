@@ -1,11 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
 namespace AppNiZiAPI.Models.Repositories
 {
-    public class DietaryManagementRepository
+    public interface IDietaryManagementRepository
+    {
+        bool AddDietaryManagement(DietaryManagementModel dietary);
+        bool DeleteDietaryManagement(int id);
+        List<DietaryManagementModel> GetDietaryManagementByPatient(int patientId);
+        bool UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement);
+    }
+
+    public class DietaryManagementRepository : IDietaryManagementRepository
     {
         private string connString { get; set; }
         public DietaryManagementRepository()
@@ -53,40 +62,88 @@ namespace AppNiZiAPI.Models.Repositories
             }
         }
 
-        public bool UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement) {
+        public bool UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement)
+        {
 
-            using (SqlConnection conn = new SqlConnection(connString)) {
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
                 conn.Open();
-                var query = $@"UPDATE DietaryManagement
-                                SETdietary_restriction_id = (SELECT r.id
+                var query = @"UPDATE DietaryManagement
+                                SET dietary_restriction_id = (SELECT r.id
                                                                 FROM DietaryRestriction as r
-                                                                WHERE r.description = {dietaryManagement.Description} )
-                                  ,amount = {dietaryManagement.Amount}
-                                  ,patient_id = {dietaryManagement.PatientId}
-                                  ,is_active = {dietaryManagement.IsActive}
-                             WHERE id = {id}";
+                                                                WHERE r.description = @DESCRIPTION)
+                                  ,amount = @AMOUNT
+                                  ,patient_id = @PATIENT
+                                  ,is_active = @ISACTIVE
+                             WHERE id = @ID";
 
                 SqlCommand command = new SqlCommand(query, conn);
+                command.Parameters.Add("@DESCRIPTION", SqlDbType.VarChar).Value = dietaryManagement.Description;
+                command.Parameters.Add("@AMOUNT", SqlDbType.Int).Value = dietaryManagement.Amount;
+                command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietaryManagement.PatientId;
+                command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietaryManagement.IsActive;
+                command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+
                 return command.ExecuteNonQuery() > 0;
             }
         }
 
-        public bool DeleteDietaryManagement(int id) {
+        public bool DeleteDietaryManagement(int id)
+        {
             using (SqlConnection conn = new SqlConnection(connString))
             {
                 conn.Open();
-                var query = $@"DELETE FROM DietaryManagement
-                                WHERE id = {id}";
+                var query = @"DELETE FROM DietaryManagement
+                                WHERE id = @ID";
 
                 try
                 {
                     SqlCommand command = new SqlCommand(query, conn);
+                    command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
                     return command.ExecuteNonQuery() > 0;
                 }
                 catch (Exception)
                 {
 
                     return false;
+                }
+            }
+        }
+
+        public bool AddDietaryManagement(DietaryManagementModel dietary)
+        {
+            using (SqlConnection conn = new SqlConnection(connString))
+            {
+                conn.Open();
+                var query = @"INSERT INTO DietaryManagement
+                                   (dietary_restriction_id,
+                                    amount,
+                                    patient_id,
+                                    is_active)
+                             VALUES
+                                   (
+                                    (
+                                    SELECT r.id
+                                        FROM DietaryRestriction as r
+                                        WHERE r.description = @DESCRIPTION
+                                    ),
+                                    @AMOUNT,
+                                    @PATIENT,
+                                    @ISACTIVE
+                                )";
+
+                try
+                {
+                    SqlCommand command = new SqlCommand(query, conn);
+                    command.Parameters.Add("@DESCRIPTION", SqlDbType.VarChar).Value = dietary.Description;
+                    command.Parameters.Add("@AMOUNT", SqlDbType.Int).Value = dietary.Amount;
+                    command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietary.PatientId;
+                    command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietary.IsActive;
+                    return command.ExecuteNonQuery() > 0;
+                }
+                catch (Exception e)
+                {
+                    throw e;
                 }
             }
         }

@@ -7,56 +7,49 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using AppNiZiAPI.Variables;
-using AppNiZiAPI.Models;
-using AppNiZiAPI.Models.Repositories;
-using AppNiZiAPI.Security;
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using System.Net;
-using Authorization = AppNiZiAPI.Security.Authorization;
+using AppNiZiAPI.Models;
+using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using AppNiZiAPI.Variables;
+using AppNiZiAPI.Models.Repositories;
 
-namespace AppNiZiAPI.Functions.DietaryManagement.PUT
+namespace AppNiZiAPI.Functions.DietaryManagement.POST
 {
-    public static class UpdateDietaryManagement
+    public static class CreateDieataryManagement
     {
         /// <summary>
-        /// Update a dietaryManagment
+        /// Get DietaryManagement of a Patient
         /// </summary>
-        /// <param name="dietId"></param>
-        /// <param name="req"></param>
+        /// <param name="patientId"></param>
         /// <returns>list of dietarymanagement</returns>
         [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
-        [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(Error))]
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(Error))]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized, Type = typeof(Error))]
         [RequestHttpHeader("Authorization", isRequired: false)]
-        [FunctionName("UpdateDietaryManagement")]
+        [FunctionName("CreateDieataryManagement")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.DietaryManagementById))]
-            [RequestBodyType(typeof(DietaryManagementModel), "Dietary management")]HttpRequest req, string dietId,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.DietaryManagement))] HttpRequest req,
             ILogger log)
         {
-
             //link voor swagger https://medium.com/@yuka1984/open-api-swagger-and-swagger-ui-on-azure-functions-v2-c-a4a460b34b55
             log.LogInformation("C# HTTP trigger function processed a request.");
             //if (!await Authorization.CheckAuthorization(req.Headers)) { return new UnauthorizedResult(); }
-
-            int id = 0;
-            if (!int.TryParse(dietId, out id)) { return new BadRequestObjectResult(Messages.ErrorMissingValues); }
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             if (string.IsNullOrEmpty(requestBody))
                 return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues);
 
+            DietaryManagementModel dietary = null;
+
             IDietaryManagementRepository repository = new DietaryManagementRepository();
+            
             try
             {
-                DietaryManagementModel dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
-                bool success = repository.UpdateDietaryManagement(id, dietary);
-
+                dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
+                bool success = repository.AddDietaryManagement(dietary);
                 if (success)
                 {
-                    return new OkObjectResult(Messages.OKUpdate);
+                    return new OkObjectResult(Messages.OKPost);
                 }
                 else
                 {
@@ -65,7 +58,6 @@ namespace AppNiZiAPI.Functions.DietaryManagement.PUT
             }
             catch (Exception e)
             {
-
                 return new NotFoundObjectResult(Messages.ErrorMissingValues + e.Message);
             }
         }

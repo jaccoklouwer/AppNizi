@@ -41,7 +41,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
             int id = 0;
             if (!int.TryParse(dietId, out id)) { return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues); }
 
-            DietaryManagementRepository repository = new DietaryManagementRepository();
+            IDietaryManagementRepository repository = new DietaryManagementRepository();
             bool success = false;
             try
             {

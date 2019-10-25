@@ -42,13 +42,13 @@ namespace AppNiZiAPI.Functions.DietaryManagement
             List<DietaryManagementModel> dietaryManagementModels = null;
             try
             {
-                DietaryManagementRepository repository = new DietaryManagementRepository();
+                IDietaryManagementRepository repository = new DietaryManagementRepository();
                 dietaryManagementModels = repository.GetDietaryManagementByPatient(id);
             }
             catch (Exception e)
             {
                 log.LogInformation(e.Message);
-                return new NotFoundObjectResult(Messages.ErrorMissingValues);
+                return new NotFoundObjectResult(Messages.ErrorMissingValues + e.Message);
             }
 
             if (dietaryManagementModels == null)
