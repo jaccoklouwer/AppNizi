@@ -13,17 +13,13 @@ using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
 using System.Net;
 using AppNiZiAPI.Models.Handlers;
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AppNiZiAPI.Functions.Patients.POST
 {
-
-
     public static class CreatePatient
     {
-
-
-
-
         [FunctionName("CreatePatient")]
         public static async Task<HttpResponseMessage> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Patients))] HttpRequestMessage req,
@@ -41,12 +37,14 @@ namespace AppNiZiAPI.Functions.Patients.POST
 
             try
             {
+                IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
+
                 // Received object from client
                 PatientObject patient = JsonConvert.DeserializeObject<PatientObject>(jsonContent);
 
                 // Insert and fetch object
-                int id = new PatientRepository().Insert(patient);
-                PatientObject returnedObj = new PatientRepository().Select(id);
+                int id = patientRepository.Insert(patient);
+                PatientObject returnedObj = patientRepository.Select(id);
 
                 // Return response
                 return req.CreateResponse(HttpStatusCode.Created, returnedObj);
