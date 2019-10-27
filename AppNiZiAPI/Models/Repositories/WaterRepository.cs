@@ -1,4 +1,5 @@
-﻿using AppNiZiAPI.Models.Water;
+﻿using AppNiZiAPI.Models.Handlers;
+using AppNiZiAPI.Models.Water;
 using AppNiZiAPI.Variables;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -68,6 +69,11 @@ namespace AppNiZiAPI.Models.Repositories
             }
             return waterConsumptions;
         }
+
+        //public Result InsertWaterConsumption(WaterConsumptionViewModel model)
+        //{
+
+        //}
 
 
         private void ReadFromDataReader(SqlDataReader reader)

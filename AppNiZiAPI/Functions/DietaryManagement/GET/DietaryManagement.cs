@@ -35,7 +35,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement
             ILogger log)
         {
             //link voor swagger https://medium.com/@yuka1984/open-api-swagger-and-swagger-ui-on-azure-functions-v2-c-a4a460b34b55
-            //if (!await Authorization.CheckAuthorization(req.Headers)) { return new UnauthorizedResult(); }
+            //if (!await Authorization.CheckAuthorization(req, patientId)) { return new UnauthorizedResult(); }
             int id = 0;
             if (!int.TryParse(patientId, out id)) { return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues); }
 

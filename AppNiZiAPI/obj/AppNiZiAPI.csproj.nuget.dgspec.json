@@ -57,11 +57,11 @@
             },
             "Microsoft.IdentityModel.Protocols": {
               "target": "Package",
-              "version": "[5.6.0, )"
+              "version": "[5.5.0, )"
             },
             "Microsoft.IdentityModel.Protocols.OpenIdConnect": {
               "target": "Package",
-              "version": "[5.6.0, )"
+              "version": "[5.5.0, )"
             },
             "Microsoft.NET.Sdk.Functions": {
               "target": "Package",
@@ -79,7 +79,7 @@
             },
             "System.Data.SqlClient": {
               "target": "Package",
-              "version": "[4.7.0, )"
+              "version": "[4.6.0, )"
             }
           },
           "imports": [

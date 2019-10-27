@@ -12,6 +12,7 @@ using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models.Water;
 using AppNiZiAPI.Security;
+using Newtonsoft.Json.Linq;
 
 namespace AppNiZiAPI.Functions.WaterConsumption.GET
 {
@@ -19,14 +20,16 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
     {
         [FunctionName("WaterConsumption")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = (Routes.APIVersion + Routes.GetWaterConsumption))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetWaterConsumption))] HttpRequest req,
             ILogger log, int patientId, string date)
         {
-            if (!await Authorization.CheckAuthorization(req.Headers, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            // Auth check
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+
             WaterRepository rep = new WaterRepository();
             WaterConsumptionDaily model = rep.GetWaterConsumption(patientId, date);
 
-            if(model.WaterConsumptions.Count == 0)
+            if (model.WaterConsumptions.Count == 0)
             {
                 return new StatusCodeResult(StatusCodes.Status204NoContent);
             }
