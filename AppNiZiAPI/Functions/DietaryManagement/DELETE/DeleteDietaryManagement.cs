@@ -29,7 +29,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(Error))]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized, Type = typeof(Error))]
         [RequestHttpHeader("Authorization", isRequired: false)]
-        [FunctionName("Delete DietaryManagement")]
+        [FunctionName("DeleteDietaryManagement")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, string dietId,
             ILogger log)
@@ -41,7 +41,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
             int id = 0;
             if (!int.TryParse(dietId, out id)) { return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues); }
 
-            DietaryManagementRepository repository = new DietaryManagementRepository();
+            IDietaryManagementRepository repository = new DietaryManagementRepository();
             bool success = false;
             try
             {

@@ -7413,27 +7413,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Mitch\\.nuget\\packages\\": {},
-    "C:\\Microsoft\\Xamarin\\NuGet\\": {},
+    "C:\\Users\\jacco\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Mitch\\Documents\\GitHub\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
+      "projectUniqueName": "D:\\documenten\\cloud\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
       "projectName": "AppNiZiAPI",
-      "projectPath": "C:\\Users\\Mitch\\Documents\\GitHub\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
-      "packagesPath": "C:\\Users\\Mitch\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Mitch\\Documents\\GitHub\\AppNizi\\AppNiZiAPI\\obj\\",
+      "projectPath": "D:\\documenten\\cloud\\AppNizi\\AppNiZiAPI\\AppNiZiAPI.csproj",
+      "packagesPath": "C:\\Users\\jacco\\.nuget\\packages\\",
+      "outputPath": "D:\\documenten\\cloud\\AppNizi\\AppNiZiAPI\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Microsoft\\Xamarin\\NuGet\\",
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Mitch\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+        "C:\\Users\\jacco\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.1"
@@ -7496,10 +7493,16 @@
           }
         },
         "imports": [
-          "net461"
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
         ],
         "assetTargetFallback": true,
-        "warn": true
+        "warn": true,
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.0.100\\RuntimeIdentifierGraph.json"
       }
     }
   }

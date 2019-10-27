@@ -29,7 +29,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement
         [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(Error))]
         [ProducesResponseType((int)HttpStatusCode.Unauthorized, Type = typeof(Error))]
         [RequestHttpHeader("Authorization", isRequired: false)]
-        [FunctionName("Get DietaryManagement By Patient")]
+        [FunctionName("GetDietaryManagementByPatient")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, string patientId,
             ILogger log)
@@ -42,13 +42,13 @@ namespace AppNiZiAPI.Functions.DietaryManagement
             List<DietaryManagementModel> dietaryManagementModels = null;
             try
             {
-                DietaryManagementRepository repository = new DietaryManagementRepository();
+                IDietaryManagementRepository repository = new DietaryManagementRepository();
                 dietaryManagementModels = repository.GetDietaryManagementByPatient(id);
             }
             catch (Exception e)
             {
                 log.LogInformation(e.Message);
-                return new NotFoundObjectResult(Messages.ErrorMissingValues);
+                return new NotFoundObjectResult(Messages.ErrorMissingValues + e.Message);
             }
 
             if (dietaryManagementModels == null)
