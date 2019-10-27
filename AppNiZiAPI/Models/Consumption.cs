@@ -4,17 +4,17 @@ using System.Text;
 
 namespace AppNiZiAPI.Models
 {
-    public class Food
+    public class Consumption : BaseEntity
     {
-        public int FoodId { get; set; }
-        public string Name { get; set; }
+        public string FoodName { get; set; }
         public float KCal { get; set; }
         public float Protein { get; set; }
         public float Fiber { get; set; }
-        public float Calcium { get; set; }
+        public float Calium { get; set; }
         public float Sodium { get; set; }
-        public float PortionSize { get; set; }
+        public int Amount { get; set; }
         public float WeightUnitId { get; set; }
-
+        public DateTime Date { get; set; }
+        public int PatientId { get; set; }
     }
 }

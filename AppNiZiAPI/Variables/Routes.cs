@@ -9,6 +9,10 @@ namespace AppNiZiAPI.Variables
         // API info
         public const string APIVersion = "v1";
 
+        //Swagger
+        public const string SwaggerUI = "swagger/ui";
+        public const string SwaggerJson = "swagger/json";
+
         // Patients
         public const string Patients = "/patients";
         public const string Me = "/me";
@@ -19,14 +23,32 @@ namespace AppNiZiAPI.Variables
         // Doctors
         public const string GetDoctorPatients = "/doctor/patients";
 
+        // Consumption
+        public const string Consumption = "/consumption/{consumptionId}";
+        public const string Consumptions = "/consumptions";
+
         // Water Consumption
         public const string PostWaterConsumption = "/waterConsumption";
-        public const string GetWaterConsumption = "/waterconsumption/{patientId: int}";
+        public const string GetWaterConsumption = "/waterconsumption/{patientId:int}/{date}";
+        public const string GetWaterConsumptionPeriod = "/waterconsumption/period/{patientId:int}";
 
         // DietaryManagement
         public const string DietaryManagement = "/dietaryManagement";
+        public const string GetDietaryManagement = "/dietaryManagement/{patientId}";
+        public const string DietaryManagementById = "/dietaryManagement/{dietId}";
 
         //Food
-        public const string FoodByName = "/food/{foodName: string}";
+        public const string FoodByName = "/food/{foodName}";
+        public const string FoodByPartialname = "/food/partial/{foodName}";
+        //TODO verbeter deze fantastische naamgeving 
+
+        public const string GetFavoriteFood = "/food/favorite/{patientId}";
+        public const string PostFavoriteFood = "/test/postfavorite";
+
+        //Meal
+        public const string AddMeal = "/meal/add/{patientId}";
+        public const string DeleteMeal = "/meal/delete/{patientId}/{mealId}";
+        public const string GetMeals = "/meal/get/{patientId}";
+
     }
 }
