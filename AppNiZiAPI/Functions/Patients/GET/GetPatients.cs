@@ -18,6 +18,8 @@ using Microsoft.Net.Http.Headers;
 using System.Net.Http.Headers;
 using AppNiZiAPI.Security;
 using Microsoft.IdentityModel.Logging;
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AppNiZiAPI.Functions.Patients
 {
@@ -38,7 +40,8 @@ namespace AppNiZiAPI.Functions.Patients
 
             int count = new QueryHandler().ExtractIntegerFromRequestQuery("count", req);
 
-            List<PatientView> patients = new PatientRepository().List(count);
+            IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
+            List<PatientView> patients = patientRepository.List(count);
 
             dynamic data = JsonConvert.SerializeObject(patients);
             

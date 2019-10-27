@@ -8,7 +8,16 @@ using System.Text;
 
 namespace AppNiZiAPI.Models.Repositories
 {
-    class PatientRepository
+    public interface IPatientRepository
+    {
+        PatientObject Select(int id);
+        PatientObject Select(string guid);
+        List<PatientView> List(int count);
+        int Insert(PatientObject patient);
+        bool Delete(string guid);
+    }
+
+    public class PatientRepository : IPatientRepository
     {
         /// <summary>
         /// Select patient by ID.
@@ -130,7 +139,7 @@ namespace AppNiZiAPI.Models.Repositories
                 sqlCmd.Parameters.Add("@WEIGHT", SqlDbType.Int).Value = patient.weightInKilograms;
                 sqlCmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = Guid.NewGuid().ToString();
 
-                createdObjectId = (int) sqlCmd.ExecuteScalar();
+                createdObjectId = (int)sqlCmd.ExecuteScalar();
             }
 
             return createdObjectId;
