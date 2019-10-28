@@ -8,6 +8,8 @@ using Microsoft.Extensions.Logging;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
 using System.Net;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Infrastructure;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
 {
@@ -28,7 +30,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
             //if (!await Authorization.CheckAuthorization(req, patientId)) { return new UnauthorizedResult(); }
 
 
-            IDietaryManagementRepository repository = new DietaryManagementRepository();
+            IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
             bool success;
             try
             {

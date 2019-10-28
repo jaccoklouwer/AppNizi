@@ -7,10 +7,15 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
+using AppNiZiAPI.Models.Dietarymanagement;
 using AppNiZiAPI.Models;
 using System.Collections.Generic;
 using AppNiZiAPI.Models.Repositories;
+using AppNiZiAPI.Security;
+using AppNiZiAPI.Infrastructure;
 using System.Net;
+using Authorization = AppNiZiAPI.Security.Authorization;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.GET
 {
@@ -29,13 +34,19 @@ namespace AppNiZiAPI.Functions.DietaryManagement.GET
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
-            //if (!await Authorization.CheckAuthorization(req, patientId)) { return new UnauthorizedResult(); }
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
             List<DietaryManagementModel> dietaryManagementModels;
+            List<DietaryRestriction> dietaryRestrictions;
+            DietaryView view;
             try
             {
-                IDietaryManagementRepository repository = new DietaryManagementRepository();
+                IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
                 dietaryManagementModels = repository.GetDietaryManagementByPatient(patientId);
+                dietaryRestrictions = repository.GetDietaryRestrictions();
+                view = new DietaryView();
+                view.DietaryManagements = dietaryManagementModels;
+                view.restrictions = dietaryRestrictions;
             }
             catch (Exception e)
             {
@@ -46,7 +57,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.GET
             if (dietaryManagementModels == null)
                 return new BadRequestObjectResult("No Dietarymanagement was found!");
 
-            string json = JsonConvert.SerializeObject(dietaryManagementModels);
+            string json = JsonConvert.SerializeObject(view);
 
             return json != null
                 ? (ActionResult)new OkObjectResult(json)

@@ -10,6 +10,9 @@ using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Infrastructure;
+using AppNiZiAPI.Models.Dietarymanagement;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.PUT
 {
@@ -38,7 +41,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.PUT
             if (string.IsNullOrEmpty(requestBody))
                 return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues);
 
-            IDietaryManagementRepository repository = new DietaryManagementRepository();
+            IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
             try
             {
                 DietaryManagementModel dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
