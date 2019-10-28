@@ -10,6 +10,11 @@ using Newtonsoft.Json;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models.Handlers;
 using AppNiZiAPI.Variables;
+using AppNiZiAPI.Security;
+
+
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AppNiZiAPI.Functions.Meal.DELETE
 {
@@ -20,11 +25,12 @@ namespace AppNiZiAPI.Functions.Meal.DELETE
             [HttpTrigger(AuthorizationLevel.Function, "delete", "post", Route = ( Routes.APIVersion + Routes.DeleteMeal))] HttpRequest req,
             ILogger log,int mealId,int patientId)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
-
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            
+            IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
             try
             {
-                bool success = new MealRepository().DeleteMeal(patientId,mealId);
+                bool success = mealRepository.DeleteMeal(patientId,mealId);
 
                 if (success)
                     return new OkObjectResult("Deleted.");

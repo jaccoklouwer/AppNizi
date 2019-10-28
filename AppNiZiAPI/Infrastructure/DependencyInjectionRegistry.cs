@@ -14,6 +14,10 @@ namespace AppNiZiAPI.Infrastructure
             services.AddSingleton<IPatientRepository, PatientRepository>();
             services.AddSingleton<IAuthorizationRepository, AuthorizationRepository>();
 
+            services.AddSingleton<IFoodRepository, FoodRepository>();
+
+            services.AddSingleton<IMealRepository, MealRepository>();
+
             return services;
         }
     }
