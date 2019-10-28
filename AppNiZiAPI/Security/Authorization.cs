@@ -5,10 +5,11 @@ using Microsoft.Net.Http.Headers;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
+using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using AppNiZiAPI.Infrastructure;
 
 namespace AppNiZiAPI.Security
 {
@@ -18,7 +19,7 @@ namespace AppNiZiAPI.Security
          * Authorization Check for every call
         */
 
-        public static async Task<bool> CheckAuthorization(HttpRequest req, int userId)
+        public static async Task<bool> CheckAuthorization(HttpRequest req, int userId = 0)
         {
             bool isDoctor = false;
 
@@ -48,13 +49,18 @@ namespace AppNiZiAPI.Security
             catch (Exception)
             { return false; }
 
+            IAuthorizationRepository authRepository = DIContainer.Instance.GetService<IAuthorizationRepository>();
+            // Kan misschien weg
+            if (userId == 0 && authRepository.GetAccountId(tokenGuid, isDoctor) == 0)
+                return false;
+
             // When a call is from a Doctor that needs info about a patient, the following method will be called
             // UserId is here patientId
-            if (isDoctor && new AuthorizationRepositories().CheckDoctorAcces(userId, tokenGuid))
+            if (isDoctor && authRepository.CheckDoctorAcces(userId, tokenGuid))
                 return true;
 
             // When a call is from a patient of doctor and only ask for information about the same user the following method will be called
-            if (userId != 0 && new AuthorizationRepositories().PatientAuth(userId, tokenGuid, isDoctor))
+            if (userId != 0 && authRepository.PatientAuth(userId, tokenGuid, isDoctor))
                 return true;
 
             return false;
