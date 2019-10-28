@@ -8,7 +8,7 @@ using System.Text;
 
 namespace AppNiZiAPI.Models.Repositories
 {
-    class FoodRepository: Repository
+    class FoodRepository: Repository, IFoodRepository
     {
         //change to Id
         public Food Select(string foodname)
@@ -100,7 +100,7 @@ namespace AppNiZiAPI.Models.Repositories
             }
             return foods;
         }
-        public List<Food> Favorites(int id)
+        public List<Food> Favorites(int patientId)
         {
             List<Food> foods = new List<Food>();
 
@@ -109,7 +109,7 @@ namespace AppNiZiAPI.Models.Repositories
             {
 
                 conn.Open();
-                var text = $"Select* from Food Inner Join MyFood On Food.id = MyFood.food_id where patient_id ="+ id;
+                var text = $"Select* from Food Inner Join MyFood On Food.id = MyFood.food_id where patient_id ="+ patientId;
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {

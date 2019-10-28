@@ -10,7 +10,7 @@ using System.Text;
 
 namespace AppNiZiAPI.Models.Repositories
 {
-    class WaterRepository
+    class WaterRepository : IWaterRepository
     {
         private List<WaterConsumptionViewModel> waterConsumptions = new List<WaterConsumptionViewModel>();
         private int MinumumRestriction = 0;
@@ -75,7 +75,6 @@ namespace AppNiZiAPI.Models.Repositories
 
         //}
 
-
         private void ReadFromDataReader(SqlDataReader reader)
         {
             while (reader.Read())
@@ -102,5 +101,11 @@ namespace AppNiZiAPI.Models.Repositories
                 catch { }
             }
         }
+    }
+
+    interface IWaterRepository
+    {
+        WaterConsumptionDaily GetWaterConsumption(int patientId, string date);
+        List<WaterConsumptionViewModel> GetWaterConsumptionPeriod(int patientId, string beginDate, string endDate);
     }
 }

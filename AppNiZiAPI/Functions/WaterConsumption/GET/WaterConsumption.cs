@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -8,11 +6,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
-using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models.Water;
 using AppNiZiAPI.Security;
-using Newtonsoft.Json.Linq;
+using AppNiZiAPI.Infrastructure;
+
 
 namespace AppNiZiAPI.Functions.WaterConsumption.GET
 {
@@ -23,6 +21,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetWaterConsumption))] HttpRequest req,
             ILogger log, int patientId, string date)
         {
+            
             // Auth check
             if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
@@ -39,4 +38,6 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
             return new OkObjectResult(json);
         }
     }
+
+
 }

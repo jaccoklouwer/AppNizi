@@ -11,6 +11,9 @@ using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Security;
 
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace AppNiZiAPI.Functions.Food
 {
     public static class FavoriteFood
@@ -18,11 +21,10 @@ namespace AppNiZiAPI.Functions.Food
         [FunctionName("PostFavoriteFood")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function,  "get", Route = (Routes.APIVersion + Routes.PostFavoriteFood))] HttpRequest req,
-            ILogger log)
+            ILogger log,int patientId,int foodId)
         {
-            //if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            int foodId= 1;
-            int patientId = 3;
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            
             try
             {
                 //TODO haal patient id op een coole manier op
@@ -34,7 +36,9 @@ namespace AppNiZiAPI.Functions.Food
                 return new BadRequestObjectResult(Messages.ErrorMissingValues);
             }
 
-            bool succes = new FoodRepository().Favorite(patientId,foodId);
+            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
+
+            bool succes = foodRepository.Favorite(patientId,foodId);
 
             return succes != null
                 ? (ActionResult)new OkObjectResult($"alles is super sexy en je hebt een fav gedaan")

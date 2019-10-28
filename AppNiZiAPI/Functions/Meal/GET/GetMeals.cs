@@ -11,6 +11,10 @@ using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
 using System.Collections.Generic;
 using AppNiZiAPI.Variables;
+using AppNiZiAPI.Security;
+
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AppNiZiAPI.Functions.Meal.GET
 {
@@ -21,7 +25,9 @@ namespace AppNiZiAPI.Functions.Meal.GET
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion+Routes.GetMeals))] HttpRequest req,
             ILogger log,int patientId)
         {
-            List<Models.Meal> meals = new MealRepository().GetMyMeals(patientId);
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
+            List<Models.Meal> meals = mealRepository.GetMyMeals(patientId);
 
             var jsonMeals = JsonConvert.SerializeObject(meals);
             return jsonMeals != null
