@@ -16,6 +16,9 @@ using AppNiZiAPI.Security;
 using Microsoft.Net.Http.Headers;
 using System.Net.Http.Headers;
 
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+
 
 namespace AppNiZiAPI
 {
@@ -24,12 +27,14 @@ namespace AppNiZiAPI
         [FunctionName("Food")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodByName))] HttpRequest req,
-            ILogger log, string foodName)
+            ILogger log,int patientId, string foodName)
         {
 
-            //if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            //TODO maak dit minder lelijk(iets minder lelijk nu maar wil graag van de specificatie models.food af)
-            Food food = new FoodRepository().Select(foodName);
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+
+            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
+
+            Food food = foodRepository.Select(foodName);
 
             var jsonFood = JsonConvert.SerializeObject(food);
             return jsonFood != null

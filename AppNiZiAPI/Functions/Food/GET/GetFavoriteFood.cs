@@ -12,6 +12,9 @@ using AppNiZiAPI.Models.Repositories;
 using System.Collections.Generic;
 using AppNiZiAPI.Security;
 
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace AppNiZiAPI.Functions.Food
 {
     public static class GetFavoriteFood
@@ -22,9 +25,11 @@ namespace AppNiZiAPI.Functions.Food
             ILogger log, int patientId)
         {
 
-            //if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
             //TODO maak dit minder lelijk
-            List<Models.Food> food = new FoodRepository().Favorites(patientId);
+
+            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
+            List<Models.Food> food = foodRepository.Favorites(patientId);
             //TODO convert to JSON
             var jsonFood = JsonConvert.SerializeObject(food);
 

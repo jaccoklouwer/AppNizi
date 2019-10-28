@@ -12,6 +12,9 @@ using AppNiZiAPI.Models.Repositories;
 using System.Collections.Generic;
 using AppNiZiAPI.Security;
 
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+
 namespace AppNiZiAPI.Functions.Food
 {
     public static class FoodByPartialName
@@ -19,12 +22,15 @@ namespace AppNiZiAPI.Functions.Food
         [FunctionName("FoodByPartialName")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodByPartialname))] HttpRequest req,
-            ILogger log, string foodName)
+            ILogger log,int patientId, string foodName)
         {
 
-            //if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
             //TODO maak dit minder lelijk
-            List<Models.Food> food = new FoodRepository().Search(foodName);
+
+            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
+            List<Models.Food> food = foodRepository.Search(foodName);
+
             //TODO convert to JSON
             var jsonFood = JsonConvert.SerializeObject(food);
             return food != null

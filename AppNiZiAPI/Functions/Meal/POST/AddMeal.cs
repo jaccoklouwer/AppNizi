@@ -9,6 +9,9 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Variables;
+using AppNiZiAPI.Security;
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AppNiZiAPI.Functions.Meal.POST
 {
@@ -19,14 +22,14 @@ namespace AppNiZiAPI.Functions.Meal.POST
             [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion+Routes.AddMeal))] HttpRequest req,
             ILogger log,int patientId)
         {
-
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             //no way dat dit werkt WAT? wrm zo easy al me ingewikkelde shit :(
             Models.Meal meal = new Models.Meal();
             JsonConvert.PopulateObject(requestBody, meal);
 
-            
-            bool succes = new MealRepository().AddMeal(meal);
+            IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
+            bool succes = mealRepository.AddMeal(meal);
 
             return succes != null
                 ? (ActionResult)new OkObjectResult(succes)
