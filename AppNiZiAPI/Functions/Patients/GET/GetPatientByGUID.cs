@@ -11,6 +11,8 @@ using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models.Handlers;
 using AppNiZiAPI.Models;
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AppNiZiAPI.Functions.Patients.GET
 {
@@ -28,7 +30,8 @@ namespace AppNiZiAPI.Functions.Patients.GET
 
             try
             {
-                PatientObject patient = new PatientRepository().Select(guid);
+                IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
+                PatientObject patient = patientRepository.Select(guid);
 
                 // Return object if possible
                 return patient != null

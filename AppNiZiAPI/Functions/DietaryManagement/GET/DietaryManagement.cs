@@ -11,39 +11,32 @@ using AppNiZiAPI.Models;
 using System.Collections.Generic;
 using AppNiZiAPI.Models.Repositories;
 using System.Net;
-using AppNiZiAPI.Security;
-using Authorization = AppNiZiAPI.Security.Authorization;
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Microsoft.OpenApi.Models;
 
-namespace AppNiZiAPI.Functions.DietaryManagement
+namespace AppNiZiAPI.Functions.DietaryManagement.GET
 {
     public static class DietaryManagement
     {
-        /// <summary>
-        /// Get DietaryManagement of a Patient
-        /// </summary>
-        /// <param name="patientId"></param>
-        /// <returns>list of dietarymanagement</returns>
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
-        [ProducesResponseType((int)HttpStatusCode.NotFound, Type = typeof(Error))]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(Error))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized, Type = typeof(Error))]
-        [RequestHttpHeader("Authorization", isRequired: false)]
-        [FunctionName("GetDietaryManagementByPatient")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, string patientId,
+        [OpenApiOperation("get")]
+        [OpenApiParameter("patientId", In = ParameterLocation.Path, Required = false, Type = typeof(int))]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string))]
+        [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(string))]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string))]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string))]
+        [FunctionName(nameof(GetDietaryManagementByPatient))]
+        public static async Task<IActionResult> GetDietaryManagementByPatient(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, int patientId,
             ILogger log)
         {
-            //link voor swagger https://medium.com/@yuka1984/open-api-swagger-and-swagger-ui-on-azure-functions-v2-c-a4a460b34b55
+            //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
             //if (!await Authorization.CheckAuthorization(req, patientId)) { return new UnauthorizedResult(); }
-            int id = 0;
-            if (!int.TryParse(patientId, out id)) { return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues); }
 
-            List<DietaryManagementModel> dietaryManagementModels = null;
+            List<DietaryManagementModel> dietaryManagementModels;
             try
             {
                 IDietaryManagementRepository repository = new DietaryManagementRepository();
-                dietaryManagementModels = repository.GetDietaryManagementByPatient(id);
+                dietaryManagementModels = repository.GetDietaryManagementByPatient(patientId);
             }
             catch (Exception e)
             {

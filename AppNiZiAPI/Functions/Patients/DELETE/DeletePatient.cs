@@ -12,6 +12,8 @@ using System.Net.Http;
 using System.Net;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models.Handlers;
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace AppNiZiAPI.Functions.Patients.DELETE
 {
@@ -29,7 +31,8 @@ namespace AppNiZiAPI.Functions.Patients.DELETE
 
             try
             {
-                bool success = new PatientRepository().Delete(guid);
+                IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
+                bool success = patientRepository.Delete(guid);
 
                 if (success)
                     return new OkObjectResult("Deleted.");
