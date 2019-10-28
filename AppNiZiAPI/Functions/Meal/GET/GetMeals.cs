@@ -20,19 +20,19 @@ namespace AppNiZiAPI.Functions.Meal.GET
 {
     public static class GetMeals
     {
-        [FunctionName("GetMeals")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion+Routes.GetMeals))] HttpRequest req,
-            ILogger log,int patientId)
-        {
-            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
-            List<Models.Meal> meals = mealRepository.GetMyMeals(patientId);
+        //[FunctionName("GetMeals")]
+        //public static async Task<IActionResult> Run(
+        //    [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion+Routes.GetMeals))] HttpRequest req,
+        //    ILogger log,int patientId)
+        //{
+        //    if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+        //    IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
+        //    List<Models.Meal> meals = mealRepository.GetMyMeals(patientId);
 
-            var jsonMeals = JsonConvert.SerializeObject(meals);
-            return jsonMeals != null
-                ? (ActionResult)new OkObjectResult(jsonMeals)
-                : new BadRequestObjectResult(Messages.ErrorMissingValues);
-        }
+        //    var jsonMeals = JsonConvert.SerializeObject(meals);
+        //    return jsonMeals != null
+        //        ? (ActionResult)new OkObjectResult(jsonMeals)
+        //        : new BadRequestObjectResult(Messages.ErrorMissingValues);
+        //}
     }
 }

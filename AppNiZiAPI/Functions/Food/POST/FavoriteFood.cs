@@ -18,31 +18,31 @@ namespace AppNiZiAPI.Functions.Food
 {
     public static class FavoriteFood
     {
-        [FunctionName("PostFavoriteFood")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function,  "get", Route = (Routes.APIVersion + Routes.PostFavoriteFood))] HttpRequest req,
-            ILogger log,int patientId,int foodId)
-        {
-            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+        //[FunctionName("PostFavoriteFood")]
+        //public static async Task<IActionResult> Run(
+        //    [HttpTrigger(AuthorizationLevel.Function,  "get", Route = (Routes.APIVersion + Routes.PostFavoriteFood))] HttpRequest req,
+        //    ILogger log,int patientId,int foodId)
+        //{
+        //    if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
             
-            try
-            {
-                //TODO haal patient id op een coole manier op
-                foodId = Convert.ToInt32(req.Query["foodId"].ToString());
-                patientId = Convert.ToInt32(req.Query["patientId"].ToString());
-            }
-            catch (Exception)
-            {
-                return new BadRequestObjectResult(Messages.ErrorMissingValues);
-            }
+        //    try
+        //    {
+        //        //TODO haal patient id op een coole manier op
+        //        foodId = Convert.ToInt32(req.Query["foodId"].ToString());
+        //        patientId = Convert.ToInt32(req.Query["patientId"].ToString());
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return new BadRequestObjectResult(Messages.ErrorMissingValues);
+        //    }
 
-            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
+        //    IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
 
-            bool succes = foodRepository.Favorite(patientId,foodId);
+        //    bool succes = foodRepository.Favorite(patientId,foodId);
 
-            return succes != null
-                ? (ActionResult)new OkObjectResult($"alles is super sexy en je hebt een fav gedaan")
-                : new BadRequestObjectResult("oopsiewoopsie er is een fout begaan banaan");
-        }
+        //    return succes != null
+        //        ? (ActionResult)new OkObjectResult($"alles is super sexy en je hebt een fav gedaan")
+        //        : new BadRequestObjectResult("oopsiewoopsie er is een fout begaan banaan");
+        //}
     }
 }

@@ -24,22 +24,22 @@ namespace AppNiZiAPI
 {
     public static class FoodByName
     {
-        [FunctionName("Food")]
-        public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodByName))] HttpRequest req,
-            ILogger log,int patientId, string foodName)
-        {
+        //[FunctionName("Food")]
+        //public static async Task<IActionResult> Run(
+        //    [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodByName))] HttpRequest req,
+        //    ILogger log,int patientId, string foodName)
+        //{
 
-            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+        //    if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
-            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
+        //    IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
 
-            Food food = foodRepository.Select(foodName);
+        //    Food food = foodRepository.Select(foodName);
 
-            var jsonFood = JsonConvert.SerializeObject(food);
-            return jsonFood != null
-                ? (ActionResult)new OkObjectResult(jsonFood)
-                : new BadRequestObjectResult(Messages.ErrorMissingValues);
-        }
+        //    var jsonFood = JsonConvert.SerializeObject(food);
+        //    return jsonFood != null
+        //        ? (ActionResult)new OkObjectResult(jsonFood)
+        //        : new BadRequestObjectResult(Messages.ErrorMissingValues);
+        //}
     }
 }
