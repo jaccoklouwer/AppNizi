@@ -11,7 +11,9 @@ using System.Net;
 using AppNiZiAPI.Models;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
-
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Models.Dietarymanagement;
+using AppNiZiAPI.Infrastructure;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.POST
 {
@@ -34,8 +36,8 @@ namespace AppNiZiAPI.Functions.DietaryManagement.POST
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             if (string.IsNullOrEmpty(requestBody))
                 return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues);
-            IDietaryManagementRepository repository = new DietaryManagementRepository();
-            
+            IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
+
             try
             {
                 DietaryManagementModel dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);

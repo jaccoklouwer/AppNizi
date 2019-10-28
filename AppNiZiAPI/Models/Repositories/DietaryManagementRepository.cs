@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using AppNiZiAPI.Models.Dietarymanagement;
 
 namespace AppNiZiAPI.Models.Repositories
 {
@@ -11,6 +12,7 @@ namespace AppNiZiAPI.Models.Repositories
         bool AddDietaryManagement(DietaryManagementModel dietary);
         bool DeleteDietaryManagement(int id);
         List<DietaryManagementModel> GetDietaryManagementByPatient(int patientId);
+        List<DietaryRestriction> GetDietaryRestrictions();
         bool UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement);
     }
 
@@ -32,9 +34,10 @@ namespace AppNiZiAPI.Models.Repositories
                 try
                 {
                     SqlDataReader reader = cmd.ExecuteReader();
+                    DietaryManagementModel dietaryManagementModel = new DietaryManagementModel();
                     while (reader.Read())
                     {
-                        DietaryManagementModel dietaryManagementModel = new DietaryManagementModel();
+
                         // Uit lezen bijv
                         dietaryManagementModel.Id = Int32.Parse(reader["id"].ToString());
                         dietaryManagementModel.Description = reader["description"].ToString();
@@ -53,6 +56,37 @@ namespace AppNiZiAPI.Models.Repositories
             conn.Close();
             return dietaryManagementModels;
         }
+
+        public List<DietaryRestriction> GetDietaryRestrictions()
+        {
+            List<DietaryRestriction> dietaryRestrictions = new List<DietaryRestriction>();
+            conn.Open();
+            var query = "SELECT * FROM DietaryRestriction";
+
+            using (SqlCommand cmd = new SqlCommand(query, conn))
+            {
+                try
+                {
+                    DietaryRestriction restriction = new DietaryRestriction();
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        restriction.Id = Int32.Parse(reader["id"].ToString());
+                        restriction.Description = reader["description"].ToString();
+                        dietaryRestrictions.Add(restriction);
+                    }
+                }
+                catch (Exception e)
+                {
+
+                    throw e;
+                }
+            }
+
+            conn.Close();
+            return dietaryRestrictions;
+        }
+
 
         public bool UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement)
         {

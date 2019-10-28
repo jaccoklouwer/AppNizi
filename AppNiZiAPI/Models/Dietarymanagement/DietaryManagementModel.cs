@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace AppNiZiAPI.Models
+namespace AppNiZiAPI.Models.Dietarymanagement
 {
     public class DietaryManagementModel
     {
