@@ -9,43 +9,38 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net;
 using AppNiZiAPI.Models;
-using AzureFunctions.Extensions.Swashbuckle.Attribute;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.POST
 {
-    public static class CreateDieataryManagement
+    public static class DieataryManagement
     {
-        /// <summary>
-        /// Get DietaryManagement of a Patient
-        /// </summary>
-        /// <param name="patientId"></param>
-        /// <returns>list of dietarymanagement</returns>
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(string))]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest, Type = typeof(Error))]
-        [ProducesResponseType((int)HttpStatusCode.Unauthorized, Type = typeof(Error))]
-        [RequestHttpHeader("Authorization", isRequired: false)]
-        [FunctionName("CreateDieataryManagement")]
-        public static async Task<IActionResult> Run(
+        [OpenApiOperation("get")]
+        [OpenApiRequestBody("application / json", typeof(DietaryManagementModel))]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string))]
+        [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(string))]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string))]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string))]
+        [FunctionName(nameof(CreateDieataryManagement))]
+        public static async Task<IActionResult> CreateDieataryManagement(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.DietaryManagement))] HttpRequest req,
             ILogger log)
         {
-            //link voor swagger https://medium.com/@yuka1984/open-api-swagger-and-swagger-ui-on-azure-functions-v2-c-a4a460b34b55
+            //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
             log.LogInformation("C# HTTP trigger function processed a request.");
             //if (!await Authorization.CheckAuthorization(req.Headers)) { return new UnauthorizedResult(); }
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             if (string.IsNullOrEmpty(requestBody))
                 return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues);
-
-            DietaryManagementModel dietary = null;
-
             IDietaryManagementRepository repository = new DietaryManagementRepository();
             
             try
             {
-                dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
+                DietaryManagementModel dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
                 bool success = repository.AddDietaryManagement(dietary);
                 if (success)
                 {
