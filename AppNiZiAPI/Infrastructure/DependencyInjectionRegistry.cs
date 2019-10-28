@@ -1,9 +1,6 @@
 ﻿using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Security;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace AppNiZiAPI.Infrastructure
 {
@@ -19,6 +16,8 @@ namespace AppNiZiAPI.Infrastructure
 
             services.AddSingleton<IMealRepository, MealRepository>();
             services.AddSingleton<IDietaryManagementRepository, DietaryManagementRepository>();
+
+            services.AddSingleton<IConsumptionRepository, ConsumptionRespository>();
 
             return services;
         }
