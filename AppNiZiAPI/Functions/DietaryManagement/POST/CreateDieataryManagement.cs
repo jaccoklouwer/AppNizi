@@ -11,19 +11,17 @@ using System.Net;
 using AppNiZiAPI.Models;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
-using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
-using Microsoft.OpenApi.Models;
+
 
 namespace AppNiZiAPI.Functions.DietaryManagement.POST
 {
     public static class DieataryManagement
     {
-        [OpenApiOperation("get")]
-        [OpenApiRequestBody("application / json", typeof(DietaryManagementModel))]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string))]
+        /// <summary>
+        /// Create DieataryManagement
+        /// </summary>
+        /// <param name="req"
+        /// <returns></returns>
         [FunctionName(nameof(CreateDieataryManagement))]
         public static async Task<IActionResult> CreateDieataryManagement(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.DietaryManagement))] HttpRequest req,

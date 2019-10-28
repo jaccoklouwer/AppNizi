@@ -11,19 +11,18 @@ using AppNiZiAPI.Models;
 using System.Collections.Generic;
 using AppNiZiAPI.Models.Repositories;
 using System.Net;
-using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
-using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.GET
 {
     public static class DietaryManagement
     {
-        [OpenApiOperation("get")]
-        [OpenApiParameter("patientId", In = ParameterLocation.Path, Required = false, Type = typeof(int))]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string))]
+        /// <summary>
+        /// Get DietaryManagement
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
+        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DietaryManagementModel[]))]
+        [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(Error))]
         [FunctionName(nameof(GetDietaryManagementByPatient))]
         public static async Task<IActionResult> GetDietaryManagementByPatient(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, int patientId,

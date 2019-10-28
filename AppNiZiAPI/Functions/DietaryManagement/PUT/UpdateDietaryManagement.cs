@@ -10,22 +10,18 @@ using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
-using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
-using System.Net;
-using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.PUT
 {
-    
+
     public static class DietaryManagement
     {
-        [OpenApiOperation("put")]
-        [OpenApiRequestBody("application / json", typeof(DietaryManagementModel))]
-        [OpenApiParameter("dietId", In = ParameterLocation.Path, Required = false, Type = typeof(int))]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string))]
+        /// <summary>
+        /// Create DieataryManagement
+        /// </summary>
+        /// <param name="req"></param>
+        /// <param name="dietId"></param>
+        /// <returns></returns>
         [FunctionName(nameof(RuUpdateDietaryManagementn))]
         public static async Task<IActionResult> RuUpdateDietaryManagementn(
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.DietaryManagementById))]

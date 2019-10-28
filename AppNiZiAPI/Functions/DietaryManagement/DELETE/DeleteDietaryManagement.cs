@@ -8,19 +8,16 @@ using Microsoft.Extensions.Logging;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
 using System.Net;
-using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
-using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
 {
     public static class DietaryManagement
     {
-        [OpenApiOperation("delete")]
-        [OpenApiParameter("dietId", In = ParameterLocation.Path, Required = false, Type = typeof(int))]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string))]
+        /// <summary>
+        /// Create Products
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns></returns>
         [FunctionName(nameof(DeleteDietaryManagement))]
         public static async Task<IActionResult> DeleteDietaryManagement(
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId,
