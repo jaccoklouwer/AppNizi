@@ -34,7 +34,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.GET
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
-            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            //if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
             List<DietaryManagementModel> dietaryManagementModels;
             List<DietaryRestriction> dietaryRestrictions;
