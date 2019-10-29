@@ -6,6 +6,7 @@
   <ItemGroup>
     <PackageReference Include="AzureFunctions.Extensions.Swashbuckle" Version="1.4.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.2.5" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols" Version="5.5.0" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="5.5.0" />

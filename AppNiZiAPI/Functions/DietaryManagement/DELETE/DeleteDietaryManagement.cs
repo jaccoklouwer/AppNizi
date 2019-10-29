@@ -7,9 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
-using System.Net;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
+using AppNiZiAPI.Security;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
 {
@@ -18,16 +18,16 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
         /// <summary>
         /// Create Products
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="dietId"></param>
         /// <returns></returns>
         [FunctionName(nameof(DeleteDietaryManagement))]
         public static async Task<IActionResult> DeleteDietaryManagement(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId,
+            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId, int patientId,
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
             log.LogInformation("C# HTTP trigger function processed a request.");
-            //if (!await Authorization.CheckAuthorization(req, patientId)) { return new UnauthorizedResult(); }
+            if (!await new Authorization().CheckAuthorization(req, patientId)) { return new UnauthorizedObjectResult(Messages.AuthNoAcces); }
 
 
             IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
