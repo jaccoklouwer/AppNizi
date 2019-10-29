@@ -16,6 +16,8 @@ using AppNiZiAPI.Infrastructure;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using Microsoft.OpenApi.Models;
+using AppNiZiAPI.Security;
+using AppNiZiAPI.Models;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.POST
 {
@@ -34,7 +36,6 @@ namespace AppNiZiAPI.Functions.DietaryManagement.POST
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
             log.LogInformation("C# HTTP trigger function processed a request.");
-            //if (!await Authorization.CheckAuthorization(req.Headers)) { return new UnauthorizedResult(); }
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             if (string.IsNullOrEmpty(requestBody))
@@ -44,7 +45,13 @@ namespace AppNiZiAPI.Functions.DietaryManagement.POST
             try
             {
                 DietaryManagementModel dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
-                bool success = repository.AddDietaryManagement(dietary);
+
+
+                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, dietary.PatientId);
+                if (!authResult.Result)
+                    return new StatusCodeResult(authResult.StatusCode);
+
+                bool success = repository.AddDietaryManagement(dietary.Model);
                 if (success)
                 {
                     return new OkObjectResult(Messages.OKPost);
