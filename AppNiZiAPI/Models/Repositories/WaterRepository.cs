@@ -1,7 +1,6 @@
 ﻿using AppNiZiAPI.Models.Handlers;
 using AppNiZiAPI.Models.Water;
 using AppNiZiAPI.Variables;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -20,18 +19,20 @@ namespace AppNiZiAPI.Models.Repositories
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
                 conn.Open();
-                var text = 
-                    $"SELECT w.*, u.short, u.unit, dm.amount AS maxAmount " +
-                    $"FROM WaterConsumption AS w " +
-                    $"INNER JOIN WeightUnit AS u ON w.weight_unit_id = u.id " +
-                    $"INNER JOIN DietaryManagement AS dm ON dm.patient_id = w.patient_id " +
-                    $"WHERE w.patient_id = {patientId} AND w.date = '{date}'";
+                string sqlQuery =
+                    "SELECT w.*, u.short, u.unit, dm.amount AS maxAmount " +
+                    "FROM WaterConsumption AS w " +
+                    "INNER JOIN WeightUnit AS u ON w.weight_unit_id = u.id " +
+                    "INNER JOIN DietaryManagement AS dm ON dm.patient_id = w.patient_id " +
+                    "WHERE w.patient_id = @PATIENTID AND w.date = @DATE";
 
-                using (SqlCommand cmd = new SqlCommand(text, conn))
-                {
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    ReadFromDataReader(reader);
-                }
+                SqlCommand cmd = new SqlCommand(sqlQuery, conn);
+                cmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
+                cmd.Parameters.Add("@DATE", SqlDbType.NVarChar).Value = date;
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                ReadFromDataReader(reader);
+
                 conn.Close();
             }
 
@@ -55,25 +56,48 @@ namespace AppNiZiAPI.Models.Repositories
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
                 conn.Open();
-                var text = $"SELECT w.*, u.short, u.unit " +
-                    $"FROM WaterConsumption AS w " +
-                    $"INNER JOIN WeightUnit AS u ON u.id = w.weight_unit_id "+
-                    $"WHERE w.patient_id = {patientId} AND w.date BETWEEN '{beginDate}' AND '{endDate}'";
+                var sqlQuery = $"SELECT w.*, u.short, u.unit " +
+                    "FROM WaterConsumption AS w " +
+                    "INNER JOIN WeightUnit AS u ON u.id = w.weight_unit_id " +
+                    "WHERE w.patient_id = @PATIENTID AND w.date BETWEEN @BEGINDATE AND @ENDDATE " +
+                    "ORDER BY w.date ASC";
 
-                using (SqlCommand cmd = new SqlCommand(text, conn))
-                {
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    ReadFromDataReader(reader);
-                }
+                SqlCommand cmd = new SqlCommand(sqlQuery, conn);
+                cmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
+                cmd.Parameters.Add("@BEGINDATE", SqlDbType.NVarChar).Value = beginDate;
+                cmd.Parameters.Add("@ENDDATE", SqlDbType.NVarChar).Value = endDate;
+
+                SqlDataReader reader = cmd.ExecuteReader();
+                ReadFromDataReader(reader);
+
                 conn.Close();
             }
             return waterConsumptions;
         }
 
-        //public Result InsertWaterConsumption(WaterConsumptionViewModel model)
-        //{
+        public Result InsertWaterConsumption(WaterConsumptionModel model)
+        {
+            using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                var sqlQuery =
+                    $"INSERT INTO WaterConsumption(date, amount, patient_id, weight_unit_id) " +
+                    $"VALUES(@DATE,@AMOUNT ,@PATIENTID, 7)";
 
-        //}
+                SqlCommand cmd = new SqlCommand(sqlQuery, conn);
+                cmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = model.PatientId;
+                cmd.Parameters.Add("@DATE", SqlDbType.NVarChar).Value = model.Date.ToString("yyy-MM-dd");
+                cmd.Parameters.Add("@AMOUNT", SqlDbType.Int).Value = model.Amount;
+
+                conn.Open();
+
+                int result = cmd.ExecuteNonQuery();
+                conn.Close();
+
+                if (result > 0)
+                    return new Result { Succesfull = true, Message = Messages.OKPost };
+            }
+            return new Result { Succesfull = false, Message = Messages.ErrorPost };
+        }
 
         private void ReadFromDataReader(SqlDataReader reader)
         {
@@ -107,5 +131,6 @@ namespace AppNiZiAPI.Models.Repositories
     {
         WaterConsumptionDaily GetWaterConsumption(int patientId, string date);
         List<WaterConsumptionViewModel> GetWaterConsumptionPeriod(int patientId, string beginDate, string endDate);
+        Result InsertWaterConsumption(WaterConsumptionModel model);
     }
 }

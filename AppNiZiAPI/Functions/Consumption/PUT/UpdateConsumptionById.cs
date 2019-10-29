@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Infrastructure;
 
 namespace AppNiZiAPI
 {
@@ -20,6 +22,8 @@ namespace AppNiZiAPI
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.Consumption))] HttpRequest req,
             ILogger log, string consumptionId)
         {
+            log.LogDebug($"Triggered '" + typeof(UpdateConsumptionById).Name + "' with parameter: '" + consumptionId + "'");
+
             if (!int.TryParse(consumptionId, out int id)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
             Consumption updateConsumption = new Consumption();
             string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();
@@ -27,7 +31,8 @@ namespace AppNiZiAPI
 
             // TODO: What if Consumption.Id != consumptionId??
 
-            if (new ConsumptionRespository().UpdateConsumption(id, updateConsumption))
+            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
+            if (consumptionRepository.UpdateConsumption(id, updateConsumption))
             {
                 return new OkObjectResult(Messages.OKPost);
             }

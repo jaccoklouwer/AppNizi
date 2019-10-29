@@ -6,11 +6,12 @@ namespace AppNiZiAPI.Models
 {
     public class PatientObject
     {
-        public string firstName { get; set; }
-        public string lastName { get; set; }
-        public DateTime dateOfBirth { get; set; }
-        public int weightInKilograms { get; set; }
-        public string guid { get; set; }
+        public int PatientId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public float WeightInKilograms { get; set; }
+        public string Guid { get; set; }
     }
 
 }

@@ -1,14 +1,19 @@
-using System;
-using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Security;
+using System.IO;
+using Newtonsoft.Json.Linq;
+using System;
+using AppNiZiAPI.Models;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Models.Repositories;
+using AppNiZiAPI.Infrastructure;
+using AppNiZiAPI.Models.Handlers;
 
 namespace AppNiZiAPI.Functions.WaterConsumption.POST
 {
@@ -19,18 +24,33 @@ namespace AppNiZiAPI.Functions.WaterConsumption.POST
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.PostWaterConsumption))] HttpRequest req,
             ILogger log)
         {
-            // PatientId nog ophalen
-            if (!await Authorization.CheckAuthorization(req, 11)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            WaterConsumptionModel model = new WaterConsumptionModel();
 
-            string name = req.Query["name"];
+            try
+            {
+                var content = await new StreamReader(req.Body).ReadToEndAsync();
+                var jsonParsed = JObject.Parse(content);
+                int patientId = (int)jsonParsed["patientId"];
+                if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+                model = new WaterConsumptionModel()
+                {
+                    PatientId = patientId,
+                    Amount = (int)jsonParsed["amount"],
+                    Date = Convert.ToDateTime(jsonParsed["date"].ToString())
+                };
+            }
+            catch (Exception e)
+            {
+                return new BadRequestObjectResult(Messages.ErrorPost);
+            }
 
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
+            Result result = waterRep.InsertWaterConsumption(model);
+
+            if (result.Succesfull)
+                return new OkObjectResult(result);
+            return new BadRequestObjectResult(result);
         }
     }
 }

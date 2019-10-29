@@ -10,6 +10,7 @@ using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models.Water;
 using AppNiZiAPI.Security;
 using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
 
 
 namespace AppNiZiAPI.Functions.WaterConsumption.GET
@@ -25,8 +26,8 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
             // Auth check
             if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
-            WaterRepository rep = new WaterRepository();
-            WaterConsumptionDaily model = rep.GetWaterConsumption(patientId, date);
+            IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
+            WaterConsumptionDaily model = waterRep.GetWaterConsumption(patientId, date);
 
             if (model.WaterConsumptions.Count == 0)
             {

@@ -1,4 +1,5 @@
-﻿using AppNiZiAPI.Models.Views;
+﻿using AppNiZiAPI.Models.AccountModels;
+using AppNiZiAPI.Models.Views;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -15,6 +16,7 @@ namespace AppNiZiAPI.Models.Repositories
         List<PatientView> List(int count);
         int Insert(PatientObject patient);
         bool Delete(string guid);
+        PatientLogin GetPatientInfo(string guid);
     }
 
     public class PatientRepository : IPatientRepository
@@ -42,9 +44,9 @@ namespace AppNiZiAPI.Models.Repositories
                 {
                     patient = new PatientObject()
                     {
-                        guid = reader["guid"].ToString(),
-                        dateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
-                        weightInKilograms = Convert.ToInt32(reader["weight"])
+                        Guid = reader["guid"].ToString(),
+                        DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
+                        WeightInKilograms = Convert.ToInt32(reader["weight"])
                     };
                 }
             }
@@ -72,9 +74,9 @@ namespace AppNiZiAPI.Models.Repositories
                 {
                     patient = new PatientObject()
                     {
-                        guid = reader["guid"].ToString(),
-                        dateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
-                        weightInKilograms = Convert.ToInt32(reader["weight"])
+                        Guid = reader["guid"].ToString(),
+                        DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
+                        WeightInKilograms = Convert.ToInt32(reader["weight"])
                     };
                 }
             }
@@ -135,8 +137,8 @@ namespace AppNiZiAPI.Models.Repositories
                 sqlConn.Open();
 
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery.ToString(), sqlConn);
-                sqlCmd.Parameters.Add("@DATEOFBIRTH", SqlDbType.DateTime).Value = patient.dateOfBirth;
-                sqlCmd.Parameters.Add("@WEIGHT", SqlDbType.Int).Value = patient.weightInKilograms;
+                sqlCmd.Parameters.Add("@DATEOFBIRTH", SqlDbType.DateTime).Value = patient.DateOfBirth;
+                sqlCmd.Parameters.Add("@WEIGHT", SqlDbType.Int).Value = patient.WeightInKilograms;
                 sqlCmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = Guid.NewGuid().ToString();
 
                 createdObjectId = (int)sqlCmd.ExecuteScalar();
@@ -167,5 +169,62 @@ namespace AppNiZiAPI.Models.Repositories
 
             return success;
         }
+
+        public PatientLogin GetPatientInfo(string guid)
+        {
+            PatientLogin patientLogin = null;
+            string sqlQuery =
+                "SELECT a.first_name, a.last_name, a.role, r.role_name, ac.first_name AS doctor_first_name, ac.last_name as doctor_last_name, p.id AS patient_id, p.* " +
+                "FROM Patient AS p " +
+                "INNER JOIN Account AS a ON p.account_id = a.id " +
+                "INNER JOIN Doctor AS d ON p.doctor_id = d.id " +
+                "INNER JOIN Account AS ac ON ac.id = d.account_id " +
+                "INNER JOIN Role AS r ON r.id = a.role " +
+                "WHERE p.guid = @GUID";
+
+            using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery.ToString(), conn);
+                sqlCmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = guid;
+
+                conn.Open();
+
+                SqlDataReader reader = sqlCmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    AccountModel account = new AccountModel
+                    {
+                        AccountId = (int)reader["account_id"],
+                        Role = (string)reader["role_name"]
+                    };
+
+                    PatientObject patient = new PatientObject
+                    {
+                        DateOfBirth = (DateTime)reader["date_of_birth"],
+                        FirstName = (string)reader["first_name"],
+                        LastName = (string)reader["last_name"],
+                        Guid = (string)reader["guid"],
+                        PatientId = (int)reader["patient_id"],
+                        WeightInKilograms =  float.Parse(reader["weight"].ToString())
+                    };
+
+                    Doctor doctor = new Doctor
+                    {
+                        FirstName = (string)reader["doctor_first_name"],
+                        LastName = (string)reader["doctor_last_name"],
+                        DoctorId = (int)reader["doctor_id"]
+                    };
+
+                    patientLogin = new PatientLogin
+                    {
+                        Account = account,
+                        Patient = patient,
+                        Doctor = doctor
+                    };
+                }
+                conn.Close();
+            }
+            return patientLogin;
+        } 
     }
 }
