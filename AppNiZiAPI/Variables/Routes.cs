@@ -43,7 +43,7 @@ namespace AppNiZiAPI.Variables
         //TODO verbeter deze fantastische naamgeving 
 
         public const string GetFavoriteFood = "/food/favorite/{patientId:int}";
-        public const string PostFavoriteFood = "/food/favorite/{patientId:int}";
+        public const string PostFavoriteFood = "/food/favorite/{patientId:int}/{foodId:int}";
 
         //Meal
         public const string AddMeal = "/meal/{patientId:int}";

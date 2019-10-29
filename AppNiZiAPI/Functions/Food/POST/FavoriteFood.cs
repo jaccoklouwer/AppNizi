@@ -20,7 +20,7 @@ namespace AppNiZiAPI.Functions.Food
     {
         [FunctionName("PostFavoriteFood")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function,  "get", Route = (Routes.APIVersion + Routes.PostFavoriteFood))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion + Routes.PostFavoriteFood))] HttpRequest req,
             ILogger log,int patientId,int foodId)
         {
             if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
