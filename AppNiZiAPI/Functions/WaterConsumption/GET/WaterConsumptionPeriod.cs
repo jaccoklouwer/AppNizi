@@ -12,16 +12,23 @@ using System.Collections.Generic;
 using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using AppNiZiAPI.Security;
 
 namespace AppNiZiAPI.Functions.WaterConsumption.GET
 {
     public static class WaterConsumptionPeriod
     {
         [FunctionName("WaterConsumptionPeriod")]
-        public static IActionResult Run(
+        public static async Task<IActionResult> RunAsync(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetWaterConsumptionPeriod))] HttpRequest req,
             ILogger log, int patientId)
         {
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode); 
+            #endregion
+
             // Parse Dates, could'nt work within one if statement because the out var
             if (DateTime.TryParse(req.Query["beginDate"], out var parsedBeginDate))
                 return new StatusCodeResult(StatusCodes.Status400BadRequest);

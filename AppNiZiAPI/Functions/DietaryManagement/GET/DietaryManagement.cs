@@ -14,7 +14,6 @@ using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Security;
 using AppNiZiAPI.Infrastructure;
 using System.Net;
-using Authorization = AppNiZiAPI.Security.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using Microsoft.OpenApi.Models;
@@ -35,7 +34,10 @@ namespace AppNiZiAPI.Functions.DietaryManagement.GET
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
-            //if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
 
             List<DietaryManagementModel> dietaryManagementModels;
             List<DietaryRestriction> dietaryRestrictions;
