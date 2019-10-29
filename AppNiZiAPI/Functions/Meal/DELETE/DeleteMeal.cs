@@ -23,7 +23,7 @@ namespace AppNiZiAPI.Functions.Meal.DELETE
         [FunctionName("DeleteMeal")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "delete", "post", Route = ( Routes.APIVersion + Routes.DeleteMeal))] HttpRequest req,
-            ILogger log,int mealId,int patientId)
+            ILogger log,int patientId,int mealId)
         {
             if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
           

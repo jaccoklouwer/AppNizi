@@ -6,11 +6,12 @@ using System.Text;
 
 namespace AppNiZiAPI.Models.Repositories
 {
-    class MealRepository : Repository, IMealRepository
+    class MealRepository :IMealRepository
     {
         //TODO laat add en delete iets teruggeven
         public bool AddMeal(Meal meal)
         {
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             //TODO get rid of weightunitid das beetje viezigheid zoals het nu is
             StringBuilder sqlQuery = new StringBuilder();
             sqlQuery.Append("INSERT INTO Meal (patient_id, name, kcal,protein,fiber,calcium,sodium,portion_size,weight_unit_id) ");
@@ -20,7 +21,6 @@ namespace AppNiZiAPI.Models.Repositories
             {
 
                 conn.Open();
-                int createdObjectId = 0;
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery.ToString(), conn);
                 sqlCmd.Parameters.Add("@PATIENT_ID", SqlDbType.Int).Value = meal.PatientId;
                 sqlCmd.Parameters.Add("@NAME", SqlDbType.NVarChar).Value = meal.Name;
@@ -39,6 +39,7 @@ namespace AppNiZiAPI.Models.Repositories
 
         public bool DeleteMeal(int patient_id, int meal_id)
         {
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             bool success = false;
             //kan technisch gezien zonder patient_id
             string sqlQuery = "DELETE FROM meal WHERE patient_id=@PATIENT_ID AND id=@MEAL_ID";
@@ -60,6 +61,7 @@ namespace AppNiZiAPI.Models.Repositories
 
         public List<Meal> GetMyMeals(int patient_id)
         {
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             List<Meal> meals = new List<Meal>();
             using (conn)
             {

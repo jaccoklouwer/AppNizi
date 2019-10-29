@@ -21,9 +21,10 @@ namespace AppNiZiAPI.Functions.Food
         [FunctionName("PostFavoriteFood")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion + Routes.PostFavoriteFood))] HttpRequest req,
-            ILogger log,int patientId,int foodId)
+            ILogger log)
         {
-            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            int foodId;
+            int patientId;
           
             try
             {
@@ -36,11 +37,13 @@ namespace AppNiZiAPI.Functions.Food
                 return new BadRequestObjectResult(Messages.ErrorMissingValues);
             }
 
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+
             IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
 
             bool succes = foodRepository.Favorite(patientId,foodId);
 
-            return succes != null
+            return succes != false
                 ? (ActionResult)new OkObjectResult($"alles is super sexy en je hebt een fav gedaan")
                 : new BadRequestObjectResult("oopsiewoopsie er is een fout begaan banaan");
         }

@@ -26,15 +26,15 @@ namespace AppNiZiAPI
     {
         [FunctionName("Food")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodByName))] HttpRequest req,
-            ILogger log,int patientId, string foodName)
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodById))] HttpRequest req,
+            ILogger log,int patientId, int foodId)
         {
 
             if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
             IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
-
-            Food food = foodRepository.Select(foodName);
+            //FoodRepository foodRepository = new FoodRepository();
+            Food food = foodRepository.Select(foodId);
 
             var jsonFood = JsonConvert.SerializeObject(food);
             return jsonFood != null

@@ -22,16 +22,16 @@ namespace AppNiZiAPI.Functions.Meal.POST
             [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion+Routes.AddMeal))] HttpRequest req,
             ILogger log,int patientId)
         {
-            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            //no way dat dit werkt WAT? wrm zo easy al me ingewikkelde shit :(
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            
             Models.Meal meal = new Models.Meal();
             JsonConvert.PopulateObject(requestBody, meal);
-
+            meal.PatientId = patientId;
             IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
             bool succes = mealRepository.AddMeal(meal);
 
-            return succes != null
+            return succes != false
                 ? (ActionResult)new OkObjectResult(succes)
                 : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
         }

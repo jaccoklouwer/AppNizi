@@ -8,18 +8,18 @@ using System.Text;
 
 namespace AppNiZiAPI.Models.Repositories
 {
-    class FoodRepository: Repository, IFoodRepository
+    class FoodRepository: IFoodRepository
     {
         //change to Id
-        public Food Select(string foodname)
+        public Food Select(int foodId)
         {
             Food food = new Food();
-
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             using (conn)
             {
 
                 conn.Open();
-                var text = $"SELECT * FROM Food WHERE name = '{foodname}'";
+                var text = $"SELECT * FROM Food WHERE id = '{foodId}'";
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {
@@ -56,7 +56,7 @@ namespace AppNiZiAPI.Models.Repositories
         {
             
             List<Food> foods = new List<Food>();
-
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             //Todo controleer op lengte (moet minstens 2 zijn)
             using (conn)
             {
@@ -104,7 +104,7 @@ namespace AppNiZiAPI.Models.Repositories
         {
             List<Food> foods = new List<Food>();
 
-
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             using (conn)
             {
 
@@ -150,7 +150,7 @@ namespace AppNiZiAPI.Models.Repositories
         public bool Favorite(int patient_id,int food_id)
         {
             bool succes = true;
-
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             //TODO patient_id kan uit ingelogde user komen
             StringBuilder sqlQuery = new StringBuilder();
             sqlQuery.Append("INSERT INTO MyFood (food_id, patient_id) ");
