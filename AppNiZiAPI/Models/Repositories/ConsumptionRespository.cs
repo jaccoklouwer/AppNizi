@@ -6,7 +6,6 @@ namespace AppNiZiAPI.Models.Repositories
 {
     public class ConsumptionRespository : Repository, IConsumptionRepository
     {
-        //TODO Maybe use SqlDataReaderMapper https://www.nuget.org/packages/SqlDataReaderMapper/
         
         public bool AddConsumption(Consumption consumption)
         {
@@ -28,8 +27,31 @@ namespace AppNiZiAPI.Models.Repositories
             return added;
         }
 
-        // TODO: USE ENUM INSTEAD OF BOOL
-        public bool DeleteConsumption(int consumptionId)
+        public int GetConsumptionPatientId(int consumptionId)
+        {
+            int patientId = 0;
+            var query = $"SELECT Consumption.patient_id FROM Consumption WHERE id = '{consumptionId}'";
+            using (SqlCommand sqlCommand = new SqlCommand(query, conn))
+            {
+                conn.Open();
+                try
+                {
+                    SqlDataReader reader = sqlCommand.ExecuteReader();
+                    while (reader.Read())
+                    {                      
+                        patientId = (int)reader["patient_id"];
+                    }
+                }
+                catch (Exception e)
+                {
+                    // logging?
+                    throw e;
+                }
+                conn.Close();
+            }
+            return patientId;
+        }
+        private bool DeleteConsumption(int consumptionId)
         {
             bool affected;
             var query = $"DELETE FROM Consumption WHERE id = '{consumptionId}'";
@@ -38,15 +60,20 @@ namespace AppNiZiAPI.Models.Repositories
             {
                 SqlCommand command = new SqlCommand(query, conn);
                 affected = command.ExecuteNonQuery() > 0;
-                // Return 'deletion succeeded enum' of 'no data was affected enum' (ofzoiets)
             }
             catch (Exception)
             {
-                // Return 'deletion failed enum' (ofzoiets)
                 affected = false;
             }
             conn.Close();
             return affected;
+        }
+
+        public bool DeleteConsumption(int consumptionId, int patientId)
+        {
+            if (patientId == 0) return false;
+            if (GetConsumptionPatientId(consumptionId) ==  patientId) return DeleteConsumption(consumptionId);
+            return false;
         }
 
         public Consumption GetConsumptionByConsumptionId(int consumptionId)
@@ -163,5 +190,6 @@ namespace AppNiZiAPI.Models.Repositories
             command.Parameters.AddWithValue("@patient_id", consumption.PatientId);
             return command;
         }
+
     }
 }
