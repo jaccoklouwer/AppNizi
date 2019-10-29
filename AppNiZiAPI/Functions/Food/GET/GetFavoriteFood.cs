@@ -19,23 +19,23 @@ namespace AppNiZiAPI.Functions.Food
 {
     public static class GetFavoriteFood
     {
-        //[FunctionName("GetFavoriteFood")]
-        //public static async Task<IActionResult> Run(
-        //    [HttpTrigger(AuthorizationLevel.Function,  "get", Route = (Routes.APIVersion + Routes.GetFavoriteFood))] HttpRequest req,
-        //    ILogger log, int patientId)
-        //{
+        [FunctionName("GetFavoriteFood")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function,  "get", Route = (Routes.APIVersion + Routes.GetFavoriteFood))] HttpRequest req,
+            ILogger log, int patientId)
+        {
 
-        //    if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-        //    //TODO maak dit minder lelijk
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            //TODO maak dit minder lelijk
 
-        //    IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
-        //    List<Models.Food> food = foodRepository.Favorites(patientId);
-        //    //TODO convert to JSON
-        //    var jsonFood = JsonConvert.SerializeObject(food);
+            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
+            List<Models.Food> food = foodRepository.Favorites(patientId);
+            //TODO convert to JSON
+            var jsonFood = JsonConvert.SerializeObject(food);
 
-        //    return food != null
-        //        ? (ActionResult)new OkObjectResult(food)
-        //        : new BadRequestObjectResult(Messages.ErrorMissingValues);
-        //}
+            return food != null
+                ? (ActionResult)new OkObjectResult(food)
+                : new BadRequestObjectResult(Messages.ErrorMissingValues);
+        }
     }
 }

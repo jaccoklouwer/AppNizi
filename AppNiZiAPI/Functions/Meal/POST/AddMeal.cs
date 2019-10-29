@@ -17,23 +17,23 @@ namespace AppNiZiAPI.Functions.Meal.POST
 {
     public static class AddMeal
     {
-        //[FunctionName("AddMeal")]
-        //public static async Task<IActionResult> Run(
-        //    [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion+Routes.AddMeal))] HttpRequest req,
-        //    ILogger log,int patientId)
-        //{
-        //    if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-        //    string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-        //    //no way dat dit werkt WAT? wrm zo easy al me ingewikkelde shit :(
-        //    Models.Meal meal = new Models.Meal();
-        //    JsonConvert.PopulateObject(requestBody, meal);
+        [FunctionName("AddMeal")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion+Routes.AddMeal))] HttpRequest req,
+            ILogger log,int patientId)
+        {
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            //no way dat dit werkt WAT? wrm zo easy al me ingewikkelde shit :(
+            Models.Meal meal = new Models.Meal();
+            JsonConvert.PopulateObject(requestBody, meal);
 
-        //    IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
-        //    bool succes = mealRepository.AddMeal(meal);
+            IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
+            bool succes = mealRepository.AddMeal(meal);
 
-        //    return succes != null
-        //        ? (ActionResult)new OkObjectResult(succes)
-        //        : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
-        //}
+            return succes != null
+                ? (ActionResult)new OkObjectResult(succes)
+                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+        }
     }
 }

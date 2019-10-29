@@ -19,23 +19,23 @@ namespace AppNiZiAPI.Functions.Food
 {
     public static class FoodByPartialName
     {
-        //[FunctionName("FoodByPartialName")]
-        //public static async Task<IActionResult> Run(
-        //    [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodByPartialname))] HttpRequest req,
-        //    ILogger log,int patientId, string foodName)
-        //{
+        [FunctionName("FoodByPartialName")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodByPartialname))] HttpRequest req,
+            ILogger log,int patientId, string foodName)
+        {
 
-        //    if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-        //    //TODO maak dit minder lelijk
+            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            //TODO maak dit minder lelijk
 
-        //    IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
-        //    List<Models.Food> food = foodRepository.Search(foodName);
+            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
+            List<Models.Food> food = foodRepository.Search(foodName);
 
-        //    //TODO convert to JSON
-        //    var jsonFood = JsonConvert.SerializeObject(food);
-        //    return food != null
-        //        ? (ActionResult)new OkObjectResult(food)
-        //        : new BadRequestObjectResult(Messages.ErrorMissingValues);
-        //}
+            //TODO convert to JSON
+            var jsonFood = JsonConvert.SerializeObject(food);
+            return food != null
+                ? (ActionResult)new OkObjectResult(food)
+                : new BadRequestObjectResult(Messages.ErrorMissingValues);
+        }
     }
 }
