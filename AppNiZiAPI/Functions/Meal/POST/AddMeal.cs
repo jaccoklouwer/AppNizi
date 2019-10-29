@@ -23,11 +23,14 @@ namespace AppNiZiAPI.Functions.Meal.POST
             [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion+Routes.AddMeal))] HttpRequest req,
             ILogger log,int patientId)
         {
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            // Auth check
+            #region AuthCheck
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult(authResult.StatusCode);
+            #endregion
+
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
             Models.Meal meal = new Models.Meal();
             JsonConvert.PopulateObject(requestBody, meal);

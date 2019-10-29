@@ -14,6 +14,8 @@ using System.Net;
 using AppNiZiAPI.Models.Dietarymanagement;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using Microsoft.OpenApi.Models;
+using AppNiZiAPI.Models;
+using AppNiZiAPI.Security;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
 {
@@ -32,11 +34,6 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
             log.LogInformation("C# HTTP trigger function processed a request.");
-
-            // Auth check
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
-            if (!authResult.Result)
-                return new StatusCodeResult(authResult.StatusCode);
 
 
 
