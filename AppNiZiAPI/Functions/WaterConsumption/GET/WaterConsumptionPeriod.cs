@@ -11,6 +11,7 @@ using AppNiZiAPI.Models;
 using System.Collections.Generic;
 using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace AppNiZiAPI.Functions.WaterConsumption.GET
 {
@@ -21,17 +22,19 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetWaterConsumptionPeriod))] HttpRequest req,
             ILogger log, int patientId)
         {
-            string beginDate = req.Query["beginDate"];
-            string endDate = req.Query["endDate"];
-
-            if (beginDate == null || endDate == null)
+            // Parse Dates, could'nt work within one if statement because the out var
+            if (DateTime.TryParse(req.Query["beginDate"], out var parsedBeginDate))
+                return new StatusCodeResult(StatusCodes.Status400BadRequest);
+            if (DateTime.TryParse(req.Query["endDate"], out var parsedEndDate))
                 return new StatusCodeResult(StatusCodes.Status400BadRequest);
 
             IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
-            List<WaterConsumptionViewModel> listModel = waterRep.GetWaterConsumptionPeriod(patientId, beginDate, endDate);
+            List<WaterConsumptionViewModel> listModel = waterRep.GetWaterConsumptionPeriod(patientId, parsedBeginDate, parsedEndDate);
 
             if (listModel.Count == 0)
                 return new StatusCodeResult(StatusCodes.Status204NoContent);
+            if (listModel[0].Error)
+                return new StatusCodeResult(StatusCodes.Status400BadRequest);
 
             var json = JsonConvert.SerializeObject(listModel);
 

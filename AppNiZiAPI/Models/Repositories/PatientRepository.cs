@@ -166,7 +166,6 @@ namespace AppNiZiAPI.Models.Repositories
                 if (rows > 0)
                     success = true;
             }
-
             return success;
         }
 

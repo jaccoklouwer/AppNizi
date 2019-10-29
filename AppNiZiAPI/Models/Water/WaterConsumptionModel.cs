@@ -15,5 +15,6 @@ namespace AppNiZiAPI.Models
     class WaterConsumptionViewModel : WaterConsumptionModel
     {
         public WeightUnitModel WeightUnit { get; set; }
+        public bool Error { get; set; }
     }
 }

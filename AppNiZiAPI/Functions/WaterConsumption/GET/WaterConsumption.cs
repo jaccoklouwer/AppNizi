@@ -11,7 +11,9 @@ using AppNiZiAPI.Models.Water;
 using AppNiZiAPI.Security;
 using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-
+using System.Net.Http;
+using System.Net;
+using AppNiZiAPI.Models;
 
 namespace AppNiZiAPI.Functions.WaterConsumption.GET
 {
@@ -22,23 +24,21 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetWaterConsumption))] HttpRequest req,
             ILogger log, int patientId, string date)
         {
-            
-            // Auth check
-            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+            #endregion
 
             IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
             WaterConsumptionDaily model = waterRep.GetWaterConsumption(patientId, date);
 
-            if (model.WaterConsumptions.Count == 0)
-            {
+            if (model == null || model.WaterConsumptions.Count == 0)
                 return new StatusCodeResult(StatusCodes.Status204NoContent);
-            }
 
             var json = JsonConvert.SerializeObject(model);
 
             return new OkObjectResult(json);
         }
     }
-
-
 }

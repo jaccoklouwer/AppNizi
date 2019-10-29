@@ -10,6 +10,7 @@ using AppNiZiAPI.Models.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Security;
+using AppNiZiAPI.Models;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
 {
@@ -27,7 +28,11 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
             log.LogInformation("C# HTTP trigger function processed a request.");
-            if (!await new Authorization().CheckAuthorization(req, patientId)) { return new UnauthorizedObjectResult(Messages.AuthNoAcces); }
+
+            // Auth check
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
 
 
             IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();

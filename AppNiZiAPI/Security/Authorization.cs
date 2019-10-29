@@ -9,16 +9,21 @@ using System.IO;
 using Newtonsoft.Json.Linq;
 using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Models.AccountModels;
+using AppNiZiAPI.Models;
+using Microsoft.AspNetCore.Mvc;
 
 namespace AppNiZiAPI.Security
 {
-    class Authorization
+    class Authorization : IAuthorization
     {
         /**
          * Authorization Check for every call
         */
 
-        public static async Task<bool> CheckAuthorization(HttpRequest req, int userId = 0)
+        private readonly int UnauthorizedStatusCode = 401;
+        private readonly int ForbiddenStatusCode = 403;
+
+        public async Task<AuthResultModel> CheckAuthorization(HttpRequest req, int userId = 0)
         {
             bool isDoctor = false;
 
@@ -26,13 +31,13 @@ namespace AppNiZiAPI.Security
             AuthenticationHeaderValue.TryParse(req.Headers[HeaderNames.Authorization], out var authHeader);
 
             if (authHeader == null)
-                return false;
+                return new AuthResultModel(false, UnauthorizedStatusCode);
 
             // Token validation with Auth0 servers
             ClaimsPrincipal claims = await Auth0.ValidateTokenAsync(authHeader);
 
             if (claims == null)
-                return false;
+                return new AuthResultModel(false, UnauthorizedStatusCode);
 
             // Get Token Guid for Authorization
             string tokenGuid = claims.FindFirst("azp").Value;
@@ -50,22 +55,22 @@ namespace AppNiZiAPI.Security
             IAuthorizationRepository authRepository = DIContainer.Instance.GetService<IAuthorizationRepository>();
 
             // If userId needs to come from token, only calls the method GetAccountId if userId is zero
-            if (userId == 0 && authRepository.GetAccountId(tokenGuid, isDoctor) != 0)
-                return true;
+            if (userId == 0 && authRepository.GetAccountId(tokenGuid, isDoctor) == 0)
+                return new AuthResultModel(false, ForbiddenStatusCode);
 
             // When a call is from a Doctor that needs info about a patient, the following method will be called
             // UserId is here patientId
-            if (isDoctor && authRepository.CheckDoctorAcces(userId, tokenGuid))
-                return true;
+            if (isDoctor && !authRepository.CheckDoctorAcces(userId, tokenGuid))
+                return new AuthResultModel(false, ForbiddenStatusCode);
 
             // When a call is from a patient of doctor and only ask for information about the same user the following method will be called
-            if (userId != 0 && authRepository.PatientAuth(userId, tokenGuid, isDoctor))
-                return true;
+            if (userId != 0 && !authRepository.PatientAuth(userId, tokenGuid, isDoctor))
+                return new AuthResultModel(false, ForbiddenStatusCode);
 
-            return false;
+            return new AuthResultModel(true);
         }
 
-        public static async Task<AuthLogin> LoginAuthAsync(HttpRequest req)
+        public async Task<AuthLogin> LoginAuthAsync(HttpRequest req)
         {
             AuthenticationHeaderValue.TryParse(req.Headers[HeaderNames.Authorization], out var authHeader);
 
@@ -87,6 +92,12 @@ namespace AppNiZiAPI.Security
 
             return authLogin;
         }
+    }
+
+    public interface IAuthorization
+    {
+        Task<AuthLogin> LoginAuthAsync(HttpRequest req);
+        Task<AuthResultModel> CheckAuthorization(HttpRequest req, int userId = 0);
     }
 }
 

@@ -51,7 +51,7 @@ namespace AppNiZiAPI.Models.Repositories
             };
         }
 
-        public List<WaterConsumptionViewModel> GetWaterConsumptionPeriod(int patientId, string beginDate, string endDate)
+        public List<WaterConsumptionViewModel> GetWaterConsumptionPeriod(int patientId, DateTime beginDate, DateTime endDate)
         {
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -64,8 +64,8 @@ namespace AppNiZiAPI.Models.Repositories
 
                 SqlCommand cmd = new SqlCommand(sqlQuery, conn);
                 cmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
-                cmd.Parameters.Add("@BEGINDATE", SqlDbType.NVarChar).Value = beginDate;
-                cmd.Parameters.Add("@ENDDATE", SqlDbType.NVarChar).Value = endDate;
+                cmd.Parameters.Add("@BEGINDATE", SqlDbType.Date).Value = beginDate;
+                cmd.Parameters.Add("@ENDDATE", SqlDbType.Date).Value = endDate;
 
                 SqlDataReader reader = cmd.ExecuteReader();
                 ReadFromDataReader(reader);
@@ -101,28 +101,40 @@ namespace AppNiZiAPI.Models.Repositories
 
         private void ReadFromDataReader(SqlDataReader reader)
         {
-            while (reader.Read())
+            waterConsumptions = new List<WaterConsumptionViewModel>();
+            try
+            {
+                while (reader.Read())
+                {
+                    WaterConsumptionViewModel waterConsumption = new WaterConsumptionViewModel
+                    {
+                        Id = (int)reader["id"],
+                        Amount = (double)reader["amount"],
+                        Date = (DateTime)reader["date"],
+                        PatientId = (int)reader["patient_id"],
+                        WeightUnit = new WeightUnitModel
+                        {
+                            Id = (int)reader["weight_unit_id"],
+                            Short = (string)reader["short"],
+                            Unit = (string)reader["unit"]
+                        }
+                    };
+                    waterConsumptions.Add(waterConsumption);
+
+                    try
+                    {
+                        MinumumRestriction = (int)reader["maxAmount"];
+                    }
+                    catch { }
+                }
+            }
+            catch(Exception e)
             {
                 WaterConsumptionViewModel waterConsumption = new WaterConsumptionViewModel
                 {
-                    Id = (int)reader["id"],
-                    Amount = (double)reader["amount"],
-                    Date = (DateTime)reader["date"],
-                    PatientId = (int)reader["patient_id"],
-                    WeightUnit = new WeightUnitModel
-                    {
-                        Id = (int)reader["weight_unit_id"],
-                        Short = (string)reader["short"],
-                        Unit = (string)reader["unit"]
-                    }
+                    Error = true
                 };
                 waterConsumptions.Add(waterConsumption);
-
-                try
-                {
-                    MinumumRestriction = (int)reader["maxAmount"];
-                }
-                catch { }
             }
         }
     }
@@ -130,7 +142,7 @@ namespace AppNiZiAPI.Models.Repositories
     interface IWaterRepository
     {
         WaterConsumptionDaily GetWaterConsumption(int patientId, string date);
-        List<WaterConsumptionViewModel> GetWaterConsumptionPeriod(int patientId, string beginDate, string endDate);
+        List<WaterConsumptionViewModel> GetWaterConsumptionPeriod(int patientId, DateTime beginDate, DateTime endDate);
         Result InsertWaterConsumption(WaterConsumptionModel model);
     }
 }

@@ -31,7 +31,11 @@ namespace AppNiZiAPI.Functions.WaterConsumption.POST
                 var content = await new StreamReader(req.Body).ReadToEndAsync();
                 var jsonParsed = JObject.Parse(content);
                 int patientId = (int)jsonParsed["patientId"];
-                if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+
+                // Auth check
+                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+                if (!authResult.Result)
+                    return new StatusCodeResult(authResult.StatusCode);
 
                 model = new WaterConsumptionModel()
                 {

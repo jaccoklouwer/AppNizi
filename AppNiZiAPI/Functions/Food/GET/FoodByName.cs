@@ -30,7 +30,11 @@ namespace AppNiZiAPI
             ILogger log,int patientId, int foodId)
         {
 
-            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+            #endregion
 
             IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
             //FoodRepository foodRepository = new FoodRepository();

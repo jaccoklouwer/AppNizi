@@ -26,8 +26,8 @@ namespace AppNiZiAPI.Functions.Account.GET
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetUser))] HttpRequest req,
             ILogger log)
         {
-            AuthLogin authLogin = await Authorization.LoginAuthAsync(req);
             // Auth check
+            AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
             if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
             IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
