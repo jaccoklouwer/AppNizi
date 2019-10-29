@@ -50,5 +50,8 @@ namespace AppNiZiAPI.Variables
         public const string DeleteMeal = "/meal/{patientId}/{mealId}";
         public const string GetMeals = "/meal/{patientId}";
 
+        // Account
+        public const string GetUser = "/account/getUser";
+
     }
 }

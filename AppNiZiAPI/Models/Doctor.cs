@@ -5,17 +5,12 @@ using System.Text;
 
 namespace AppNiZiAPI.Models
 {
-    class Doctor : Account
+    public class Doctor
     {
-        /// <summary>
-        /// Gets or Sets DoctorId
-        /// </summary>
-        [Required]
-        public int? DoctorId { get; set; }
+        public int DoctorId { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Location { get; set; }
 
-        /// <summary>
-        /// Gets or Sets Birthdate
-        /// </summary>
-        public DateTime Birthday { get; set; }
     }
 }
