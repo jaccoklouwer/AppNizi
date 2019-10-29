@@ -1,6 +1,4 @@
-﻿using AppNiZiAPI.Variables;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.Net.Http.Headers;
 using System.Net.Http.Headers;
 using System.Security.Claims;
@@ -10,6 +8,7 @@ using System;
 using System.IO;
 using Newtonsoft.Json.Linq;
 using AppNiZiAPI.Infrastructure;
+using AppNiZiAPI.Models.AccountModels;
 
 namespace AppNiZiAPI.Security
 {
@@ -46,13 +45,13 @@ namespace AppNiZiAPI.Security
                 if (jsonParsed["Role"].ToString() == "Doctor")
                     isDoctor = true;
             }
-            catch (Exception)
-            { return false; }
+            catch (Exception){}
 
             IAuthorizationRepository authRepository = DIContainer.Instance.GetService<IAuthorizationRepository>();
-            // Kan misschien weg
-            if (userId == 0 && authRepository.GetAccountId(tokenGuid, isDoctor) == 0)
-                return false;
+
+            // If userId needs to come from token, only calls the method GetAccountId if userId is zero
+            if (userId == 0 && authRepository.GetAccountId(tokenGuid, isDoctor) != 0)
+                return true;
 
             // When a call is from a Doctor that needs info about a patient, the following method will be called
             // UserId is here patientId
@@ -64,6 +63,29 @@ namespace AppNiZiAPI.Security
                 return true;
 
             return false;
+        }
+
+        public static async Task<AuthLogin> LoginAuthAsync(HttpRequest req)
+        {
+            AuthenticationHeaderValue.TryParse(req.Headers[HeaderNames.Authorization], out var authHeader);
+
+            if (authHeader == null)
+                return null;
+
+            ClaimsPrincipal claims = await Auth0.ValidateTokenAsync(authHeader);
+
+            Token token = new Token
+            {
+                Scheme = authHeader.Scheme,
+                AccesCode = authHeader.Parameter
+            };
+
+            AuthLogin authLogin = new AuthLogin
+            {   Token = token,
+                Guid = claims.FindFirst("azp").Value
+            };
+
+            return authLogin;
         }
     }
 }
