@@ -51,7 +51,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.POST
                 if (!authResult.Result)
                     return new StatusCodeResult(authResult.StatusCode);
 
-                bool success = repository.AddDietaryManagement(dietary.Model);
+                bool success = repository.AddDietaryManagement(dietary);
                 if (success)
                 {
                     return new OkObjectResult(Messages.OKPost);
