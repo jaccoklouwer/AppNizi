@@ -1,6 +1,6 @@
 ﻿using System.Reflection;
 using AppNiZiAPI;
-using AzureFunctions.Extensions.Swashbuckle;
+
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Hosting;
 
@@ -13,7 +13,7 @@ namespace AppNiZiAPI
         public void Configure(IWebJobsBuilder builder)
         {
             //Register the extension
-            builder.AddSwashBuckle(Assembly.GetExecutingAssembly());
+            //builder.AddSwashBuckle(Assembly.GetExecutingAssembly());
 
         }
     }

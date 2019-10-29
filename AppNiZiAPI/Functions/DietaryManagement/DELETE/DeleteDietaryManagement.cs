@@ -9,25 +9,30 @@ using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
-using AppNiZiAPI.Security;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using AppNiZiAPI.Models.Dietarymanagement;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
 {
     public static class DietaryManagement
     {
-        /// <summary>
-        /// Create Products
-        /// </summary>
-        /// <param name="dietId"></param>
-        /// <returns></returns>
         [FunctionName(nameof(DeleteDietaryManagement))]
+        [OpenApiOperation("CreateDieataryManagement", "DietaryManagement", Summary = "Create anew dietary managment", Description = "Create anew dietary managment of a patient", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiResponseBody(HttpStatusCode.UnprocessableEntity, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiParameter("dietId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> DeleteDietaryManagement(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId, int patientId,
+            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId,
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
             log.LogInformation("C# HTTP trigger function processed a request.");
-            if (!await new Authorization().CheckAuthorization(req, patientId)) { return new UnauthorizedObjectResult(Messages.AuthNoAcces); }
+            //if (!await Authorization.CheckAuthorization(req, patientId)) { return new UnauthorizedObjectResult(Messages.AuthNoAcces); }
 
 
             IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
