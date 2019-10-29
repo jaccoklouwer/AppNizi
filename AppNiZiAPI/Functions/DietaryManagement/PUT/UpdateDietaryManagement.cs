@@ -8,25 +8,29 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
-using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Models.Dietarymanagement;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using System.Net;
+using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.PUT
 {
 
     public static class DietaryManagement
     {
-        /// <summary>
-        /// Create DieataryManagement
-        /// </summary>
-        /// <param name="req"></param>
-        /// <param name="dietId"></param>
-        /// <returns></returns>
-        [FunctionName(nameof(RuUpdateDietaryManagementn))]
-        public static async Task<IActionResult> RuUpdateDietaryManagementn(
+
+        [FunctionName(nameof(UpdateDietaryManagement))]
+        [OpenApiOperation("UpdateDietaryManagement", "DietaryManagement", Summary = "Updates a dietary managment", Description = "updates the dietary management of a patient", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiRequestBody("application/json", typeof(DietaryManagementModel), Description = "the new values of the dietaryManagement")]
+        [OpenApiParameter("dietId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        public static async Task<IActionResult> UpdateDietaryManagement(
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.DietaryManagementById))]
             HttpRequest req, int dietId,
             ILogger log)

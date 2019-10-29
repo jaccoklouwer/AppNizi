@@ -16,19 +16,20 @@ using AppNiZiAPI.Infrastructure;
 using System.Net;
 using Authorization = AppNiZiAPI.Security.Authorization;
 using Microsoft.Extensions.DependencyInjection;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Microsoft.OpenApi.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.GET
 {
     public static class DietaryManagement
     {
-        /// <summary>
-        /// Get DietaryManagement
-        /// </summary>
-        /// <param name="request"></param>
-        /// <returns></returns>
-        [ProducesResponseType((int)HttpStatusCode.OK, Type = typeof(DietaryManagementModel[]))]
-        [ProducesResponseType((int)HttpStatusCode.InternalServerError, Type = typeof(Error))]
         [FunctionName(nameof(GetDietaryManagementByPatient))]
+        [OpenApiOperation("UpdateDietaryManagement", "DietaryManagement", Summary = "Updates a dietary managment", Description = "updates the dietary management of a patient", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiParameter("patientId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> GetDietaryManagementByPatient(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, int patientId,
             ILogger log)
