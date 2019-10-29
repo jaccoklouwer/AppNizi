@@ -6,8 +6,9 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using AppNiZiAPI.Variables;
-using AppNiZiAPI.Security;
 using AppNiZiAPI.Models.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Infrastructure;
 
 namespace AppNiZiAPI
 {
@@ -18,9 +19,11 @@ namespace AppNiZiAPI
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.Consumption))] HttpRequest req,
             ILogger log, string consumptionId)
         {
+            log.LogDebug($"Triggered '" + typeof(DeleteConsumptionById).Name + "' with parameter: '"+ consumptionId +"'");
             if (!int.TryParse(consumptionId, out int Id) || Id <= 0) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
 
-            bool deleted = new ConsumptionRespository().DeleteConsumption(Id);
+            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
+            bool deleted = consumptionRepository.DeleteConsumption(Id);
 
             return deleted
                 ? (ActionResult)new OkObjectResult(Messages.OKDelete)

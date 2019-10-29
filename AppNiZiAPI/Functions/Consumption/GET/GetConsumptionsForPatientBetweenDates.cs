@@ -11,7 +11,8 @@ using AppNiZiAPI.Models.Repositories;
 using System.Collections.Generic;
 using System;
 using System.Globalization;
-using AppNiZiAPI.Security;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Infrastructure;
 
 namespace AppNiZiAPI
 {
@@ -22,6 +23,8 @@ namespace AppNiZiAPI
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.Consumptions))] HttpRequest req,
             ILogger log)
         {
+            log.LogDebug($"Triggered '" + typeof(GetConsumptionsForPatientBetweenDates).Name + "'");
+
             DateTime startDate;
             DateTime endDate;
             string patientIdString;
@@ -42,8 +45,9 @@ namespace AppNiZiAPI
                 return new BadRequestObjectResult(Messages.ErrorMissingValues);
             }
         
-            if (!int.TryParse(patientIdString, out int patientId)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);      
-            List<Consumption> consumption = new ConsumptionRespository().GetConsumptionsForPatientBetweenDates(patientId, startDate, endDate);
+            if (!int.TryParse(patientIdString, out int patientId)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
+            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
+            List<Consumption> consumption = consumptionRepository.GetConsumptionsForPatientBetweenDates(patientId, startDate, endDate);
 
             var consumptionJson = JsonConvert.SerializeObject(consumption);
             return consumptionJson != null

@@ -9,6 +9,8 @@ using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Infrastructure;
 
 namespace AppNiZiAPI
 {
@@ -19,11 +21,14 @@ namespace AppNiZiAPI
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Consumptions))] HttpRequest req,
             ILogger log)
         {
+            log.LogDebug($"Triggered '" + typeof(AddConsumption).Name + "'");
+
             Consumption newConsumption = new Consumption();
             string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();
             JsonConvert.PopulateObject(consumptionJson, newConsumption);
-            
-            if (new ConsumptionRespository().AddConsumption(newConsumption))
+
+            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
+            if (consumptionRepository.AddConsumption(newConsumption))
             {
                 return new OkObjectResult(Messages.OKPost);
             }
