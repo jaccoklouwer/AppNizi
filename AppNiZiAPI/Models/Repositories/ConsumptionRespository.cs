@@ -1,13 +1,15 @@
-﻿using System;
+﻿using AppNiZiAPI.Models.Repositories;
+using AppNiZiAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
-namespace AppNiZiAPI.Models.Repositories
+namespace AppNiZiAPI
 {
     public class ConsumptionRespository : Repository, IConsumptionRepository
     {
         
-        public bool AddConsumption(Consumption consumption)
+        public bool AddConsumption(ConsumptionView consumption, int patientId)
         {
             bool added;
             var insert = $"INSERT INTO Consumption " +
@@ -17,7 +19,7 @@ namespace AppNiZiAPI.Models.Repositories
             conn.Open();
             try
             {
-                added = ConsumptionCommand(insertQuery, consumption).ExecuteNonQuery() > 0;
+                added = ConsumptionCommand(insertQuery, consumption, patientId).ExecuteNonQuery() > 0;
             }
             catch (Exception)
             {
@@ -29,6 +31,8 @@ namespace AppNiZiAPI.Models.Repositories
 
         public int GetConsumptionPatientId(int consumptionId)
         {
+            //TODO: Test method
+
             int patientId = 0;
             var query = $"SELECT Consumption.patient_id FROM Consumption WHERE id = '{consumptionId}'";
             using (SqlCommand sqlCommand = new SqlCommand(query, conn))
@@ -38,7 +42,7 @@ namespace AppNiZiAPI.Models.Repositories
                 {
                     SqlDataReader reader = sqlCommand.ExecuteReader();
                     while (reader.Read())
-                    {                      
+                    {
                         patientId = (int)reader["patient_id"];
                     }
                 }
@@ -51,6 +55,7 @@ namespace AppNiZiAPI.Models.Repositories
             }
             return patientId;
         }
+
         private bool DeleteConsumption(int consumptionId)
         {
             bool affected;
@@ -112,13 +117,13 @@ namespace AppNiZiAPI.Models.Repositories
             return consumption;
         }
 
-        public List<Consumption> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate)
+        public List<ConsumptionView> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate)
         {
             String sqlStartDate = startDate.Date.ToString("yyyy-MM-dd").Replace("/", "-");
             String sqlEndDate = endDate.Date.ToString("yyyy-MM-dd").Replace("/", "-");
             var query = $"SELECT * FROM Consumption WHERE patient_id = '{patientId}' AND date BETWEEN '{sqlStartDate}' AND '{sqlEndDate}'";
 
-            List<Consumption> consumptions = new List<Consumption>();
+            List<ConsumptionView> consumptions = new List<ConsumptionView>();
             conn.Open();
 
             using (SqlCommand sqlCommand = new SqlCommand(query, conn))
@@ -141,12 +146,12 @@ namespace AppNiZiAPI.Models.Repositories
                         consumption.WeightUnitId = (int)reader["weight_unit_id"];
                         consumption.Date = Convert.ToDateTime(reader["date"]).Date;
                         consumption.PatientId = (int)reader["patient_id"];
-                        consumptions.Add(consumption);
+                        consumptions.Add(new ConsumptionView(consumption));
                     }
                 }
                 catch (Exception e)
                 {
-                    // logging?
+                    consumptions.Add(new ConsumptionView());
                     throw e;
                 }
             }
@@ -154,7 +159,7 @@ namespace AppNiZiAPI.Models.Repositories
             return consumptions;
         }
 
-        public bool UpdateConsumption(int consumptionId, Consumption consumption)
+        public bool UpdateConsumption(int consumptionId, ConsumptionView consumption, int patientId)
         {
             bool updated;
             var updateQuery = $"UPDATE Consumption SET " +
@@ -165,7 +170,7 @@ namespace AppNiZiAPI.Models.Repositories
             conn.Open();
             try
             {
-                updated = ConsumptionCommand(updateQuery, consumption).ExecuteNonQuery() > 0;
+                updated = ConsumptionCommand(updateQuery, consumption, patientId).ExecuteNonQuery() > 0;
             }
             catch (Exception)
             {
@@ -177,17 +182,22 @@ namespace AppNiZiAPI.Models.Repositories
 
         private SqlCommand ConsumptionCommand(String query, Consumption consumption)
         {
+            return ConsumptionCommand(query, new ConsumptionView(consumption), consumption.PatientId);
+        }
+
+        private SqlCommand ConsumptionCommand(String query, ConsumptionView consumptionView, int PatientId)
+        {
             SqlCommand command = new SqlCommand(query, conn);
-            command.Parameters.AddWithValue("@food_name", consumption.FoodName);
-            command.Parameters.AddWithValue("@kcal", consumption.KCal);
-            command.Parameters.AddWithValue("@protein", consumption.Protein);
-            command.Parameters.AddWithValue("@fiber", consumption.Fiber);
-            command.Parameters.AddWithValue("@calium", consumption.Calium);
-            command.Parameters.AddWithValue("@sodium", consumption.Sodium);
-            command.Parameters.AddWithValue("@amount", consumption.Amount);
-            command.Parameters.AddWithValue("@weight_unit_id", consumption.WeightUnitId);
-            command.Parameters.AddWithValue("@date", consumption.Date);
-            command.Parameters.AddWithValue("@patient_id", consumption.PatientId);
+            command.Parameters.AddWithValue("@food_name", consumptionView.FoodName);
+            command.Parameters.AddWithValue("@kcal", consumptionView.KCal);
+            command.Parameters.AddWithValue("@protein", consumptionView.Protein);
+            command.Parameters.AddWithValue("@fiber", consumptionView.Fiber);
+            command.Parameters.AddWithValue("@calium", consumptionView.Calium);
+            command.Parameters.AddWithValue("@sodium", consumptionView.Sodium);
+            command.Parameters.AddWithValue("@amount", consumptionView.Amount);
+            command.Parameters.AddWithValue("@weight_unit_id", consumptionView.WeightUnitId);
+            command.Parameters.AddWithValue("@date", consumptionView.Date);
+            command.Parameters.AddWithValue("@patient_id", PatientId);
             return command;
         }
 

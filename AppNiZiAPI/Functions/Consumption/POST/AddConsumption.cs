@@ -11,6 +11,7 @@ using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
+using AppNiZiAPI.Security;
 
 namespace AppNiZiAPI
 {
@@ -27,8 +28,16 @@ namespace AppNiZiAPI
             string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();
             JsonConvert.PopulateObject(consumptionJson, newConsumption);
 
+            //TODO: Validate
+            int patientId = newConsumption.PatientId;
+            // Auth check
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+
+
             IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
-            if (consumptionRepository.AddConsumption(newConsumption))
+            if (consumptionRepository.AddConsumption(new ConsumptionView(newConsumption), patientId))
             {
                 return new OkObjectResult(Messages.OKPost);
             }

@@ -10,6 +10,7 @@ using AppNiZiAPI.Models.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Security;
+using AppNiZiAPI.Models;
 
 namespace AppNiZiAPI
 {
@@ -24,12 +25,12 @@ namespace AppNiZiAPI
             if (!int.TryParse(consumptionId, out int Id) || Id <= 0) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
 
             IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
+            int patientId = consumptionRepository.GetConsumptionByConsumptionId(Id).PatientId;
 
             // Auth check
-            if (!await Authorization.CheckAuthorization(req)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-
-            // TODO: Get patientId from request
-            int patientId = 11;
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
 
             bool deleted = consumptionRepository.DeleteConsumption(Id, patientId);
 

@@ -6,15 +6,15 @@ namespace AppNiZiAPI.Models.Repositories
     interface IConsumptionRepository
     {
         Consumption GetConsumptionByConsumptionId(int consumptionId);
-        List<Consumption> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate);
+        List<ConsumptionView> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate);
 
         int GetConsumptionPatientId(int consumptionId);
 
-        bool AddConsumption(Consumption consumption);
+        bool AddConsumption(ConsumptionView consumption, int patientId);
 
         bool DeleteConsumption(int consumptionId, int patientId);
 
-        bool UpdateConsumption(int consumptionId, Consumption consumption);
+        bool UpdateConsumption(int consumptionId, ConsumptionView consumption, int patientId);
 
     }
 }

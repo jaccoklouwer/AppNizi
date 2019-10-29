@@ -13,6 +13,7 @@ using System;
 using System.Globalization;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
+using AppNiZiAPI.Security;
 
 namespace AppNiZiAPI
 {
@@ -46,8 +47,15 @@ namespace AppNiZiAPI
             }
         
             if (!int.TryParse(patientIdString, out int patientId)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
+
+            // TODO: Validate patientId
+            // Auth check
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+
             IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
-            List<Consumption> consumption = consumptionRepository.GetConsumptionsForPatientBetweenDates(patientId, startDate, endDate);
+            List<ConsumptionView> consumption = consumptionRepository.GetConsumptionsForPatientBetweenDates(patientId, startDate, endDate);
 
             var consumptionJson = JsonConvert.SerializeObject(consumption);
             return consumptionJson != null

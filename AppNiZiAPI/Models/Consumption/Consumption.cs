@@ -1,8 +1,9 @@
-﻿using System;
+﻿using AppNiZiAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AppNiZiAPI.Models
+namespace AppNiZiAPI
 {
     public class Consumption : BaseEntity
     {
@@ -16,5 +17,6 @@ namespace AppNiZiAPI.Models
         public float WeightUnitId { get; set; }
         public DateTime Date { get; set; }
         public int PatientId { get; set; }
+
     }
 }
