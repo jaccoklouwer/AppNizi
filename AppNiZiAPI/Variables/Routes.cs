@@ -14,14 +14,15 @@ namespace AppNiZiAPI.Variables
         public const string SwaggerJson = "swagger/json";
 
         // Patients
-        public const string Patients = "/patients";
+        public const string Patients = "/patient";
         public const string Me = "/me";
-        public const string PatientId = "/{patientGuid}";
-
-        public const string SpecificPatient = "/patients/{patientId:int}";
+        public const string SpecificPatient = "/patient/{patientId:int}";
 
         // Doctors
-        public const string GetDoctorPatients = "/doctor/patients";
+        public const string GetDoctorPatients = "/doctor/{doctorId:int}/patients";
+        public const string SpecificDoctor = "/doctor/{doctorId:int}"; // GET, DELETE, PUT
+        public const string Doctor = "/doctor"; // GET, POST, DELETE
+        public const string DoctorMe = "/doctor/me";
 
         // Consumption
         public const string Consumption = "/consumption/{consumptionId}";

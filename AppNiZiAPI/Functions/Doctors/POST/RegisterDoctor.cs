@@ -16,20 +16,18 @@ using AppNiZiAPI.Models.Repositories;
 using Newtonsoft.Json.Linq;
 using AppNiZiAPI.Models;
 
-
-namespace AppNiZiAPI.Functions.Account.POST
+namespace AppNiZiAPI.Functions.Doctor.POST
 {
-    public static class RegisterPatient
+    public static class RegisterDoctor
     {
-        [FunctionName("RegisterPatient")]
+        [FunctionName("RegisterDoctor")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Patients))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Doctor))] HttpRequest req,
             ILogger log)
         {
-            // Auth check
-            AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
+            uthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
             if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            PatientLogin newPatient = new PatientLogin { Patient = new PatientObject(), Account = new AccountModel(), AuthLogin = new AuthLogin(), Doctor = new Models.Doctor()  };
+            PatientLogin newPatient = new PatientLogin { Patient = new PatientObject(), Account = new AccountModel(), AuthLogin = new AuthLogin(), Doctor = new Models.Doctor() };
 
             try
             {
@@ -51,7 +49,7 @@ namespace AppNiZiAPI.Functions.Account.POST
                 log.LogInformation(e.Message);
                 return new BadRequestResult();
             }
-            
+
             IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
             newPatient = patientRepository.RegisterPatient(newPatient);
             newPatient.AuthLogin = authLogin;

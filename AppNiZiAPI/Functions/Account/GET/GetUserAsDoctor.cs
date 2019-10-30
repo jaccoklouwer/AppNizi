@@ -1,12 +1,21 @@
-using System;
-using System.IO;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using AppNiZiAPI.Variables;
+using AppNiZiAPI.Models.Repositories;
+using AppNiZiAPI.Models;
+using System.Collections.Generic;
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using System.IO;
+using Newtonsoft.Json.Linq;
+using AppNiZiAPI.Security;
+using System;
+using AppNiZiAPI.Models.AccountModels;
+using System.Threading.Tasks;
 
 namespace AppNiZiAPI.Functions.Account.GET
 {
@@ -14,20 +23,18 @@ namespace AppNiZiAPI.Functions.Account.GET
     {
         [FunctionName("GetUserAsDoctor")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = (Routes.APIVersion + Routes.DoctorMe))] HttpRequest req,
             ILogger log)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
+            if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
-            string name = req.Query["name"];
+            IDoctorRepository doctorRepository = DIContainer.Instance.GetService<IDoctorRepository>();
+            DoctorLogin doctorLogin = doctorRepository.GetLoggedInDoctor(authLogin.Guid);
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
-
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            return doctorLogin != null
+                ? (ActionResult)new OkObjectResult(doctorLogin)
+                : new BadRequestResult();
         }
     }
 }

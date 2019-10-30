@@ -17,7 +17,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.PUT
 {
     public static class UpdateWaterConsumption
     {
-        [FunctionName("DeleteWaterConsumption")]
+        [FunctionName("UpdateWaterConsumption")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get","delete", Route = (Routes.APIVersion + Routes.SingleWaterConsumption))] HttpRequest req,
             ILogger log, int waterId)

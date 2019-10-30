@@ -16,8 +16,13 @@ namespace AppNiZiAPI.Security
                 conn.Open();
 
                 if (isDoctor)
+                {
+                #if DEBUG
+                    guid = "jfjfjfj";
+#endif
                     text = 
                         $"SELECT id FROM Doctor WHERE guid = '{guid}'";
+                }
                 else
                     text =
                         $"SELECT id FROM Patient WHERE guid = '{guid}'";

@@ -20,7 +20,10 @@ namespace AppNiZiAPI.Infrastructure
             services.AddSingleton<IWaterRepository, WaterRepository>();
 
             services.AddSingleton<IConsumptionRepository, ConsumptionRespository>();
-            
+
+            services.AddSingleton<IDoctorRepository, DoctorRepository>();
+
+            services.AddSingleton<IAccountRepository, AccountRepository>();
 
             return services;
         }
