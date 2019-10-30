@@ -18,7 +18,7 @@ namespace AppNiZiAPI.Variables
         public const string Me = "/me";
         public const string PatientId = "/{patientGuid}";
 
-        public const string SpecificPatient = "/patients/{patientId: int}";
+        public const string SpecificPatient = "/patients/{patientId:int}";
 
         // Doctors
         public const string GetDoctorPatients = "/doctor/patients";
@@ -29,8 +29,9 @@ namespace AppNiZiAPI.Variables
 
         // Water Consumption
         public const string PostWaterConsumption = "/waterConsumption";
-        public const string GetWaterConsumption = "/waterconsumption/{patientId:int}/{date}";
-        public const string GetWaterConsumptionPeriod = "/waterconsumption/period/{patientId:int}";
+        public const string GetDailyWaterConsumption = "/waterconsumption/daily/{date}";
+        public const string GetWaterConsumptionPeriod = "/waterconsumption/period";
+        public const string SingleWaterConsumption = "/waterconsumptions/{waterId:int}"; // GET, DELETE
 
         // DietaryManagement
         public const string DietaryManagement = "/dietaryManagement";
@@ -50,8 +51,10 @@ namespace AppNiZiAPI.Variables
         public const string DeleteMeal = "/meal/{patientId:int}/{mealId}";
         public const string GetMeals = "/meal/{patientId:int}";
 
-        // Account
-        public const string GetUser = "/account/getUser";
+        //Account
+        public const string RegisterPatient = "/patients/register";
+        public const string Account = "/account";
+
 
     }
 }

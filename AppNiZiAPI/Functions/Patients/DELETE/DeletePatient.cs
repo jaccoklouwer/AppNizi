@@ -14,6 +14,8 @@ using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models.Handlers;
 using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Security;
+using AppNiZiAPI.Models;
 
 namespace AppNiZiAPI.Functions.Patients.DELETE
 {
@@ -21,18 +23,23 @@ namespace AppNiZiAPI.Functions.Patients.DELETE
     {
         [FunctionName("DeletePatient")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.Patients + "/{guid}"))] HttpRequest req, string guid,
+            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.SpecificPatient))] HttpRequest req, int patientId,
             ILogger log)
         {
-            log.LogInformation($"C# HTTP trigger function processed a request. {guid}");
 
-            if (string.IsNullOrEmpty(guid))
-                return new BadRequestObjectResult("No GUID parameter passed.");
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+            #endregion
+
+            if (patientId == 0)
+                return new BadRequestObjectResult("No patientId parameter passed.");
 
             try
             {
                 IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
-                bool success = patientRepository.Delete(guid);
+                bool success = patientRepository.Delete(patientId);
 
                 if (success)
                     return new OkObjectResult("Deleted.");

@@ -40,6 +40,12 @@ namespace AppNiZiAPI.Security
 
         public bool CheckDoctorAcces(int patientId, string guid)
         {
+            // VOOR TESTEN GEBRUIK DEZE GUID, doctor id is 1
+#if DEBUG
+
+            guid = "jfjfjfj";
+#endif
+
             bool result = false;
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {

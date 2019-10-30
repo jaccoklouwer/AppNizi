@@ -23,9 +23,9 @@ namespace AppNiZiAPI.Security
         private readonly int UnauthorizedStatusCode = 401;
         private readonly int ForbiddenStatusCode = 403;
 
-        public async Task<AuthResultModel> CheckAuthorization(HttpRequest req, int userId = 0)
+        public async Task<AuthResultModel> CheckAuthorization(HttpRequest req, int userId = 0, bool isDoctor = false)
         {
-            bool isDoctor = false;
+            
 
             // Get AuthentificationHeader from request
             AuthenticationHeaderValue.TryParse(req.Headers[HeaderNames.Authorization], out var authHeader);
@@ -42,16 +42,6 @@ namespace AppNiZiAPI.Security
             // Get Token Guid for Authorization
             string tokenGuid = claims.FindFirst("azp").Value;
 
-            // Get the role from the body
-            try
-            {
-                var content = await new StreamReader(req.Body).ReadToEndAsync();
-                var jsonParsed = JObject.Parse(content);
-                if (jsonParsed["Role"].ToString() == "Doctor")
-                    isDoctor = true;
-            }
-            catch (Exception){}
-
             IAuthorizationRepository authRepository = DIContainer.Instance.GetService<IAuthorizationRepository>();
 
             // If userId needs to come from token, only calls the method GetAccountId if userId is zero
@@ -60,8 +50,8 @@ namespace AppNiZiAPI.Security
 
             // When a call is from a Doctor that needs info about a patient, the following method will be called
             // UserId is here patientId
-            if (isDoctor && !authRepository.CheckDoctorAcces(userId, tokenGuid))
-                return new AuthResultModel(false, ForbiddenStatusCode);
+            if (isDoctor && authRepository.CheckDoctorAcces(userId, tokenGuid))
+                return new AuthResultModel(true);
 
             // When a call is from a patient of doctor and only ask for information about the same user the following method will be called
             if (userId != 0 && !authRepository.PatientAuth(userId, tokenGuid, isDoctor))
@@ -97,7 +87,7 @@ namespace AppNiZiAPI.Security
     public interface IAuthorization
     {
         Task<AuthLogin> LoginAuthAsync(HttpRequest req);
-        Task<AuthResultModel> CheckAuthorization(HttpRequest req, int userId = 0);
+        Task<AuthResultModel> CheckAuthorization(HttpRequest req, int userId = 0, bool isDoctor = false);
     }
 }
 

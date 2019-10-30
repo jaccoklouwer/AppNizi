@@ -21,10 +21,12 @@ namespace AppNiZiAPI.Functions.WaterConsumption.POST
     {
         [FunctionName("InsterWaterConsumption")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.PostWaterConsumption))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "post", "put", Route = (Routes.APIVersion + Routes.PostWaterConsumption))] HttpRequest req,
             ILogger log)
         {
             WaterConsumptionModel model = new WaterConsumptionModel();
+            bool update = false;
+            IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
 
             try
             {
@@ -32,10 +34,11 @@ namespace AppNiZiAPI.Functions.WaterConsumption.POST
                 var jsonParsed = JObject.Parse(content);
                 int patientId = (int)jsonParsed["patientId"];
 
-                // Auth check
+                #region AuthCheck
                 AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
                 if (!authResult.Result)
                     return new StatusCodeResult(authResult.StatusCode);
+                #endregion
 
                 model = new WaterConsumptionModel()
                 {
@@ -43,18 +46,23 @@ namespace AppNiZiAPI.Functions.WaterConsumption.POST
                     Amount = (int)jsonParsed["amount"],
                     Date = Convert.ToDateTime(jsonParsed["date"].ToString())
                 };
+
+                if(req.Method.ToLower() == "put")
+                {
+                    model.Id = (int)jsonParsed["id"];
+                    update = true;
+                }
             }
             catch (Exception e)
             {
                 return new BadRequestObjectResult(Messages.ErrorPost);
             }
 
-            IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
-            Result result = waterRep.InsertWaterConsumption(model);
+            Result result = waterRep.InsertWaterConsumption(model, update);
 
-            if (result.Succesfull)
-                return new OkObjectResult(result);
-            return new BadRequestObjectResult(result);
+            return result.Succesfull 
+                ? (ActionResult)new OkObjectResult(result) 
+                : new BadRequestObjectResult(result);
         }
     }
 }
