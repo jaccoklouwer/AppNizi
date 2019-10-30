@@ -17,9 +17,9 @@ using AppNiZiAPI.Models.Handlers;
 
 namespace AppNiZiAPI.Functions.WaterConsumption.POST
 {
-    public static class InsterWaterConsumption
+    public static class InsertWaterConsumption
     {
-        [FunctionName("InsterWaterConsumption")]
+        [FunctionName("InsertrWaterConsumption")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", "put", Route = (Routes.APIVersion + Routes.PostWaterConsumption))] HttpRequest req,
             ILogger log)
