@@ -7,6 +7,7 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using AppNiZiAPI.Variables;
 
 namespace AppNiZiAPI.Functions.Doctor.DELETE
 {
@@ -14,7 +15,7 @@ namespace AppNiZiAPI.Functions.Doctor.DELETE
     {
         [FunctionName("DeleteDoctor")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.SpecificDoctor))] HttpRequest req,
             ILogger log)
         {
             log.LogInformation("C# HTTP trigger function processed a request.");

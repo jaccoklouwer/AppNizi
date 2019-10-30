@@ -25,9 +25,9 @@ namespace AppNiZiAPI.Functions.Doctor.POST
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Doctor))] HttpRequest req,
             ILogger log)
         {
-            uthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
+            AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
             if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            PatientLogin newPatient = new PatientLogin { Patient = new PatientObject(), Account = new AccountModel(), AuthLogin = new AuthLogin(), Doctor = new Models.Doctor() };
+            DoctorLogin newDoctor = new DoctorLogin { Account = new AccountModel(), Auth = new AuthLogin(), Doctor = new Models.Doctor() };
 
             try
             {
@@ -37,12 +37,10 @@ namespace AppNiZiAPI.Functions.Doctor.POST
 
                 // Parse Patient Info
                 JObject jsonParsed = JObject.Parse(content);
-                newPatient.Patient.FirstName = jsonParsed["firstName"].ToString();
-                newPatient.Patient.LastName = jsonParsed["lastName"].ToString();
-                newPatient.Patient.DateOfBirth = (DateTime)jsonParsed["dateOfBirth"];
-                newPatient.Patient.WeightInKilograms = (float)jsonParsed["weight"];
-                newPatient.Doctor.DoctorId = (int)jsonParsed["doctorId"];
-                newPatient.Patient.Guid = authLogin.Guid;
+                newDoctor.Doctor.FirstName = jsonParsed["firstName"].ToString();
+                newDoctor.Doctor.LastName = jsonParsed["lastName"].ToString();
+                newDoctor.Doctor.Location = jsonParsed["location"].ToString();
+                newDoctor.Auth.Guid = authLogin.Guid;
             }
             catch (Exception e)
             {
@@ -50,12 +48,12 @@ namespace AppNiZiAPI.Functions.Doctor.POST
                 return new BadRequestResult();
             }
 
-            IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
-            newPatient = patientRepository.RegisterPatient(newPatient);
-            newPatient.AuthLogin = authLogin;
+            IDoctorRepository doctorRepository = DIContainer.Instance.GetService<IDoctorRepository>();
+            newDoctor = doctorRepository.RegisterDoctor(newDoctor);
+            newDoctor.Auth = authLogin;
 
-            return newPatient != null
-                ? (ActionResult)new OkObjectResult(newPatient)
+            return newDoctor != null
+                ? (ActionResult)new OkObjectResult(newDoctor)
                 : new BadRequestResult();
         }
     }

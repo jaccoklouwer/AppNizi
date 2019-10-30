@@ -27,7 +27,7 @@ namespace AppNiZiAPI.Models.Repositories
         }
 
         // Returned new account id
-        private int RegisterAccount(string firstName, string lastName, int role)
+        public int RegisterAccount(string firstName, string lastName, int role)
         {
             string sqlQuery =
                 "INSERT INTO Account(first_name, last_name, role) " +
