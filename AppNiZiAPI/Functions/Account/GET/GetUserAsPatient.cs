@@ -19,15 +19,15 @@ using AppNiZiAPI.Models.AccountModels;
 
 namespace AppNiZiAPI.Functions.Account.GET
 {
-    public static class GetUser
+    public static class GetUserAsPatient
     {
-        [FunctionName("GetUser")]
+        [FunctionName("GetUserAsPatient")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetUser))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.Patients + Routes.Me))] HttpRequest req,
             ILogger log)
         {
-            AuthLogin authLogin = await Authorization.LoginAuthAsync(req);
             // Auth check
+            AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
             if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
             IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();

@@ -15,6 +15,7 @@ using AppNiZiAPI.Security;
 
 using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Models;
 
 namespace AppNiZiAPI.Functions.Meal.DELETE
 {
@@ -25,8 +26,11 @@ namespace AppNiZiAPI.Functions.Meal.DELETE
             [HttpTrigger(AuthorizationLevel.Function, "delete", "post", Route = ( Routes.APIVersion + Routes.DeleteMeal))] HttpRequest req,
             ILogger log,int patientId,int mealId)
         {
-            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-          
+            // Auth check
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+
             IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
             try
             {

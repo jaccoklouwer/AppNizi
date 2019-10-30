@@ -12,6 +12,7 @@ using AppNiZiAPI.Variables;
 using AppNiZiAPI.Security;
 using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Models;
 
 namespace AppNiZiAPI.Functions.Meal.POST
 {
@@ -22,9 +23,15 @@ namespace AppNiZiAPI.Functions.Meal.POST
             [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion+Routes.AddMeal))] HttpRequest req,
             ILogger log,int patientId)
         {
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+            #endregion
+
+
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            
+
             Models.Meal meal = new Models.Meal();
             JsonConvert.PopulateObject(requestBody, meal);
             meal.PatientId = patientId;

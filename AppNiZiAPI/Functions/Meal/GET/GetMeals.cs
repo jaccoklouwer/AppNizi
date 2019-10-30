@@ -25,7 +25,11 @@ namespace AppNiZiAPI.Functions.Meal.GET
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion+Routes.GetMeals))] HttpRequest req,
             ILogger log,int patientId)
         {
-            if (!await Authorization.CheckAuthorization(req, patientId)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            // Auth check
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+
             IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
             List<Models.Meal> meals = mealRepository.GetMyMeals(patientId);
 

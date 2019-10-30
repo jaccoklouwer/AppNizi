@@ -7,33 +7,32 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
-using AppNiZiAPI.Models;
-using System.Collections.Generic;
+using AppNiZiAPI.Models.Water;
+using AppNiZiAPI.Security;
 using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using AppNiZiAPI.Security;
+using System.Net.Http;
+using System.Net;
+using AppNiZiAPI.Models;
 using System.IO;
 using Newtonsoft.Json.Linq;
 
 namespace AppNiZiAPI.Functions.WaterConsumption.GET
 {
-    public static class WaterConsumptionPeriod
+    public static class DailyWaterConsumption
     {
-        [FunctionName("WaterConsumptionPeriod")]
-        public static async Task<IActionResult> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetWaterConsumptionPeriod))] HttpRequest req,
-            ILogger log)
+        [FunctionName("DailyWaterConsumption")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetDailyWaterConsumption))] HttpRequest req,
+            ILogger log, string date)
         {
-
             int patientId;
             bool isDoctor = false;
             try
             {
-                StreamReader streamReader = new StreamReader(req.Body);
-                var content = await streamReader.ReadToEndAsync();
-                streamReader.DiscardBufferedData();
+                var content = await new StreamReader(req.Body).ReadToEndAsync();
                 JObject jsonParsed = JObject.Parse(content);
+                patientId = (int)jsonParsed["patientId"];
                 patientId = (int)jsonParsed["patientId"];
                 if (jsonParsed.ContainsKey("Role") && jsonParsed["Role"].ToString() == "Doctor")
                     isDoctor = true;
@@ -49,21 +48,13 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
                 return new BadRequestResult();
             }
 
-            // Parse Dates, could'nt work within one if statement because the out var
-            if (!DateTime.TryParse(req.Query["beginDate"], out var parsedBeginDate))
-                return new StatusCodeResult(StatusCodes.Status400BadRequest);
-            if (!DateTime.TryParse(req.Query["endDate"], out var parsedEndDate))
-                return new StatusCodeResult(StatusCodes.Status400BadRequest);
-
             IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
-            List<WaterConsumptionViewModel> listModel = waterRep.GetWaterConsumptionPeriod(patientId, parsedBeginDate, parsedEndDate);
+            WaterConsumptionDaily model = waterRep.GetDailyWaterConsumption(patientId, date);
 
-            if (listModel.Count == 0)
+            if (model == null || model.WaterConsumptions.Count == 0)
                 return new StatusCodeResult(StatusCodes.Status204NoContent);
-            if (listModel[0].Error)
-                return new StatusCodeResult(StatusCodes.Status400BadRequest);
 
-            var json = JsonConvert.SerializeObject(listModel);
+            var json = JsonConvert.SerializeObject(model);
 
             return new OkObjectResult(json);
         }
