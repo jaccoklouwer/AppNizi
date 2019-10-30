@@ -18,7 +18,7 @@ using Microsoft.OpenApi;
 
 using Newtonsoft.Json;
 
-namespace SampleFunction
+namespace AppNiZiAPI.Functions
 {
     public static class SwaggerFunctions
     {
