@@ -33,7 +33,6 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
                 var content = await new StreamReader(req.Body).ReadToEndAsync();
                 JObject jsonParsed = JObject.Parse(content);
                 patientId = (int)jsonParsed["patientId"];
-                patientId = (int)jsonParsed["patientId"];
                 if (jsonParsed.ContainsKey("Role") && jsonParsed["Role"].ToString() == "Doctor")
                     isDoctor = true;
 

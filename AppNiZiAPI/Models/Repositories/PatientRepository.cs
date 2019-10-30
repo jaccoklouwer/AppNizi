@@ -35,7 +35,10 @@ namespace AppNiZiAPI.Models.Repositories
             using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
                 sqlConn.Open();
-                string sqlQuery = $"SELECT * FROM patient WHERE id=@ID";
+                string sqlQuery = $"SELECT p.*, a.* " +
+                    $"FROM Patient AS p " +
+                    $"INNER JOIN Account AS A ON p.account_id = a.id " +
+                    $"WHERE p.id=@ID";
 
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@ID", SqlDbType.Int).Value = id;
@@ -45,9 +48,13 @@ namespace AppNiZiAPI.Models.Repositories
                 {
                     patient = new PatientObject()
                     {
+                        PatientId = (int)reader["id"],
                         Guid = reader["guid"].ToString(),
                         DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
-                        WeightInKilograms = Convert.ToInt32(reader["weight"])
+                        WeightInKilograms = Convert.ToInt32(reader["weight"]),
+                        FirstName = reader["first_name"].ToString(),
+                        LastName = reader["last_name"].ToString()
+                        
                     };
                 }
             }
