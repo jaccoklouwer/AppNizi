@@ -12,17 +12,29 @@ using AppNiZiAPI.Models;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Security;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using System.Net;
+using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI
 {
     public static class AddConsumption
     {
         [FunctionName("AddConsumption")]
+        #region Swagger
+        [OpenApiOperation(nameof(AddConsumption), "Consumption", Summary = "Adds a consumption", Description = "Adds a consumption for a patient by using the consumption data from the requestbody", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiRequestBody("application/json", typeof(Consumption))]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKPost)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorIncorrectId)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPost)]
+        #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Consumptions))] HttpRequest req,
             ILogger log)
         {
-            log.LogDebug($"Triggered '" + typeof(AddConsumption).Name + "'");
+            log.LogDebug($"Triggered '" + nameof(AddConsumption) + "'");
 
             Consumption newConsumption = new Consumption();
             string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();

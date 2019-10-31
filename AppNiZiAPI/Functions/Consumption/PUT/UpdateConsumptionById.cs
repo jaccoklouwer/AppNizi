@@ -12,6 +12,10 @@ using AppNiZiAPI.Models.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Security;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using System.Net;
+using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI
 {
@@ -19,6 +23,15 @@ namespace AppNiZiAPI
     public static class UpdateConsumptionById
     {
         [FunctionName("UpdateConsumptionById")]
+        #region Swagger
+        [OpenApiOperation(nameof(UpdateConsumptionById), "Consumption", Summary = "Updates a consumption", Description = "Updates a consumption of a patient by using the consumption id located in the url path and the consumption data from the requestbody", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter("consumptionId", Description = "the id of the consumption that is targeted", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiRequestBody("application/json", typeof(Consumption))]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorIncorrectId)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPut)]
+        #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.Consumption))] HttpRequest req,
             ILogger log, string consumptionId)
@@ -35,7 +48,7 @@ namespace AppNiZiAPI
             JsonConvert.PopulateObject(consumptionJson, updateConsumption);
 
             // Check if updated consumption patientId equals target patientId
-            if (updateConsumption.PatientId != targetPatientId) return new BadRequestObjectResult(Messages.ErrorPost);
+            if (updateConsumption.PatientId != targetPatientId) return new BadRequestObjectResult(Messages.ErrorPut);
 
             // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, targetPatientId);
@@ -45,9 +58,9 @@ namespace AppNiZiAPI
             
             if (consumptionRepository.UpdateConsumption(id, updateConsumption))
             {
-                return new OkObjectResult(Messages.OKPost);
+                return new OkObjectResult(Messages.OKUpdate);
             }
-            return new BadRequestObjectResult(Messages.ErrorPost);
+            return new BadRequestObjectResult(Messages.ErrorPut);
         }
     }
 }
