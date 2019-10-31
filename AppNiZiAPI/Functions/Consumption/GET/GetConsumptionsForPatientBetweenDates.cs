@@ -54,9 +54,9 @@ namespace AppNiZiAPI
                 return new StatusCodeResult(authResult.StatusCode);
 
             IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
-            List<PatientConsumptionView> consumption = consumptionRepository.GetConsumptionsForPatientBetweenDates(patientId, startDate, endDate);
+            PatientConsumptionsView consumptions = new PatientConsumptionsView(consumptionRepository.GetConsumptionsForPatientBetweenDates(patientId, startDate, endDate));
 
-            var consumptionJson = JsonConvert.SerializeObject(consumption);
+            var consumptionJson = JsonConvert.SerializeObject(consumptions);
             return consumptionJson != null
                 ? (ActionResult)new OkObjectResult(consumptionJson)
                 : new BadRequestObjectResult(Messages.ErrorIncorrectId);
