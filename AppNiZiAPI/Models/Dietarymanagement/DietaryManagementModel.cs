@@ -8,7 +8,6 @@ namespace AppNiZiAPI.Models.Dietarymanagement
         /// <summary>
         /// Diet Id
         /// </summary>
-        [Required]
         [JsonProperty("id")]
         public int Id { get; set; }
 
