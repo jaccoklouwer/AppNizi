@@ -1,13 +1,14 @@
-﻿using System;
+﻿using AppNiZiAPI.Models.Repositories;
+using AppNiZiAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 
-namespace AppNiZiAPI.Models.Repositories
+namespace AppNiZiAPI
 {
     public class ConsumptionRespository : Repository, IConsumptionRepository
     {
-        //TODO Maybe use SqlDataReaderMapper https://www.nuget.org/packages/SqlDataReaderMapper/
-        
+
         public bool AddConsumption(Consumption consumption)
         {
             bool added;
@@ -18,7 +19,7 @@ namespace AppNiZiAPI.Models.Repositories
             conn.Open();
             try
             {
-                added = ConsumptionCommand(insertQuery, consumption).ExecuteNonQuery() > 0;
+                added = ConsumptionCommand1(insertQuery, consumption).ExecuteNonQuery() > 0;
             }
             catch (Exception)
             {
@@ -28,9 +29,10 @@ namespace AppNiZiAPI.Models.Repositories
             return added;
         }
 
-        // TODO: USE ENUM INSTEAD OF BOOL
-        public bool DeleteConsumption(int consumptionId)
+        public bool DeleteConsumption(int consumptionId, int patientId)
         {
+            if (patientId == 0) return false;
+
             bool affected;
             var query = $"DELETE FROM Consumption WHERE id = '{consumptionId}'";
             conn.Open();
@@ -38,23 +40,24 @@ namespace AppNiZiAPI.Models.Repositories
             {
                 SqlCommand command = new SqlCommand(query, conn);
                 affected = command.ExecuteNonQuery() > 0;
-                // Return 'deletion succeeded enum' of 'no data was affected enum' (ofzoiets)
             }
             catch (Exception)
             {
-                // Return 'deletion failed enum' (ofzoiets)
                 affected = false;
             }
             conn.Close();
             return affected;
         }
 
-        public Consumption GetConsumptionByConsumptionId(int consumptionId)
+        public ConsumptionView GetConsumptionByConsumptionId(int consumptionId)
         {
-            var query = $"SELECT * FROM Consumption WHERE id = '{consumptionId}'";
+            var query = $"SELECT Consumption.*, WeightUnit.short, WeightUnit.unit " +
+                $"FROM Consumption " +
+                $"INNER JOIN WeightUnit ON Consumption.weight_unit_id = WeightUnit.id " +
+                $"WHERE Consumption.id = '{consumptionId}'";
 
             conn.Open();
-            Consumption consumption = new Consumption();
+            ConsumptionView consumption = new ConsumptionView();
             using (SqlCommand sqlCommand = new SqlCommand(query, conn))
             {
                 try
@@ -62,7 +65,7 @@ namespace AppNiZiAPI.Models.Repositories
                     SqlDataReader reader = sqlCommand.ExecuteReader();
                     while (reader.Read())
                     {
-                        consumption.Id = (int)reader["id"];
+                        consumption.ConsumptionId = (int)reader["id"];
                         consumption.FoodName = reader["food_name"].ToString();
                         consumption.KCal = (float)Convert.ToDouble(reader["kcal"]);
                         consumption.Protein = (float)Convert.ToDouble(reader["protein"]);
@@ -70,30 +73,41 @@ namespace AppNiZiAPI.Models.Repositories
                         consumption.Calium = (float)Convert.ToDouble(reader["calium"]);
                         consumption.Sodium = (float)Convert.ToDouble(reader["sodium"]);
                         consumption.Amount = (int)reader["amount"];
-                        consumption.WeightUnitId = (int)reader["weight_unit_id"];
+                        consumption.Weight = new WeightUnitModel
+                        {
+                            Id = (int)reader["weight_unit_id"],
+                            Short = (string)reader["short"],
+                            Unit = (string)reader["unit"]
+                        };
                         consumption.Date = Convert.ToDateTime(reader["date"]).Date;
                         consumption.PatientId = (int)reader["patient_id"];
+                        consumption.Valid = true;
                     }
                 }
                 catch (Exception e)
                 {
-                    // logging?
-                    throw e;
+                    consumption.Valid = false;
+                    return consumption;
                 }
             }
             conn.Close();
             return consumption;
         }
 
-        public List<Consumption> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate)
+        public List<PatientConsumptionView> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate)
         {
-            String sqlStartDate = startDate.Date.ToString("yyyy-MM-dd").Replace("/", "-");
-            String sqlEndDate = endDate.Date.ToString("yyyy-MM-dd").Replace("/", "-");
-            var query = $"SELECT * FROM Consumption WHERE patient_id = '{patientId}' AND date BETWEEN '{sqlStartDate}' AND '{sqlEndDate}'";
+            string sqlStartDate = startDate.Date.ToString("yyyy-MM-dd").Replace("/", "-");
+            string sqlEndDate = endDate.Date.ToString("yyyy-MM-dd").Replace("/", "-");
+            
+            var query = $"SELECT Consumption.*, WeightUnit.short, WeightUnit.unit " +
+                $"FROM Consumption " +
+                $"INNER JOIN WeightUnit ON Consumption.weight_unit_id = WeightUnit.id " +
+                $"WHERE Consumption.patient_id = '{patientId}' AND Consumption.date BETWEEN '{sqlStartDate}' AND '{sqlEndDate}'";
 
-            List<Consumption> consumptions = new List<Consumption>();
+            List<PatientConsumptionView> consumptions = new List<PatientConsumptionView>();
             conn.Open();
 
+            PatientConsumptionView consumption;
             using (SqlCommand sqlCommand = new SqlCommand(query, conn))
             {
                 try
@@ -102,24 +116,41 @@ namespace AppNiZiAPI.Models.Repositories
                     SqlDataReader reader = sqlCommand.ExecuteReader();
                     while (reader.Read())
                     {
-                        Consumption consumption = new Consumption();
-                        consumption.Id = (int)reader["id"];
-                        consumption.FoodName = reader["food_name"].ToString();
-                        consumption.KCal = (float)Convert.ToDouble(reader["kcal"]);
-                        consumption.Protein = (float)Convert.ToDouble(reader["protein"]);
-                        consumption.Fiber = (float)Convert.ToDouble(reader["fiber"]);
-                        consumption.Calium = (float)Convert.ToDouble(reader["calium"]);
-                        consumption.Sodium = (float)Convert.ToDouble(reader["sodium"]);
-                        consumption.Amount = (int)reader["amount"];
-                        consumption.WeightUnitId = (int)reader["weight_unit_id"];
-                        consumption.Date = Convert.ToDateTime(reader["date"]).Date;
-                        consumption.PatientId = (int)reader["patient_id"];
+                        consumption = new PatientConsumptionView();
+                        
+                        try
+                        {
+                            consumption.ConsumptionId = (int)reader["id"];
+                            consumption.FoodName = reader["food_name"].ToString();
+                            consumption.KCal = (float)Convert.ToDouble(reader["kcal"]);
+                            consumption.Protein = (float)Convert.ToDouble(reader["protein"]);
+                            consumption.Fiber = (float)Convert.ToDouble(reader["fiber"]);
+                            consumption.Calium = (float)Convert.ToDouble(reader["calium"]);
+                            consumption.Sodium = (float)Convert.ToDouble(reader["sodium"]);
+                            consumption.Amount = (int)reader["amount"];
+                            consumption.Weight = new WeightUnitModel
+                            {
+                                Id = (int)reader["weight_unit_id"],
+                                Short = (string)reader["short"],
+                                Unit = (string)reader["unit"]
+                            };
+                            consumption.Date = Convert.ToDateTime(reader["date"]).Date;
+                            consumption.Valid = true;
+                        }
+                        catch (Exception ex) {
+                            if (consumption.ConsumptionId == 0)
+                            {
+                                throw ex;
+                            }
+                        }
+                        
+                        // Adds incomplete consumption to consumptions. Consumption is Invalid by default
                         consumptions.Add(consumption);
                     }
                 }
                 catch (Exception e)
                 {
-                    // logging?
+                    conn.Close();
                     throw e;
                 }
             }
@@ -138,7 +169,7 @@ namespace AppNiZiAPI.Models.Repositories
             conn.Open();
             try
             {
-                updated = ConsumptionCommand(updateQuery, consumption).ExecuteNonQuery() > 0;
+                updated = ConsumptionCommand1(updateQuery, consumption).ExecuteNonQuery() > 0;
             }
             catch (Exception)
             {
@@ -148,7 +179,8 @@ namespace AppNiZiAPI.Models.Repositories
             return updated;
         }
 
-        private SqlCommand ConsumptionCommand(String query, Consumption consumption)
+        // TODO: Remove patientId and check earlier if patientId equals consumption.patient_id
+        private SqlCommand ConsumptionCommand1(string query, Consumption consumption)
         {
             SqlCommand command = new SqlCommand(query, conn);
             command.Parameters.AddWithValue("@food_name", consumption.FoodName);
@@ -163,5 +195,6 @@ namespace AppNiZiAPI.Models.Repositories
             command.Parameters.AddWithValue("@patient_id", consumption.PatientId);
             return command;
         }
+
     }
 }

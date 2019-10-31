@@ -34,7 +34,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.PUT
         [OpenApiRequestBody("application/json", typeof(DietaryManagementModel), Description = "the new values of the dietaryManagement")]
         [OpenApiParameter("dietId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> UpdateDietaryManagement(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.DietaryManagementById))]
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = (Routes.APIVersion + Routes.DietaryManagementById))]
             HttpRequest req, int dietId,
             ILogger log)
         {
@@ -51,9 +51,11 @@ namespace AppNiZiAPI.Functions.DietaryManagement.PUT
             {
                 DietaryManagementModel dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
 
-                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, dietary.PatientId);
+                #region AuthCheck
+                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, dietary.PatientId);
                 if (!authResult.Result)
                     return new StatusCodeResult((int)authResult.StatusCode);
+                #endregion
 
                 bool success = repository.UpdateDietaryManagement(dietId, dietary);
 

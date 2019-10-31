@@ -11,6 +11,7 @@ using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
+using AppNiZiAPI.Security;
 
 namespace AppNiZiAPI
 {
@@ -25,13 +26,23 @@ namespace AppNiZiAPI
             log.LogDebug($"Triggered '" + typeof(UpdateConsumptionById).Name + "' with parameter: '" + consumptionId + "'");
 
             if (!int.TryParse(consumptionId, out int id)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
+
+            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
+            int targetPatientId = consumptionRepository.GetConsumptionByConsumptionId(id).PatientId;
+
             Consumption updateConsumption = new Consumption();
             string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();
             JsonConvert.PopulateObject(consumptionJson, updateConsumption);
 
-            // TODO: What if Consumption.Id != consumptionId??
+            // Check if updated consumption patientId equals target patientId
+            if (updateConsumption.PatientId != targetPatientId) return new BadRequestObjectResult(Messages.ErrorPost);
 
-            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
+            // Auth check
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, targetPatientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+
+            
             if (consumptionRepository.UpdateConsumption(id, updateConsumption))
             {
                 return new OkObjectResult(Messages.OKPost);
