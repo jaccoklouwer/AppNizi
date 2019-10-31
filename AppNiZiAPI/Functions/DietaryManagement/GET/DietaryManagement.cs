@@ -24,21 +24,23 @@ namespace AppNiZiAPI.Functions.DietaryManagement.GET
     public static class DietaryManagement
     {
         [FunctionName(nameof(GetDietaryManagementByPatient))]
-        [OpenApiOperation("UpdateDietaryManagement", "DietaryManagement", Summary = "Updates a dietary managment", Description = "updates the dietary management of a patient", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiOperation(nameof(GetDietaryManagementByPatient), "DietaryManagement", Summary = "Updates a dietary managment", Description = "updates the dietary management of a patient", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(DietaryView), Summary = Messages.OKResult)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
         [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
         [OpenApiParameter("patientId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> GetDietaryManagementByPatient(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, int patientId,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, int patientId,
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
 
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult(authResult.StatusCode);
+            #endregion
 
             List<DietaryManagementModel> dietaryManagementModels;
             List<DietaryRestriction> dietaryRestrictions;

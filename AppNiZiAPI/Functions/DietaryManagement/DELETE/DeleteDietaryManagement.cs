@@ -23,14 +23,15 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
     public static class DietaryManagement
     {
         [FunctionName(nameof(DeleteDietaryManagement))]
-        [OpenApiOperation("CreateDieataryManagement", "DietaryManagement", Summary = "Delete a dietary managment", Description = "Delete a dietary managment of a patient", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiOperation(nameof(DeleteDietaryManagement), "DietaryManagement", Summary = "Delete a dietary managment", Description = "Delete a dietary managment of a patient", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKDelete)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
         [OpenApiResponseBody(HttpStatusCode.UnprocessableEntity, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
         [OpenApiParameter("dietId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiRequestBody("patientId", typeof(int), Description ="the id of a patient for authentication")]
         public static async Task<IActionResult> DeleteDietaryManagement(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId,
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
@@ -49,9 +50,11 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
                 return new UnprocessableEntityObjectResult(Messages.ErrorIncorrectId);
             }
 
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult(authResult.StatusCode);
+            #endregion
 
 
             IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();

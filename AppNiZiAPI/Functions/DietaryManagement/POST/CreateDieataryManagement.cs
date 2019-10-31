@@ -31,7 +31,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.POST
         [OpenApiResponseBody(HttpStatusCode.UnprocessableEntity, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
         [OpenApiRequestBody("application/json", typeof(DietaryManagementModel), Description = "the new values of the dietaryManagement")]
         public static async Task<IActionResult> CreateDieataryManagement(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.DietaryManagement))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.DietaryManagement))] HttpRequest req,
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
@@ -47,9 +47,11 @@ namespace AppNiZiAPI.Functions.DietaryManagement.POST
                 DietaryManagementModel dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
 
 
-                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, dietary.PatientId);
+                #region AuthCheck
+                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, dietary.PatientId);
                 if (!authResult.Result)
                     return new StatusCodeResult(authResult.StatusCode);
+                #endregion
 
                 bool success = repository.AddDietaryManagement(dietary);
                 if (success)
