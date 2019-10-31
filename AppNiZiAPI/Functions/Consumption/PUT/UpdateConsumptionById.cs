@@ -40,7 +40,7 @@ namespace AppNiZiAPI
             // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, targetPatientId);
             if (!authResult.Result)
-                return new StatusCodeResult(authResult.StatusCode);
+                return new StatusCodeResult((int)authResult.StatusCode);
 
             
             if (consumptionRepository.UpdateConsumption(id, updateConsumption))

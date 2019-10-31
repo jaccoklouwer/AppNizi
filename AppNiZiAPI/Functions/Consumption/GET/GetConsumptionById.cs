@@ -31,7 +31,7 @@ namespace AppNiZiAPI
             int patientId = consumption.PatientId;
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
-                return new StatusCodeResult(authResult.StatusCode);
+                return new StatusCodeResult((int)authResult.StatusCode);
             
             var consumptionJson = JsonConvert.SerializeObject(consumption);
             return consumptionJson != null && consumption.ConsumptionId != 0
