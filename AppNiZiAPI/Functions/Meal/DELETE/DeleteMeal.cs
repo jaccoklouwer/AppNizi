@@ -16,12 +16,22 @@ using AppNiZiAPI.Security;
 using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI.Functions.Meal.DELETE
 {
     public static class DeleteMeal
     {
         [FunctionName("DeleteMeal")]
+        [OpenApiOperation("DeleteMeal", "Meal", Summary = "Deletes a meal", Description = "Removes the meal of the specified user", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
+        [OpenApiParameter("patientId", Description = "the id of the patient thats going to delete his meal", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiParameter("mealId", Description = "The meal to delete", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "delete", "post", Route = ( Routes.APIVersion + Routes.DeleteMeal))] HttpRequest req,
             ILogger log,int patientId,int mealId)
