@@ -19,29 +19,29 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 
-namespace AppNiZiAPI.Functions.WaterConsumption.POST
+namespace AppNiZiAPI.Functions.WaterConsumption.PUT
 {
-    public static class InsertWaterConsumption
+    public static class UpdateWaterConsumption
     {
-        [FunctionName("InsertWaterConsumption")]
+        [FunctionName("UpdateWaterConsumption")]
         #region Swagger
-        [OpenApiOperation("InsertWaterConsumption", "WaterConsumption", Summary = "New water consumption", Description = "New water consumption", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiOperation("UpdateWaterConsumption", "WaterConsumption", Summary = "Update water consumption", Description = "Update water consumption", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(WaterConsumptionModel), Summary = Messages.OKResult)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
         [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
-        [OpenApiRequestBody("application/json", typeof(WaterConsumptionModel), Description = "Updated model for water consumption")] 
+        [OpenApiRequestBody("application/json", typeof(WaterConsumptionModel), Description = "Id can be null or zero")]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.PostWaterConsumption))] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.SingleWaterConsumption))] HttpRequest req,
+            ILogger log, int waterId)
         {
             int patientId = await DIContainer.Instance.GetService<IAuthorization>().GetUserId(req);
             if (patientId == 0)
                 return new StatusCodeResult(StatusCodes.Status401Unauthorized);
 
+            WaterConsumptionModel model = new WaterConsumptionModel();
             IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
-            WaterConsumptionModel model;
 
             try
             {
@@ -52,7 +52,8 @@ namespace AppNiZiAPI.Functions.WaterConsumption.POST
                 {
                     PatientId = patientId,
                     Amount = (int)jsonParsed["amount"],
-                    Date = Convert.ToDateTime(jsonParsed["date"].ToString())
+                    Date = Convert.ToDateTime(jsonParsed["date"].ToString()),
+                    Id = waterId
                 };
             }
             catch
@@ -60,7 +61,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.POST
                 return new BadRequestObjectResult(Messages.ErrorPost);
             }
 
-            Result result = waterRep.InsertWaterConsumption(model, false);
+            Result result = waterRep.InsertWaterConsumption(model, true);
 
             return result.Succesfull
                 ? (ActionResult)new OkObjectResult(result)

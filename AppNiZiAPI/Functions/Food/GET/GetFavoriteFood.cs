@@ -39,7 +39,7 @@ namespace AppNiZiAPI.Functions.Food
             // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
-                return new StatusCodeResult(authResult.StatusCode);
+                return new StatusCodeResult((int)authResult.StatusCode);
             //TODO maak dit minder lelijk
 
             IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();

@@ -29,7 +29,7 @@ namespace AppNiZiAPI.Functions
         [FunctionName(nameof(RenderOpenApiDocument))]
         [OpenApiIgnore]
         public static async Task<IActionResult> RenderOpenApiDocument(
-        [HttpTrigger(AuthorizationLevel.Function, "get", Route = "swagger/{version}.{extension}")] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "swagger/{version}.{extension}")] HttpRequest req,
         string version,
         string extension,
         ILogger log)
@@ -81,7 +81,7 @@ namespace AppNiZiAPI.Functions
         [FunctionName(nameof(RenderSwaggerUI))]
         [OpenApiIgnore]
         public static async Task<IActionResult> RenderSwaggerUI(
-    [HttpTrigger(AuthorizationLevel.Function, "get", Route = "swagger/ui")] HttpRequest req,
+    [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "swagger/ui")] HttpRequest req,
     ILogger log)
         {
             var settings = new AppSettings();

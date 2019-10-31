@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using AppNiZiAPI.Security;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -8,13 +9,13 @@ namespace AppNiZiAPI.Models
 {
     public class AuthResultModel
     {
-        public AuthResultModel(bool result, int statusCode = 200)
+        public AuthResultModel(bool result, AuthStatusCode statusCode)
         {
             Result = result;
             StatusCode = statusCode;
         }
 
         public bool Result { get; set; }
-        public int StatusCode { get; set; }
+        public AuthStatusCode StatusCode { get; set; }
     }
 }

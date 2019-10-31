@@ -16,40 +16,46 @@ using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Security;
 using AppNiZiAPI.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI.Functions.Doctor.DELETE
 {
     public static class DeleteDoctor
     {
         [FunctionName("DeleteDoctor")]
+        #region Swagger
+        [OpenApiOperation("DeleteDoctor", "Doctor", Summary = "Delete specific doctor", Description = "Delete specific doctor", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(PatientObject[]), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiResponseBody(HttpStatusCode.Conflict, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiParameter("doctorId", Description = "Inserting the doctor id", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.SpecificDoctor))] HttpRequest req,
             ILogger log, int doctorId)
         {
             #region AuthCheck
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, doctorId);
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctor(req, doctorId);
             if (!authResult.Result)
-                return new StatusCodeResult(authResult.StatusCode);
+                return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
-
-            if (doctorId == 0)
-                return new BadRequestObjectResult("No doctor id parameter passed.");
 
             try
             {
-                IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
-                bool success = patientRepository.Delete(doctorId);
+                IDoctorRepository doctorRepository = DIContainer.Instance.GetService<IDoctorRepository>();
+                bool success = doctorRepository.Delete(doctorId);
 
-                if (success)
-                    return new OkObjectResult("Deleted.");
-                else
-                    return new NotFoundObjectResult("Deletion failed, invalid GUID?");
+                return doctorRepository.Delete(doctorId)
+                    ? (ActionResult)new OkResult()
+                    : new StatusCodeResult(StatusCodes.Status409Conflict);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                // Build error message and return it.
-                string callbackMessage = new MessageHandler().BuildErrorMessage(ex);
-                return new BadRequestObjectResult(callbackMessage);
+                return new BadRequestObjectResult(new MessageHandler().BuildErrorMessage(e));
             }
         }
     }

@@ -16,14 +16,24 @@ using AppNiZiAPI.Security;
 using System;
 using AppNiZiAPI.Models.AccountModels;
 using System.Threading.Tasks;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
 
 namespace AppNiZiAPI.Functions.Account.GET
 {
     public static class GetUserAsDoctor
     {
         [FunctionName("GetUserAsDoctor")]
+        #region Swagger
+        [OpenApiOperation("LoginDoctor", "Doctor", Summary = "Get User As Patient from Acces Token", Description = "Get User As Patient from Acces Token", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(DoctorLogin), Summary = Messages.OKResult)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
+        [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)] 
+        #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = (Routes.APIVersion + Routes.DoctorMe))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.DoctorMe))] HttpRequest req,
             ILogger log)
         {
             AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);

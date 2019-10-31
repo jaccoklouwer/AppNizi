@@ -15,13 +15,24 @@ using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Models.Repositories;
 using Newtonsoft.Json.Linq;
 using AppNiZiAPI.Models;
-
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using System.Net;
+using AppNiZiAPI.Models.SwaggerModels;
 
 namespace AppNiZiAPI.Functions.Account.POST
 {
     public static class RegisterPatient
     {
         [FunctionName("RegisterPatient")]
+        #region Swagger
+        [OpenApiOperation("RegisterPatient", "Patient", Summary = "Register a new patient", Description = "Register a new patient", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(PatientLogin), Summary = Messages.OKResult)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
+        [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
+        [OpenApiRequestBody("application/json", typeof(SwaggerRegisterPatient), Description = "New patient")]
+        #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Patients))] HttpRequest req,
             ILogger log)
@@ -29,7 +40,7 @@ namespace AppNiZiAPI.Functions.Account.POST
             // Auth check
             AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
             if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            PatientLogin newPatient = new PatientLogin { Patient = new PatientObject(), Account = new AccountModel(), AuthLogin = new AuthLogin(), Doctor = new Models.DoctorModel()  };
+            PatientLogin newPatient;
 
             try
             {
@@ -39,12 +50,22 @@ namespace AppNiZiAPI.Functions.Account.POST
 
                 // Parse Patient Info
                 JObject jsonParsed = JObject.Parse(content);
-                newPatient.Patient.FirstName = jsonParsed["firstName"].ToString();
-                newPatient.Patient.LastName = jsonParsed["lastName"].ToString();
-                newPatient.Patient.DateOfBirth = (DateTime)jsonParsed["dateOfBirth"];
-                newPatient.Patient.WeightInKilograms = (float)jsonParsed["weight"];
-                newPatient.Doctor.DoctorId = (int)jsonParsed["doctorId"];
-                newPatient.Patient.Guid = authLogin.Guid;
+
+                newPatient = new PatientLogin
+                {
+                    Patient = new PatientObject
+                    {
+                        FirstName = jsonParsed["firstName"].ToString(),
+                        LastName = jsonParsed["lastName"].ToString(),
+                        DateOfBirth = (DateTime)jsonParsed["dateOfBirth"],
+                        WeightInKilograms = (float)jsonParsed["weight"],
+                        Guid = authLogin.Guid
+                    },
+                    Doctor = new DoctorModel
+                    {
+                        DoctorId = (int)jsonParsed["doctorId"]
+                    }
+                };
             }
             catch (Exception e)
             {

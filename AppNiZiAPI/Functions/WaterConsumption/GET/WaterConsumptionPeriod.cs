@@ -25,22 +25,24 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
     public static class WaterConsumptionPeriod
     {
         [FunctionName("WaterConsumptionPeriod")]
+        #region Swagger
         [OpenApiOperation("WaterConsumptionPeriod", "WaterConsumption", Summary = "Get waterconsumption from a date date", Description = "Get waterconsumption from a date date", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(List<WaterConsumptionViewModel>), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(WaterConsumptionViewModel[]), Summary = Messages.OKUpdate)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
-        [OpenApiParameter("patientId:int", Description = "Inserting the patientId", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiParameter("patientId", Description = "Inserting the patientId", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         [OpenApiParameter("beginDate", Description = "Inserting the bein date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
-        [OpenApiParameter("endDate", Description = "Inserting the end date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter("endDate", Description = "Inserting the end date", In = ParameterLocation.Query, Required = true, Type = typeof(string))] 
+        #endregion
         public static async Task<IActionResult> RunAsync(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetWaterConsumptionPeriod))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetWaterConsumptionPeriod))] HttpRequest req,
             ILogger log, int patientId)
         {
                 #region AuthCheck
                 AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
                 if (!authResult.Result)
-                    return new StatusCodeResult(authResult.StatusCode);
+                    return new StatusCodeResult((int)authResult.StatusCode);
                 #endregion
  
             // Parse Dates, could'nt work within one if statement because the out var

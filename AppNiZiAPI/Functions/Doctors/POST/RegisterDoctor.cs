@@ -15,19 +15,31 @@ using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Models.Repositories;
 using Newtonsoft.Json.Linq;
 using AppNiZiAPI.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Models.SwaggerModels;
 
 namespace AppNiZiAPI.Functions.Doctor.POST
 {
     public static class RegisterDoctor
     {
         [FunctionName("RegisterDoctor")]
+        #region Swagger
+        [OpenApiOperation("RegisterDoctor", "Doctor", Summary = "Register a new doctor", Description = "Register a new doctor", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(DoctorLogin), Summary = Messages.OKResult)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
+        [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
+        [OpenApiRequestBody("application/json", typeof(SwaggerRegisterDoctor), Description = "New doctor")] 
+        #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Doctor))] HttpRequest req,
             ILogger log)
         {
             AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
             if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            DoctorLogin newDoctor = new DoctorLogin { Account = new AccountModel(), Auth = new AuthLogin(), Doctor = new Models.DoctorModel() };
+            DoctorLogin newDoctor;
 
             try
             {
@@ -37,16 +49,21 @@ namespace AppNiZiAPI.Functions.Doctor.POST
 
                 // Parse Patient Info
                 JObject jsonParsed = JObject.Parse(content);
-                newDoctor.Doctor.FirstName = jsonParsed["firstName"].ToString();
-                newDoctor.Doctor.LastName = jsonParsed["lastName"].ToString();
-                newDoctor.Doctor.Location = jsonParsed["location"].ToString();
-                newDoctor.Auth.Guid = authLogin.Guid;
+                newDoctor = new DoctorLogin
+                {
+                    Doctor = new DoctorModel
+                    {
+                        FirstName = jsonParsed["firstName"].ToString(),
+                        LastName = jsonParsed["lastName"].ToString(),
+                        Location = jsonParsed["location"].ToString()
+                    },
+                    Auth = new AuthLogin
+                    {
+                        Guid = authLogin.Guid
+                    }
+                };
             }
-            catch (Exception e)
-            {
-                log.LogInformation(e.Message);
-                return new BadRequestResult();
-            }
+            catch { return new BadRequestResult(); }
 
             IDoctorRepository doctorRepository = DIContainer.Instance.GetService<IDoctorRepository>();
             newDoctor = doctorRepository.RegisterDoctor(newDoctor);

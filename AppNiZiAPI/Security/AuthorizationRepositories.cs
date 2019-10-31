@@ -32,7 +32,7 @@ namespace AppNiZiAPI.Security
             }
         }
 
-        public bool PatientAuth(int userId, string guid, bool isDoctor)
+        public bool UserAuth(int userId, string guid, bool isDoctor)
         {
             int outputUserId = 0;
             var text = "";
@@ -42,10 +42,10 @@ namespace AppNiZiAPI.Security
 
                 if (isDoctor)
                 {
-                #if DEBUG
+#if DEBUG
                     guid = "jfjfjfj";
 #endif
-                    text = 
+                    text =
                         $"SELECT id FROM Doctor WHERE guid = '{guid}'";
                 }
                 else
@@ -97,40 +97,33 @@ namespace AppNiZiAPI.Security
             }
             return result;
         }
-        public int GetAccountId(string guid, bool isDoctor)
+        public int GetUserId(string guid, bool isDoctor)
         {
-            int userId = 0;
-            var query = "";
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
-                conn.Open();
-
+                string sqlQuery;
                 if (isDoctor)
-                    query = 
-                        $"SELECT id FROM Doctor WHERE guid = '{guid}'";
+                    sqlQuery = "SELECT id FROM Doctor WHERE guid = @GUID";
                 else
-                    query =
-                    $"SELECT id FROM Patient WHERE guid = '{guid}'";
+                    sqlQuery = "SELECT id FROM Patient WHERE guid = @GUID";
 
-                using (SqlCommand cmd = new SqlCommand(query, conn))
+                SqlCommand cmd = new SqlCommand(sqlQuery, conn);
+                cmd.Parameters.Add("@GUID", SqlDbType.Int).Value = guid;
+                conn.Open();
+                try
                 {
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        userId = (int)reader["id"];
-                    }
+                    return (int)cmd.ExecuteScalar();
                 }
-                conn.Close();
+                catch { return 0; }
             }
-            return userId;
         }
     }
 
     public interface IAuthorizationRepository
     {
-        bool PatientAuth(int userId, string guid, bool isDoctor);
+        bool UserAuth(int userId, string guid, bool isDoctor);
         bool CheckDoctorAcces(int patientId, string guid);
-        int GetAccountId(string guid, bool isDoctor);
+        int GetUserId(string guid, bool isDoctor);
         bool HasAcces(int userId, string guid);
     }
 }

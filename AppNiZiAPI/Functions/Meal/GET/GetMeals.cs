@@ -38,7 +38,7 @@ namespace AppNiZiAPI.Functions.Meal.GET
             // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
-                return new StatusCodeResult(authResult.StatusCode);
+                return new StatusCodeResult((int)authResult.StatusCode);
 
             IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
             List<Models.Meal> meals = mealRepository.GetMyMeals(patientId);

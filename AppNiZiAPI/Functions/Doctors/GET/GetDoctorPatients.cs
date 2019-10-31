@@ -14,12 +14,24 @@ using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
 using System.Collections.Generic;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using System.Net;
+using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI.Functions.Doctor.GET
 {
     public static class GetDoctorPatients
     {
         [FunctionName("GetDoctorPatients")]
+        #region Swagger
+        [OpenApiOperation("GetDoctorPatients", "Doctor", Summary = "Get the patients from a doctor", Description = "Get the patients from a docto", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(PatientObject[]), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiParameter("doctorId", Description = "Inserting the doctor id", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDoctorPatients))] HttpRequest req,
             ILogger log, int doctorId)
@@ -27,7 +39,7 @@ namespace AppNiZiAPI.Functions.Doctor.GET
             #region AuthCheck
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req,doctorId,true);
             if (!authResult.Result)
-                return new StatusCodeResult(authResult.StatusCode);
+                return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
 
             IDoctorRepository doctorRepository = DIContainer.Instance.GetService<IDoctorRepository>();

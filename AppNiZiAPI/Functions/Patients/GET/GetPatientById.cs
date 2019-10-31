@@ -41,7 +41,7 @@ namespace AppNiZiAPI.Functions.Patients.GET
             #region AuthCheck
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId, isDoctor);
             if (!authResult.Result)
-                return new StatusCodeResult(authResult.StatusCode);
+                return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
 
             try

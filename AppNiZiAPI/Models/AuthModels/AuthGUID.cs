@@ -8,5 +8,6 @@ namespace AppNiZiAPI.Models.AuthModels
     {
         public bool Acces { get; set; }
         public string GUID { get; set; }
+        public AuthResultModel AuthResult { get; set; }
     }
 }

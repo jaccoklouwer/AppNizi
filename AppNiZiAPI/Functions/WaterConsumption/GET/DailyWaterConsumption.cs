@@ -26,13 +26,15 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
     public static class DailyWaterConsumption
     {
         [FunctionName("DailyWaterConsumption")]
+        #region Swagger
         [OpenApiOperation("DailyWaterConsumption", "WaterConsumption", Summary = "Get waterconsumption from a date", Description = "Get waterconsumption from a date", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(WaterConsumptionDaily), Summary = Messages.OKUpdate)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
-        [OpenApiParameter("patientId:int", Description = "Inserting the patientId", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
-        [OpenApiParameter("date", Description = "Inserting the date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter("patientId", Description = "Inserting the patientId", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiParameter("date", Description = "Inserting the date", In = ParameterLocation.Query, Required = true, Type = typeof(string))] 
+        #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDailyWaterConsumption))] HttpRequest req,
             ILogger log, int patientId)
@@ -40,7 +42,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
             #region AuthCheck
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
             if (!authResult.Result)
-                return new StatusCodeResult(authResult.StatusCode);
+                return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
 
             if (!DateTime.TryParse(req.Query["date"], out var parsedDate))

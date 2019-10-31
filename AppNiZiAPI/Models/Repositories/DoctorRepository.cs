@@ -12,7 +12,7 @@ namespace AppNiZiAPI.Models.Repositories
 {
     class DoctorRepository : IDoctorRepository
     {
-        public List<PatientObject>GetDoctorPatients(int doctorId)
+        public List<PatientObject> GetDoctorPatients(int doctorId)
         {
             List<PatientObject> list = new List<PatientObject>();
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
@@ -70,14 +70,25 @@ namespace AppNiZiAPI.Models.Repositories
 
                 while (reader.Read())
                 {
-                    doctorLogin = new DoctorLogin { Account = new AccountModel(), Auth = new AuthLogin(), Doctor = new DoctorModel() };
-                    doctorLogin.Doctor.FirstName = reader["first_name"].ToString();
-                    doctorLogin.Doctor.LastName = reader["last_name"].ToString();
-                    doctorLogin.Doctor.DoctorId = (int)reader["id"];
-                    doctorLogin.Doctor.Location = reader["location"].ToString();
-                    doctorLogin.Account.AccountId = (int)reader["account_id"];
-                    doctorLogin.Auth.Guid = reader["guid"].ToString();
-                    doctorLogin.Account.Role = reader["role_name"].ToString();
+                    doctorLogin = new DoctorLogin
+                    {
+                        Doctor = new DoctorModel
+                        {
+                            FirstName = reader["first_name"].ToString(),
+                            LastName = reader["last_name"].ToString(),
+                            DoctorId = (int)reader["id"],
+                            Location = reader["location"].ToString()
+                        },
+                        Account = new AccountModel
+                        {
+                            AccountId = (int)reader["account_id"],
+                            Role = reader["role_name"].ToString()
+                        },
+                        Auth = new AuthLogin
+                        {
+                            Guid = reader["guid"].ToString(),
+                        }
+                    };
                 }
                 conn.Close();
             }
@@ -210,6 +221,46 @@ namespace AppNiZiAPI.Models.Repositories
                 return (bool)cmd.ExecuteScalar();
             }
         }
+
+        public bool Delete(int doctorId)
+        {
+            bool success = false;
+            int accountId = 0;
+
+            string sqlQuery = "SELECT account_id FROM Doctor WHERE id=@DOCTORID";
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.Add("@DOCTORID", SqlDbType.Int).Value = doctorId;
+
+                try
+                {
+                    sqlConn.Open();
+                    accountId = (int)sqlCmd.ExecuteScalar();
+                    sqlConn.Close();
+                }
+                catch{ return false; }
+                if (accountId == 0)
+                    return false;
+            }
+
+            sqlQuery =
+                "DELETE FROM patient WHERE id=@DOCTORID;" +
+                "DELETE FROM Account WHERE id=@ACCOUNTID";
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.Add("@DOCTORID", SqlDbType.Int).Value = doctorId;
+                sqlCmd.Parameters.Add("@ACCOUNTID", SqlDbType.Int).Value = accountId;
+
+                sqlConn.Open();
+                int rows = sqlCmd.ExecuteNonQuery();
+                if (rows > 0)
+                    success = true;
+            }
+            return success;
+        }
     }
 
     public interface IDoctorRepository
@@ -219,5 +270,6 @@ namespace AppNiZiAPI.Models.Repositories
         List<DoctorModel> GetDoctors();
         DoctorLogin RegisterDoctor(DoctorLogin newDoctor);
         DoctorModel GetDoctorById(int doctorId);
+        bool Delete(int doctorId);
     }
 }

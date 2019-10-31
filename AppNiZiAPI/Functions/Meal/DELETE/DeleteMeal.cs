@@ -39,7 +39,7 @@ namespace AppNiZiAPI.Functions.Meal.DELETE
             // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
-                return new StatusCodeResult(authResult.StatusCode);
+                return new StatusCodeResult((int)authResult.StatusCode);
 
             IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
             try

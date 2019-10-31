@@ -49,7 +49,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.POST
 
                 AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, dietary.PatientId);
                 if (!authResult.Result)
-                    return new StatusCodeResult(authResult.StatusCode);
+                    return new StatusCodeResult((int)authResult.StatusCode);
 
                 bool success = repository.AddDietaryManagement(dietary);
                 if (success)
