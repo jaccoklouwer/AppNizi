@@ -10,6 +10,7 @@ using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Models;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
+using AppNiZiAPI.Security;
 
 namespace AppNiZiAPI
 {
@@ -25,10 +26,15 @@ namespace AppNiZiAPI
             if (!int.TryParse(consumptionId, out int id)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
 
             IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
-            Consumption consumption = consumptionRepository.GetConsumptionByConsumptionId(id);
+            ConsumptionView consumption = consumptionRepository.GetConsumptionByConsumptionId(id);
+
+            int patientId = consumption.PatientId;
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
             
             var consumptionJson = JsonConvert.SerializeObject(consumption);
-            return consumptionJson != null && consumption.Id != 0
+            return consumptionJson != null && consumption.ConsumptionId != 0
                 ? (ActionResult)new OkObjectResult(consumptionJson)
                 : new BadRequestObjectResult(Messages.ErrorIncorrectId);
         }

@@ -1,11 +1,13 @@
-﻿using System;
+﻿using AppNiZiAPI.Models;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace AppNiZiAPI.Models
+namespace AppNiZiAPI
 {
-    public class Consumption : BaseEntity
+    public class PatientConsumptionView
     {
+        public int ConsumptionId { get; set; }
         public string FoodName { get; set; }
         public float KCal { get; set; }
         public float Protein { get; set; }
@@ -13,8 +15,13 @@ namespace AppNiZiAPI.Models
         public float Calium { get; set; }
         public float Sodium { get; set; }
         public int Amount { get; set; }
-        public float WeightUnitId { get; set; }
+        public WeightUnitModel Weight { get; set; }
         public DateTime Date { get; set; }
-        public int PatientId { get; set; }
+        public bool Valid { get; set; }
+
+        public PatientConsumptionView()
+        {
+            this.Valid = false;
+        }
     }
 }
