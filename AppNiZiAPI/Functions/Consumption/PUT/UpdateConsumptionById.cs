@@ -26,19 +26,24 @@ namespace AppNiZiAPI
             log.LogDebug($"Triggered '" + typeof(UpdateConsumptionById).Name + "' with parameter: '" + consumptionId + "'");
 
             if (!int.TryParse(consumptionId, out int id)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
+
+            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
+            int targetPatientId = consumptionRepository.GetConsumptionByConsumptionId(id).PatientId;
+
             Consumption updateConsumption = new Consumption();
             string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();
             JsonConvert.PopulateObject(consumptionJson, updateConsumption);
 
-            //TODO: Validate
-            int patientId = updateConsumption.PatientId;
+            // Check if updated consumption patientId equals target patientId
+            if (updateConsumption.PatientId != targetPatientId) return new BadRequestObjectResult(Messages.ErrorPost);
+
             // Auth check
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, targetPatientId);
             if (!authResult.Result)
                 return new StatusCodeResult(authResult.StatusCode);
 
-            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
-            if (consumptionRepository.UpdateConsumption(id, new ConsumptionView(updateConsumption), patientId))
+            
+            if (consumptionRepository.UpdateConsumption(id, updateConsumption))
             {
                 return new OkObjectResult(Messages.OKPost);
             }

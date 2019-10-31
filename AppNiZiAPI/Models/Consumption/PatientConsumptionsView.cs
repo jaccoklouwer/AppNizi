@@ -4,19 +4,19 @@ using System.Text;
 
 namespace AppNiZiAPI
 {
-    public class ConsumptionsView
+    public class PatientConsumptionsView
     {
-        public List<ConsumptionView> Consumptions { get; }
+        public List<PatientConsumptionView> Consumptions { get; }
         public float KCalTotal { get; }
         public float ProteinTotal { get; }
         public float FiberTotal { get; }
         public float CaliumTotal { get; }
         public float SodiumTotal { get; }
 
-        public ConsumptionsView(List<ConsumptionView> consumptions)
+        public PatientConsumptionsView(List<PatientConsumptionView> consumptions)
         {
             this.Consumptions = consumptions;
-            foreach (ConsumptionView consumption in consumptions)
+            foreach (PatientConsumptionView consumption in consumptions)
             {
                 this.KCalTotal += consumption.KCal;
                 this.ProteinTotal += consumption.Protein;

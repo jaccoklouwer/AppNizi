@@ -28,7 +28,6 @@ namespace AppNiZiAPI
             string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();
             JsonConvert.PopulateObject(consumptionJson, newConsumption);
 
-            //TODO: Validate
             int patientId = newConsumption.PatientId;
             // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
@@ -37,7 +36,7 @@ namespace AppNiZiAPI
 
 
             IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
-            if (consumptionRepository.AddConsumption(new ConsumptionView(newConsumption), patientId))
+            if (consumptionRepository.AddConsumption(newConsumption))
             {
                 return new OkObjectResult(Messages.OKPost);
             }

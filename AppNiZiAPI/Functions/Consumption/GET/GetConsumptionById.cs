@@ -26,19 +26,15 @@ namespace AppNiZiAPI
             if (!int.TryParse(consumptionId, out int id)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
 
             IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
-            Consumption consumption = consumptionRepository.GetConsumptionByConsumptionId(id);
+            ConsumptionView consumption = consumptionRepository.GetConsumptionByConsumptionId(id);
 
-            // TODO: Validate
             int patientId = consumption.PatientId;
-            // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult(authResult.StatusCode);
-
-            ConsumptionView consumptionView = new ConsumptionView(consumption);
             
-            var consumptionJson = JsonConvert.SerializeObject(consumptionView);
-            return consumptionJson != null && consumption.Id != 0
+            var consumptionJson = JsonConvert.SerializeObject(consumption);
+            return consumptionJson != null && consumption.ConsumptionId != 0
                 ? (ActionResult)new OkObjectResult(consumptionJson)
                 : new BadRequestObjectResult(Messages.ErrorIncorrectId);
         }
