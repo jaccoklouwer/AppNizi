@@ -11,6 +11,7 @@ using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Models.AccountModels;
 using AppNiZiAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using AppNiZiAPI.Models.AuthModels;
 
 namespace AppNiZiAPI.Security
 {
@@ -25,8 +26,6 @@ namespace AppNiZiAPI.Security
 
         public async Task<AuthResultModel> CheckAuthorization(HttpRequest req, int userId = 0, bool isDoctor = false)
         {
-            
-
             // Get AuthentificationHeader from request
             AuthenticationHeaderValue.TryParse(req.Headers[HeaderNames.Authorization], out var authHeader);
 
@@ -60,6 +59,19 @@ namespace AppNiZiAPI.Security
             return new AuthResultModel(true);
         }
 
+        public async Task<AuthResultModel> AuthForDoctorOrPatient(HttpRequest req, int userId)
+        {
+            AuthGUID authGUID = await GetGUIDAsync(req);
+            if (!authGUID.Acces || authGUID.GUID == "")
+                return new AuthResultModel(false, ForbiddenStatusCode);
+
+            IAuthorizationRepository authRepository = DIContainer.Instance.GetService<IAuthorizationRepository>();
+
+            return authRepository.HasAcces(userId, authGUID.GUID)
+                ? new AuthResultModel(true)
+                : new AuthResultModel(false, ForbiddenStatusCode);
+        }
+
         public async Task<AuthLogin> LoginAuthAsync(HttpRequest req)
         {
             AuthenticationHeaderValue.TryParse(req.Headers[HeaderNames.Authorization], out var authHeader);
@@ -82,12 +94,35 @@ namespace AppNiZiAPI.Security
 
             return authLogin;
         }
+
+        private async Task<AuthGUID> GetGUIDAsync(HttpRequest req)
+        {
+            AuthGUID authGUID = new AuthGUID();
+            // Get AuthentificationHeader from request
+            AuthenticationHeaderValue.TryParse(req.Headers[HeaderNames.Authorization], out var authHeader);
+
+            if (authHeader == null)
+                return authGUID;
+
+            // Token validation with Auth0 servers
+            ClaimsPrincipal claims = await Auth0.ValidateTokenAsync(authHeader);
+
+            if (claims == null)
+                return authGUID;
+
+            // Get Token Guid for Authorization
+            string tokenGuid = claims.FindFirst("azp").Value;
+            authGUID.Acces = true;
+            authGUID.GUID = tokenGuid;
+            return authGUID;
+        }
     }
 
     public interface IAuthorization
     {
         Task<AuthLogin> LoginAuthAsync(HttpRequest req);
         Task<AuthResultModel> CheckAuthorization(HttpRequest req, int userId = 0, bool isDoctor = false);
+        Task<AuthResultModel> AuthForDoctorOrPatient(HttpRequest req, int userId);
     }
 }
 

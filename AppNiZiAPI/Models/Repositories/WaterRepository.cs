@@ -14,7 +14,7 @@ namespace AppNiZiAPI.Models.Repositories
         private List<WaterConsumptionViewModel> waterConsumptions = new List<WaterConsumptionViewModel>();
         private int MinumumRestriction = 0;
 
-        public WaterConsumptionDaily GetDailyWaterConsumption(int patientId, string date)
+        public WaterConsumptionDaily GetDailyWaterConsumption(int patientId, DateTime date)
         {
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -28,7 +28,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 SqlCommand cmd = new SqlCommand(sqlQuery, conn);
                 cmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
-                cmd.Parameters.Add("@DATE", SqlDbType.NVarChar).Value = date;
+                cmd.Parameters.Add("@DATE", SqlDbType.Date).Value = date;
 
                 SqlDataReader reader = cmd.ExecuteReader();
                 ReadFromDataReader(reader);
@@ -227,7 +227,7 @@ namespace AppNiZiAPI.Models.Repositories
 
     interface IWaterRepository
     {
-        WaterConsumptionDaily GetDailyWaterConsumption(int patientId, string date);
+        WaterConsumptionDaily GetDailyWaterConsumption(int patientId, DateTime date);
         List<WaterConsumptionViewModel> GetWaterConsumptionPeriod(int patientId, DateTime beginDate, DateTime endDate);
         Result InsertWaterConsumption(WaterConsumptionModel model, bool update);
         WaterConsumptionModel GetSingleWaterConsumption(int patientId, int waterId);

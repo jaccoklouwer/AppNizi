@@ -16,46 +16,42 @@ using System.Net;
 using AppNiZiAPI.Models;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Microsoft.OpenApi.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using System;
 
 namespace AppNiZiAPI.Functions.WaterConsumption.GET
 {
     public static class DailyWaterConsumption
     {
         [FunctionName("DailyWaterConsumption")]
+        [OpenApiOperation("DailyWaterConsumption", "WaterConsumption", Summary = "Get waterconsumption from a date", Description = "Get waterconsumption from a date", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(WaterConsumptionDaily), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiParameter("patientId:int", Description = "Inserting the patientId", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiParameter("date", Description = "Inserting the date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetDailyWaterConsumption))] HttpRequest req,
-            ILogger log, string date)
+            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDailyWaterConsumption))] HttpRequest req,
+            ILogger log, int patientId)
         {
-            int patientId;
-            bool isDoctor = false;
-            try
-            {
-                var content = await new StreamReader(req.Body).ReadToEndAsync();
-                JObject jsonParsed = JObject.Parse(content);
-                patientId = (int)jsonParsed["patientId"];
-                if (jsonParsed.ContainsKey("Role") && jsonParsed["Role"].ToString() == "Doctor")
-                    isDoctor = true;
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+            #endregion
 
-                #region AuthCheck
-                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId, isDoctor);
-                if (!authResult.Result)
-                    return new StatusCodeResult(authResult.StatusCode);
-                #endregion
-            }
-            catch
-            {
-                return new BadRequestResult();
-            }
+            if (!DateTime.TryParse(req.Query["date"], out var parsedDate))
+                return new StatusCodeResult(StatusCodes.Status400BadRequest);
 
             IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
-            WaterConsumptionDaily model = waterRep.GetDailyWaterConsumption(patientId, date);
+            WaterConsumptionDaily model = waterRep.GetDailyWaterConsumption(patientId, parsedDate);
 
-            if (model == null || model.WaterConsumptions.Count == 0)
-                return new StatusCodeResult(StatusCodes.Status204NoContent);
-
-            var json = JsonConvert.SerializeObject(model);
-
-            return new OkObjectResult(json);
+            return model != null || model.WaterConsumptions.Count != 0
+                ? (ActionResult)new OkObjectResult(model)
+                : new StatusCodeResult(StatusCodes.Status204NoContent);
         }
     }
 }

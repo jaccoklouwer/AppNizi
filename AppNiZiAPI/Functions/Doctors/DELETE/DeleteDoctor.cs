@@ -8,6 +8,14 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
+using System.Net.Http;
+using System.Net;
+using AppNiZiAPI.Models.Repositories;
+using AppNiZiAPI.Models.Handlers;
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Security;
+using AppNiZiAPI.Models;
 
 namespace AppNiZiAPI.Functions.Doctor.DELETE
 {
@@ -16,19 +24,33 @@ namespace AppNiZiAPI.Functions.Doctor.DELETE
         [FunctionName("DeleteDoctor")]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.SpecificDoctor))] HttpRequest req,
-            ILogger log)
+            ILogger log, int doctorId)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, doctorId);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+            #endregion
 
-            string name = req.Query["name"];
+            if (doctorId == 0)
+                return new BadRequestObjectResult("No doctor id parameter passed.");
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            try
+            {
+                IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
+                bool success = patientRepository.Delete(doctorId);
 
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+                if (success)
+                    return new OkObjectResult("Deleted.");
+                else
+                    return new NotFoundObjectResult("Deletion failed, invalid GUID?");
+            }
+            catch (Exception ex)
+            {
+                // Build error message and return it.
+                string callbackMessage = new MessageHandler().BuildErrorMessage(ex);
+                return new BadRequestObjectResult(callbackMessage);
+            }
         }
     }
 }

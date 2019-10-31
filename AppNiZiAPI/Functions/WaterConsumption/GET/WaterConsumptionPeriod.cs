@@ -15,40 +15,34 @@ using System;
 using AppNiZiAPI.Security;
 using System.IO;
 using Newtonsoft.Json.Linq;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Microsoft.OpenApi.Models;
+using System.Net;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 
 namespace AppNiZiAPI.Functions.WaterConsumption.GET
 {
     public static class WaterConsumptionPeriod
     {
         [FunctionName("WaterConsumptionPeriod")]
+        [OpenApiOperation("WaterConsumptionPeriod", "WaterConsumption", Summary = "Get waterconsumption from a date date", Description = "Get waterconsumption from a date date", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(List<WaterConsumptionViewModel>), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiParameter("patientId:int", Description = "Inserting the patientId", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiParameter("beginDate", Description = "Inserting the bein date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter("endDate", Description = "Inserting the end date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         public static async Task<IActionResult> RunAsync(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetWaterConsumptionPeriod))] HttpRequest req,
-            ILogger log)
+            ILogger log, int patientId)
         {
-
-            int patientId;
-            bool isDoctor = false;
-            try
-            {
-                StreamReader streamReader = new StreamReader(req.Body);
-                var content = await streamReader.ReadToEndAsync();
-                streamReader.DiscardBufferedData();
-                JObject jsonParsed = JObject.Parse(content);
-                patientId = (int)jsonParsed["patientId"];
-                if (jsonParsed.ContainsKey("Role") && jsonParsed["Role"].ToString() == "Doctor")
-                    isDoctor = true;
-
                 #region AuthCheck
-                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId, isDoctor);
+                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
                 if (!authResult.Result)
                     return new StatusCodeResult(authResult.StatusCode);
                 #endregion
-            }
-            catch
-            {
-                return new BadRequestResult();
-            }
-
+ 
             // Parse Dates, could'nt work within one if statement because the out var
             if (!DateTime.TryParse(req.Query["beginDate"], out var parsedBeginDate))
                 return new StatusCodeResult(StatusCodes.Status400BadRequest);

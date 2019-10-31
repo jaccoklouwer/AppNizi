@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 
@@ -7,6 +8,30 @@ namespace AppNiZiAPI.Security
 {
     class AuthorizationRepository : IAuthorizationRepository
     {
+        // Checked wanneer patient info over hemzelf opvraagt. Wanneer een doctor het vraagt checked is eerst of ie wel toegang heeft bij de patient
+        public bool HasAcces(int userId, string guid)
+        {
+            string sqlQuery =
+                "SELECT CASE WHEN EXISTS " +
+                "( SELECT * FROM Patient WHERE guid = @GUID AND id = @USERID) OR EXISTS " +
+                "( SELECT d.* FROM Doctor AS d INNER JOIN Patient AS p ON d.id = p.doctor_id " +
+                "WHERE d.guid = @GUID AND p.id = @USERID ) " +
+                "THEN CAST (1 AS BIT) ELSE CAST (0 AS BIT) END";
+            using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                try
+                {
+                    SqlCommand cmd = new SqlCommand(sqlQuery, conn);
+                    cmd.Parameters.Add("@USERID", SqlDbType.Int).Value = userId;
+                    cmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = guid;
+                    conn.Open();
+                    return (bool)cmd.ExecuteScalar();
+                }
+                catch
+                { return false; }
+            }
+        }
+
         public bool PatientAuth(int userId, string guid, bool isDoctor)
         {
             int outputUserId = 0;
@@ -106,5 +131,6 @@ namespace AppNiZiAPI.Security
         bool PatientAuth(int userId, string guid, bool isDoctor);
         bool CheckDoctorAcces(int patientId, string guid);
         int GetAccountId(string guid, bool isDoctor);
+        bool HasAcces(int userId, string guid);
     }
 }

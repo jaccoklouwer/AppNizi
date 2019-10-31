@@ -14,12 +14,21 @@ using AppNiZiAPI.Models;
 using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Models.Repositories;
 using System.Collections.Generic;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using Microsoft.OpenApi.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 
 namespace AppNiZiAPI.Functions.Doctors.GET
 {
     public static class GetDoctors
     {
         [FunctionName("GetDoctors")]
+        [OpenApiOperation("GetDoctors", "Doctor", Summary = "Get list of all doctors", Description = "Get list of all doctors", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(List<DoctorModel>), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.Doctor))] HttpRequest req,
             ILogger log)
@@ -36,7 +45,6 @@ namespace AppNiZiAPI.Functions.Doctors.GET
             return doctors.Count != 0
                 ? (ActionResult)new OkObjectResult(doctors)
                 : new NoContentResult();
-
         }
     }
 }
