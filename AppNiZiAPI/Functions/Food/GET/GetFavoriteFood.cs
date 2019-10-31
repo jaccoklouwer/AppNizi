@@ -15,12 +15,22 @@ using AppNiZiAPI.Security;
 using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using Microsoft.OpenApi.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 
 namespace AppNiZiAPI.Functions.Food
 {
     public static class GetFavoriteFood
     {
         [FunctionName("GetFavoriteFood")]
+        [OpenApiOperation("GetFavoriteFood", "Food", Summary = "Gets the users favorite foods", Description = "Retrieves the favorited fooditems of the specified patientID", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
+        [OpenApiParameter("patientId", Description = "the id of the patient thats going to get the item", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function,  "get", Route = (Routes.APIVersion + Routes.GetFavoriteFood))] HttpRequest req,
             ILogger log, int patientId)

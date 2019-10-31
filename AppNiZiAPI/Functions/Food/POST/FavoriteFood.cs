@@ -14,12 +14,22 @@ using AppNiZiAPI.Security;
 using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using Microsoft.OpenApi.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 
 namespace AppNiZiAPI.Functions.Food
 {
     public static class FavoriteFood
     {
         [FunctionName("PostFavoriteFood")]
+        [OpenApiOperation("Add Favorite Food", "Food", Summary = "Makes a fooditem a favorite", Description = "Makes a supplied fooditem a favorite of the user and retrievable with getFavoriteFood", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
+        [OpenApiParameter("patientId", Description = "the id of the patient thats favoriting the food", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
+        [OpenApiParameter("foodId", Description = "the fooditem to be favorited", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion + Routes.PostFavoriteFood))] HttpRequest req,
             ILogger log)
