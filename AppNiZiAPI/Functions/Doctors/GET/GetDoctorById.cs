@@ -7,6 +7,12 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using AppNiZiAPI.Security;
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Models;
+using AppNiZiAPI.Variables;
+using AppNiZiAPI.Models.Repositories;
 
 namespace AppNiZiAPI.Functions.Doctor.GET
 {
@@ -14,20 +20,23 @@ namespace AppNiZiAPI.Functions.Doctor.GET
     {
         [FunctionName("GetDoctorById")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
-            ILogger log)
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = (Routes.APIVersion + Routes.SpecificDoctor))] HttpRequest req,
+            ILogger log, int doctorId)
         {
-            log.LogInformation("C# HTTP trigger function processed a request.");
+            if (doctorId == 0)
+                return new BadRequestResult();
 
-            string name = req.Query["name"];
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req);
+            if (!authResult.Result)
+                return new StatusCodeResult(authResult.StatusCode);
+            #endregion
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            dynamic data = JsonConvert.DeserializeObject(requestBody);
-            name = name ?? data?.name;
+            DoctorModel doctor = DIContainer.Instance.GetService<IDoctorRepository>().GetDoctorById(doctorId);
 
-            return name != null
-                ? (ActionResult)new OkObjectResult($"Hello, {name}")
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            return doctor != null
+                ? (ActionResult)new OkObjectResult(doctor)
+                : new NoContentResult();
         }
     }
 }

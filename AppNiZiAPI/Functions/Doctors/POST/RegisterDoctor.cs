@@ -27,7 +27,7 @@ namespace AppNiZiAPI.Functions.Doctor.POST
         {
             AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
             if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            DoctorLogin newDoctor = new DoctorLogin { Account = new AccountModel(), Auth = new AuthLogin(), Doctor = new Models.Doctor() };
+            DoctorLogin newDoctor = new DoctorLogin { Account = new AccountModel(), Auth = new AuthLogin(), Doctor = new Models.DoctorModel() };
 
             try
             {

@@ -283,7 +283,7 @@ namespace AppNiZiAPI.Models.Repositories
                         WeightInKilograms =  float.Parse(reader["weight"].ToString())
                     };
 
-                    Doctor doctor = new Doctor
+                    DoctorModel doctor = new DoctorModel
                     {
                         FirstName = (string)reader["doctor_first_name"],
                         LastName = (string)reader["doctor_last_name"],

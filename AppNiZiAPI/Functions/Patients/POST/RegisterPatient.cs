@@ -29,7 +29,7 @@ namespace AppNiZiAPI.Functions.Account.POST
             // Auth check
             AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
             if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            PatientLogin newPatient = new PatientLogin { Patient = new PatientObject(), Account = new AccountModel(), AuthLogin = new AuthLogin(), Doctor = new Models.Doctor()  };
+            PatientLogin newPatient = new PatientLogin { Patient = new PatientObject(), Account = new AccountModel(), AuthLogin = new AuthLogin(), Doctor = new Models.DoctorModel()  };
 
             try
             {

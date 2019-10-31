@@ -31,7 +31,7 @@ namespace AppNiZiAPI.Functions.Doctors.GET
             #endregion
 
             IDoctorRepository doctorRepository = DIContainer.Instance.GetService<IDoctorRepository>();
-            List<AppNiZiAPI.Models.Doctor> doctors = doctorRepository.GetDoctors();
+            List<AppNiZiAPI.Models.DoctorModel> doctors = doctorRepository.GetDoctors();
 
             return doctors.Count != 0
                 ? (ActionResult)new OkObjectResult(doctors)

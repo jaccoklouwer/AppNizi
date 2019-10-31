@@ -5,7 +5,7 @@ using System.Text;
 
 namespace AppNiZiAPI.Models
 {
-    public class Doctor
+    public class DoctorModel
     {
         public int DoctorId { get; set; }
         public string FirstName { get; set; }

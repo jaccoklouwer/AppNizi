@@ -70,7 +70,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 while (reader.Read())
                 {
-                    doctorLogin = new DoctorLogin { Account = new AccountModel(), Auth = new AuthLogin(), Doctor = new Doctor() };
+                    doctorLogin = new DoctorLogin { Account = new AccountModel(), Auth = new AuthLogin(), Doctor = new DoctorModel() };
                     doctorLogin.Doctor.FirstName = reader["first_name"].ToString();
                     doctorLogin.Doctor.LastName = reader["last_name"].ToString();
                     doctorLogin.Doctor.DoctorId = (int)reader["id"];
@@ -86,9 +86,9 @@ namespace AppNiZiAPI.Models.Repositories
                 : null;
         }
 
-        public List<Doctor> GetDoctors()
+        public List<DoctorModel> GetDoctors()
         {
-            List<Doctor> doctors = new List<Doctor>();
+            List<DoctorModel> doctors = new List<DoctorModel>();
 
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -104,7 +104,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 while (reader.Read())
                 {
-                    Doctor doctor = new Doctor();
+                    DoctorModel doctor = new DoctorModel();
                     doctor.FirstName = reader["first_name"].ToString();
                     doctor.LastName = reader["last_name"].ToString();
                     doctor.DoctorId = (int)reader["id"];
@@ -160,6 +160,39 @@ namespace AppNiZiAPI.Models.Repositories
             }
         }
 
+        public DoctorModel GetDoctorById(int doctorId)
+        {
+            DoctorModel doctor = null;
+            string sqlQuery =
+                "SELECT d.*, a.first_name, a.last_name " +
+                "FROM Doctor AS d " +
+                "INNER JOIN Account AS a ON a.id = d.account_id " +
+                "WHERE d.id = @DOCTORID";
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                SqlCommand cmd = new SqlCommand(sqlQuery, sqlConn);
+                cmd.Parameters.Add("@DOCTORID", SqlDbType.Int).Value = doctorId;
+
+                sqlConn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                while (reader.Read())
+                {
+                    try
+                    {
+                        doctor = new DoctorModel();
+                        doctor.DoctorId = doctorId;
+                        doctor.FirstName = reader["first_name"].ToString();
+                        doctor.LastName = reader["last_name"].ToString();
+                        doctor.Location = reader["location"].ToString();
+                    }
+                    catch { return null; }
+                }
+            }
+            return doctor;
+        }
+
         private bool CheckIfExists(string guid)
         {
             string sqlQuery =
@@ -170,11 +203,11 @@ namespace AppNiZiAPI.Models.Repositories
 
             using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
-                sqlCmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = guid;
+                SqlCommand cmd = new SqlCommand(sqlQuery, sqlConn);
+                cmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = guid;
 
                 sqlConn.Open();
-                return (bool)sqlCmd.ExecuteScalar();
+                return (bool)cmd.ExecuteScalar();
             }
         }
     }
@@ -183,7 +216,8 @@ namespace AppNiZiAPI.Models.Repositories
     {
         List<PatientObject> GetDoctorPatients(int doctorId);
         DoctorLogin GetLoggedInDoctor(string guid);
-        List<Doctor> GetDoctors();
+        List<DoctorModel> GetDoctors();
         DoctorLogin RegisterDoctor(DoctorLogin newDoctor);
+        DoctorModel GetDoctorById(int doctorId);
     }
 }
