@@ -1,0 +1,17 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "FUNCTIONS_WORKER_RUNTIME": "dotnet",
+    "WEBSITE_CONTENTAZUREFILECONNECTIONSTRING": "DefaultEndpointsProtocol=https;AccountName=appniziapistorage;AccountKey=DL0oq3Ji9IMPhdbiroSNuFCEDu3PKBnaoqu+nbY1MHVKPsQz6kcaxcUKqY4YgNwVirfOnWTrzie8E2Rkc3wySg==",
+    "sqldb_connection": "Server=tcp:appnizi.database.windows.net,1433;Initial Catalog=AppNiziDatabase;Persist Security Info=False;User ID=AppNizi;Password=ProjectCloud!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;",
+    "OpenApi__Info__Version": "3.0.0",
+    "OpenApi__Info__Title": "App Nizi API",
+    "OpenApi__Info__Description": "The API for the App Nizi",
+    "OpenApi__Info__TermsOfService": "https://github.com/jaccoklouwer/AppNizi",
+    "OpenApi__Info__Contact__Name": "The High Fives",
+    "OpenApi__Info__Contact__Email": "no-reply@theHighFives.com",
+    "OpenApi__Info__Contact__Url": "https://github.com/jaccoklouwer/AppNizi/issues",
+    "OpenApi__Info__License__Name": "MIT",
+    "OpenApi__Info__License__Url": "http://opensource.org/licenses/MIT"
+  }
+}
