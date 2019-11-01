@@ -108,7 +108,7 @@ namespace AppNiZiAPI.Security
                     sqlQuery = "SELECT id FROM Patient WHERE guid = @GUID";
 
                 SqlCommand cmd = new SqlCommand(sqlQuery, conn);
-                cmd.Parameters.Add("@GUID", SqlDbType.Int).Value = guid;
+                cmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = guid;
                 conn.Open();
                 try
                 {

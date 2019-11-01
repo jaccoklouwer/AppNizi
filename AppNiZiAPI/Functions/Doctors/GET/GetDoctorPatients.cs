@@ -25,7 +25,7 @@ namespace AppNiZiAPI.Functions.Doctor.GET
     {
         [FunctionName("GetDoctorPatients")]
         #region Swagger
-        [OpenApiOperation("GetDoctorPatients", "Doctor", Summary = "Get the patients from a doctor", Description = "Get the patients from a docto", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiOperation("GetDoctorPatients", "Doctor", Summary = "Get the patients from a doctor", Description = "Get the patients from a doctor", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(PatientObject[]), Summary = Messages.OKUpdate)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
@@ -37,7 +37,7 @@ namespace AppNiZiAPI.Functions.Doctor.GET
             ILogger log, int doctorId)
         {
             #region AuthCheck
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req,doctorId,true);
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctor(req, doctorId);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
