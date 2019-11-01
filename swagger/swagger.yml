@@ -1,1005 +1,1927 @@
-openapi: 3.0.0
+openapi: 3.0.1
 info:
-  version: '1.0.0'
-  title: 'App Nizi API'
-  description: 'The API for the Nizi-app'
+  title: App Nizi API
+  description: The API for the App Nizi
+  termsOfService: 'https://github.com/jaccoklouwer/AppNizi'
+  contact:
+    name: The High Fives
+    url: 'https://github.com/jaccoklouwer/AppNizi/issues'
+    email: no-reply@theHighFives.com
   license:
-    name: Apache 2.0
-    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+    name: MIT
+    url: 'http://opensource.org/licenses/MIT'
+  version: 3.0.0
 servers:
-# Added by API Auto Mocking Plugin
-  - description: SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/KEVIN73/nizi/1.0.0
-  - description: Anne SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/McSmoker/NierZiektenConcept/1.0.0/
-  - description: Jacco SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/jaccoklouwer/App_Nizi/1.0.0
-  - description: Martin SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/martinstork/AppNiZi/1.0.0
-  - description: Kevin SwaggerHub API Auto Mocking
-    url: https://virtserver.swaggerhub.com/KEVIN73/app-nizi_api/1.0.0
+  - url: 'https://appnizi-api.azurewebsites.net/api'
 paths:
-  
-  # patients
-  /patients:
-    get:
-      tags:
-        - patients
-      operationId: GetPatients
-      summary: Returns patients
-      description: Retrieve an array of patients.
-      security:
-        - oAuth2: [admin]
-      responses:
-        '200':
-          description: (200) OK!
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/patient'
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-    post:
-      tags:
-        - patients
-      operationId: PostPatient
-      summary: Creates a patient
-      description: Create a new patient.
-      security:
-        - oAuth2: [admin]
-      requestBody:
-        required: true
-        content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/patient'
-      responses:
-        '200':
-          description: (200) OK!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/patient'
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  /patients/me:
-    get:
-      tags:
-        - patients
-      operationId: GetMyPatient
-      summary: Returns users's patient
-      description: Retrieve the current user's patient data.
-      security:
-        - oAuth2: [patient]
-      responses:
-        '200':
-          description: (200) OK!
-          content:
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/patient'  
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  /patients/{patientId}:
-    get:
-      tags:
-        - patients
-      operationId: GetPatientByPatientId
-      summary: Returns patient with id
-      description: Retrieve an existing patient.
-      security:
-        - oAuth2: [doctor]
-      parameters:
-        - $ref: '#/components/parameters/patientId'
-      responses:
-        '200':
-          description: (200) OK!
-          content:
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/patient'
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
+  '/v1/consumption/{consumptionId}':
     delete:
       tags:
-        - patients
-      operationId: DeletePatient
-      summary: Deletes a patient
-      description: Delete an existing patient.
-      security:
-        - oAuth2: [admin]
+        - Consumption
+      summary: Deletes a consumption by id
+      description: Deletes a consumption of a patient by id
+      operationId: DeleteConsumptionById
       parameters:
-        - $ref: '#/components/parameters/patientId'
-      responses:
-        '200':
-          description: (200) Removed!
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-    patch:
-      tags:
-        - patients
-      operationId: PatchPatient
-      summary: Patches a patient
-      description: Patch an existing patient.
-      security:
-        - oAuth2: [doctor]
-      parameters:
-        - $ref: '#/components/parameters/patientId'
-      responses:
-        '200':
-          description: (200) Updated!
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  /patients/me/diary/today:
-    get:
-      tags:
-        - patients
-      operationId: GetDiaryForToday
-      summary: Returns the user's diary from today
-      description: Retrieve the user-patient's diary for today.
-      security:
-        - oAuth2: [patient]
-      responses:
-        '200':
-          description: (200) OK!
-          content:
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/diary'
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-    post:
-      tags:
-        - patients
-      operationId: PostPatientDiary
-      summary: Creates a patient's diary
-      description: Create a new patient diary.
-      security:
-        - oAuth2: [admin]
-      requestBody:
-        required: true
-        content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/diary'
-      responses:
-        '200':
-          description: (200) OK!
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/diary'
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-    
-  /patients/me/diary/{date}:
-    get:
-      tags:
-        - patients
-      operationId: GetDiaryForDate
-      summary: Returns the user's diary for a given date
-      description: Retrieve the user-patient's diary for a given date.
-      security:
-        - oAuth2: [patient]
-      parameters:
-        - $ref: '#/components/parameters/date'
-      responses:
-        '200':
-          description: (200) OK!
-          content:
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/diary' 
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  /patients/{patientId}/diary/today:
-    get:
-      tags:
-        - patients
-      operationId: GetDiaryForTodayByPatientId
-      summary: Returns a patient's diary from today
-      description: Retrieve a given patient's diary for today.
-      security:
-        - oAuth2: [admin]
-      parameters:
-        - $ref: '#/components/parameters/patientId'
-      responses:
-        '200':
-          description: (200) OK!
-          content:
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/diary'
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  /patients/{patientId}/diary/{date}:
-    get:
-      tags:
-        - patients
-      operationId: GetDiaryForDateByPatientId
-      summary: Returns a patient's diary for a given date
-      description: Retrieve a given patient's diary for a given date.
-      security:
-        - oAuth2: [doctor]
-      parameters:
-        - $ref: '#/components/parameters/date'
-        - $ref: '#/components/parameters/patientId'
-      responses:
-        '200':
-          description: (200) OK!
-          content:
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref: '#/components/schemas/diary' 
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  
-  #doctors
-  /doctor/patients:
-    get:
-      tags:
-        - doctors
-      operationId: GetAllPatientsForDoctor
-      summary: Returns patient id's from doctor
-      description: Retrieves all patients for logged-in doctor.
-      security:
-        - oAuth2: [doctor]
-      responses:
-        '200':
-          description: (200) OK!
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/patient'
-        '401':
-          description: (401) Not authorized.
-  /doctor/patients/{patientId}:
-    get:
-      tags:
-        - doctors
-      operationId: GetPatientByPatientIdForLoggedInDoctor
-      summary: Returns a patient
-      description: Retrieves specific patient for logged-in doctor.
-      security:
-        - oAuth2: [doctor]
-      parameters:
-        - $ref: '#/components/parameters/patientId'
-      responses:
-        '200':
-          description: (200) Succesfully retrieved patient
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/patient'
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  /doctor/patients/{patientId}/periodDiary:
-    get:
-      tags:
-        - doctors
-      operationId: GetperioddiaryForPatientId
-      summary: Returns the perioddiary from a patient
-      description: Retrieves the perioddiary for a patient for the logged-in doctor.
-      security:
-        - oAuth2: [doctor]
-      parameters:
-        - $ref: '#/components/parameters/patientId'
-        - $ref: '#/components/parameters/beginDate'
-        - $ref: '#/components/parameters/endDate'
-      responses:
-        '200':
-          description: (200) Succesfully retrieved patients
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/diary'
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  #waterConsumption
-  /waterConsumption:
-    post:
-      tags:
-        - waterConsumption
-      operationId: PostWaterConsumption
-      summary: Inserts the waterconsumption
-      description: Insert the WaterConsumption.
-      security:
-        - oAuth2: [patient]
-      requestBody:
-        $ref: '#/components/requestBodies/WaterConsumption'
-      responses:
-        '200':
-          description: (200) OK
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  /WaterConsumption/{patientId}:
-    get:
-      tags:
-        - waterConsumption
-      operationId: GetWaterConsumptionByPatientId
-      summary: Returns the waterconsumption of a patient
-      description: get the WaterConsumption of a patient.
-      security:
-        - oAuth2: [patient, doctor]
-      parameters:
-        - $ref: '#/components/parameters/patientId' 
-      responses:
-        '200':
-          description: (200) OK
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  #dietaryManagement
-  /dietarymanagement/{DietId}:
-    delete:
-      tags:
-        - dietaryManagement
-      operationId: DeleteMyDietaryManagement
-      summary: Deletes the diatarymanagement of a patient
-      description: Deletes the dietarymanagement of a patient.
-      security:
-        - oAuth2: [doctor]
-      parameters:
-        - $ref: '#/components/parameters/dietId'
-      responses:
-        '200':
-          description: (200) OK
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  /dietaryManagement:
-    put:
-      tags:
-        - dietaryManagement
-      operationId: PutDietaryManagement
-      summary: Edits the dietarymanagement of a patient
-      description: Edits the dietarymanagement of a patient.
-      security:
-        - oAuth2: [doctor]
-      requestBody:
-        $ref: '#/components/requestBodies/dietarymanagment'
-      responses:
-        '200':
-          description: (200) OK
-        '400':
-          description: (400) Bad request.
-        '401':
-          description: (401) Not authorized.
-        '404':
-          description: (404) Resource not found.
-  /dietaryManagement/{patientId}:
-    get:
-      tags:
-        - dietaryManagement
-      operationId: GetAllDietaryManagementForPatient
-      summary: Returns all nutrients of a patient
-      description: Retrieves all dietarymanagment of the patient.
-      security:
-        - oAuth2: [patient, doctor]
-      parameters:
-        - $ref: '#/components/parameters/patientId'
-      responses:
-        '200':
-          description: (200) OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Nutrient'
-        401:
-          description: (401) you are unauthorized to see these patients dietary manegment
-        403:
-          description: (403) this is not your dietary management
-        404:
-          description: (404) this patient is not found
-  #account
-  /account/login:
-    post:
-      tags:
-        - account
-      operationId: Login
-      summary: Logs user in
-      description: Logs user in.
-      requestBody:
-        required: true
-        content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  email:
-                    type: string
-                    example: johndoe@mail.com
-                  password:
-                    type: string
-                    example: supersecretpassword1
-      responses:
-        '200':
-          description: (200) User login finished
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  AuthToken:
-                    type: string
-                    example: "1-4343-47637-43764383-4637673"
-        '401':
-          description: (401) not authorized
-  /account/registerPatient:
-    post:
-      tags:
-        - account
-      operationId: Register
-      summary: Registers a patient
-      description: Registers a new patient.
-      security:
-        - oAuth2: [doctor]
-      requestBody:
-        required: true
-        content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  email:
-                    type: string
-                    example: johndoe@mail.com
-                  password:
-                    type: string
-                    example: supersecretpassword1
-                  name:
-                    type: string
-                    example: benito franco
-      responses:
-        '200':
-          description: (200) patient registered and ready to party
-        '401':
-          description: (401) not authorized
-        '400':
-          description: (400) Bad request.
-        '404':
-          description: (404) Resource not found.
-  /account/registerDoctor:
-    post:
-      tags:
-        - account
-      operationId: RegisterDoctor
-      summary: Registers a doctor
-      description: Registers a new doctor.
-      security:
-        - oAuth2: [admin]
-      requestBody:
-        required: true
-        content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  email:
-                    type: string
-                    example: johndoe@mail.com
-                  password:
-                    type: string
-                    example: supersecretpassword
-      responses:
-        '200':
-          description: (200) doctor registered
-        '401':
-          description: (401) not authorized to register a doctor     
-        '400':
-          description: (400) Bad request.
-        '404':
-          description: (404) Resource not found.
-  /account/updatepatient:
-    put:
-      tags:
-        - account
-      operationId: PutPassword
-      summary: Sets a patient's password
-      description: Sets the patient's new password.
-      security:
-        - oAuth2: [patient]
-      requestBody:
-        required: true
-        content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  password:
-                    type: string
-                    example: supersecretpassword2
-      responses:
-        '200':
-          description: (200) patient updated
-        '401':
-          description: (401) not authorized to login 
-        '400':
-          description: (400) Bad request.
-        '404':
-          description: (404) Resource not found.
-  #food
-  /food:
-    get:
-      tags:
-        - food
-      operationId: GetFood
-      summary: Get the name and ID from the database
-      description: Get method that returns a food name from the input of the user. This method can be called while the user types the name.
-      security:
-        - oAuth2: [patient, doctor]
-      parameters:
-        - in: path
-          name: foodName
+        - name: consumptionId
+          in: path
+          description: the id of the consumption that is going to be deleted
           required: true
           schema:
-            type: string
+            type: integer
+            format: int32
       responses:
-        200:
-          description: (200) Succesful
+        '200':
+          description: Payload of String
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/food'
-        400:
-          description: (400) Failed
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Removing Data Successfully
+        '400':
+          description: Payload of Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-        401:
-          description: (401) No authorization
-        404:
-          description: (404) No food item available
-
-    post:
-      tags:
-        - food
-      operationId: PostFoodItem
-      summary: Add amount of a food item to the diary
-      description: The user can put an amount of food (in grams) in their diary.
-      security:
-        - oAuth2: [patient]    
-      requestBody:
-        $ref: '#/components/requestBodies/Addfood'
-      responses:
-        200:
-          description: (200) Succesful
-        401: 
-          description: (401) No authorization
-        404: 
-          description: (404) Failed
-
-    delete:
-      tags:
-        - food
-      operationId: DeleteFoodItem
-      summary: Delete a food item from the diary of the user
-      description: Get method that returns a food name from the input of the user. This method can be called while the user types the name.
-      security:
-        - oAuth2: [patient, doctor]
-      parameters:
-        - in: path
-          name: foodConsumptionId
-          required: true
-          schema:
-            type: integer
-      responses:
-        200:
-          description: (200) Succesful
-        401: 
-          description: (401) No authorization
-        404: 
-          description: (404) Failed
-
-  /test:
-    get:
-      tags:
-        - test
-      summary: test call
-      operationId: TestCall
-      description: Calling this allows you to fetch the test data
-      responses:
-        '200':
-          description: the test data
+          x-ms-summary: Incorrect id
+        '401':
+          description: Payload of Error
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TestObject'
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+    get:
+      tags:
+        - Consumption
+      summary: Gets a consumption by id
+      description: Gets a consumption of a patient by id
+      operationId: GetConsumptionById
+      parameters:
+        - name: consumptionId
+          in: path
+          description: the id of the consumption that is targeted
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of ConsumptionView
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConsumptionView'
         '400':
-          description: (400) Bad request.
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect id
         '401':
-          description: (401) Not authorized.
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+    put:
+      tags:
+        - Consumption
+      summary: Updates a consumption
+      description: Updates a consumption of a patient by using the consumption id located in the url path and the consumption data from the requestbody
+      operationId: UpdateConsumptionById
+      parameters:
+        - name: consumptionId
+          in: path
+          description: the id of the consumption that is targeted
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Consumption'
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect id
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  /v1/consumptions:
+    get:
+      tags:
+        - Consumption
+      summary: Gets all consumptions for a patient between 2 dates
+      description: Gets all consumptions for a patientid between a startdate and enddate
+      operationId: GetConsumptionsForPatientBetweenDates
+      parameters:
+        - name: patientId
+          in: query
+          description: the id of the patient which adds a consumption
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: startDate
+          in: query
+          description: the start date
+          required: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: the end date
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payload of PatientConsumptionsView
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientConsumptionsView'
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect id
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+    post:
+      tags:
+        - Consumption
+      summary: Adds a consumption
+      description: Adds a consumption for a patient by using the consumption data from the requestbody
+      operationId: AddConsumption
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Consumption'
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Inserting Data Successfully
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect id
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  '/v1/food/{patientId}/{foodId}':
+    get:
+      tags:
+        - Food
+      summary: Gets the requested FoodItem
+      description: updates the dietary management of a patient
+      operationId: GetFoodById
+      parameters:
+        - name: patientId
+          in: path
+          description: the id of the patient thats going to get the item
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: foodId
+          in: path
+          description: the id of food item to be retrieved
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Missing values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  /v1/waterconsumption:
+    post:
+      tags:
+        - WaterConsumption
+      summary: New water consumption
+      description: New water consumption
+      operationId: InsertWaterConsumption
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WaterConsumptionModel'
+      responses:
+        '200':
+          description: Payload of WaterConsumptionModel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaterConsumptionModel'
+          x-ms-summary: 'Result: OK'
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
         '404':
-          description: (404) Resource not found.
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
+  '/v1/waterconsumption/{waterId}':
+    get:
+      tags:
+        - WaterConsumption
+      summary: Get water consumption
+      description: Get water consumption
+      operationId: WaterConsumption
+      parameters:
+        - name: waterId
+          in: path
+          description: Single input id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Removing Data Successfully
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+        '422':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
+    put:
+      tags:
+        - WaterConsumption
+      summary: Update water consumption
+      description: Update water consumption
+      operationId: UpdateWaterConsumption
+      parameters:
+        - name: waterId
+          in: path
+          description: Single input id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WaterConsumptionModel'
+      responses:
+        '200':
+          description: Payload of WaterConsumptionModel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaterConsumptionModel'
+          x-ms-summary: 'Result: OK'
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+        '404':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
+    delete:
+      tags:
+        - WaterConsumption
+      summary: Delete water consumption
+      description: Delete water consumption
+      operationId: DeleteWaterConsumption
+      parameters:
+        - name: waterId
+          in: path
+          description: Single input id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Removing Data Successfully
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+        '422':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
+  '/v1/waterconsumption/daily/{patientId}':
+    get:
+      tags:
+        - WaterConsumption
+      summary: Get waterconsumption from a date
+      description: Get waterconsumption from a date
+      operationId: DailyWaterConsumption
+      parameters:
+        - name: patientId
+          in: path
+          description: Inserting the patientId
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: date
+          in: query
+          description: Inserting the date
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payload of WaterConsumptionDaily
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaterConsumptionDaily'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+        '403':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  '/v1/waterconsumption/period/{patientId}':
+    get:
+      tags:
+        - WaterConsumption
+      summary: Get waterconsumption from a period
+      description: Get waterconsumption from a period
+      operationId: WaterConsumptionPeriod
+      parameters:
+        - name: patientId
+          in: path
+          description: Inserting the patientId
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: beginDate
+          in: query
+          description: Inserting the bein date
+          required: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: Inserting the end date
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: 'Payload of WaterConsumptionViewModel[]'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WaterConsumptionViewModel'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+        '403':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  /v1/patient:
+    get:
+      tags:
+        - Patient
+      summary: Get all patients
+      description: Get all patients
+      operationId: GetPatients
+      parameters:
+        - name: patientId
+          in: path
+          description: Inserting the patient id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: 'Payload of PatientObject[]'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientObject'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+        '403':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+    post:
+      tags:
+        - Patient
+      summary: Register a new patient
+      description: Register a new patient
+      operationId: RegisterPatient
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwaggerRegisterPatient'
+      responses:
+        '200':
+          description: Payload of PatientLogin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientLogin'
+          x-ms-summary: 'Result: OK'
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+        '404':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
+  '/v1/patient/{patientId}':
+    get:
+      tags:
+        - Patient
+      summary: Get specific patient
+      description: Get specific patient
+      operationId: GetPatientByID
+      parameters:
+        - name: patientId
+          in: path
+          description: Inserting the patient id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of PatientObject
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientObject'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+        '403':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+    delete:
+      tags:
+        - Patient
+      summary: Delete a specific patient
+      description: Delete a specific patient
+      operationId: DeletePatient
+      parameters:
+        - name: patientId
+          in: path
+          description: Inserting the patient id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+        '403':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  '/v1/meal/{patientId}':
+    post:
+      tags:
+        - Meal
+      summary: Adds a meal
+      description: Adds a meal to the specified patient
+      operationId: AddMeal
+      parameters:
+        - name: patientId
+          in: path
+          description: The patient who is adding the meal
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Meal'
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Missing values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+    get:
+      tags:
+        - Meal
+      summary: Retrieves meals
+      description: retrieves the meals of the specified user
+      operationId: GetMeals
+      parameters:
+        - name: patientId
+          in: path
+          description: The patient which meals will be retrieved
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Missing values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  '/v1/meal/{patientId}/{mealId}':
+    delete:
+      tags:
+        - Meal
+      summary: Deletes a meal
+      description: Removes the meal of the specified user
+      operationId: DeleteMeal
+      parameters:
+        - name: patientId
+          in: path
+          description: the id of the patient thats going to delete his meal
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: mealId
+          in: path
+          description: The meal to delete
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Missing values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  '/v1/food/partial/{patientId}/{foodName}':
+    get:
+      tags:
+        - Food
+      summary: Searches the FoodDB
+      description: Allows you to search the food Database and gets items that start with the supplied letters
+      operationId: SearchFood
+      parameters:
+        - name: patientId
+          in: path
+          description: the id of the patient thats going to get the item
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: foodName
+          in: path
+          description: The letters to use in the search
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Missing values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  '/v1/food/favorite/{patientId}':
+    get:
+      tags:
+        - Food
+      summary: Gets the users favorite foods
+      description: Retrieves the favorited fooditems of the specified patientID
+      operationId: GetFavoriteFood
+      parameters:
+        - name: patientId
+          in: path
+          description: the id of the patient thats going to get the item
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Missing values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  /v1/food/favorite:
+    post:
+      tags:
+        - Food
+      summary: Makes a fooditem a favorite
+      description: Makes a supplied fooditem a favorite of the user and retrievable with getFavoriteFood
+      operationId: Add Favorite Food
+      parameters:
+        - name: patientId
+          in: query
+          description: the id of the patient thats favoriting the food
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: foodId
+          in: query
+          description: the fooditem to be favorited
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Missing values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  /v1/doctor:
+    get:
+      tags:
+        - Doctor
+      summary: Get list of all doctors
+      description: Get list of all doctors
+      operationId: GetDoctors
+      responses:
+        '200':
+          description: 'Payload of DoctorModel[]'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorModelArray'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+        '403':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+    post:
+      tags:
+        - Doctor
+      summary: Register a new doctor
+      description: Register a new doctor
+      operationId: RegisterDoctor
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SwaggerRegisterDoctor'
+      responses:
+        '200':
+          description: Payload of DoctorLogin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorLogin'
+          x-ms-summary: 'Result: OK'
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+        '404':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
+  '/v1/doctor/{doctorId}':
+    get:
+      tags:
+        - Doctor
+      summary: Get doctor by id
+      description: Get doctor by id
+      operationId: GetDoctorById
+      parameters:
+        - name: doctorId
+          in: path
+          description: Inserting the doctor id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of DoctorModel
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorModel'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+        '403':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+    delete:
+      tags:
+        - Doctor
+      summary: Delete specific doctor
+      description: Delete specific doctor
+      operationId: DeleteDoctor
+      parameters:
+        - name: doctorId
+          in: path
+          description: Inserting the doctor id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: 'SuccesFull'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientObject'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+        '403':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+        '409':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
+  '/v1/doctor/{doctorId}/patients':
+    get:
+      tags:
+        - Doctor
+      summary: Get the patients from a doctor
+      description: Get the patients from a doctor
+      operationId: GetDoctorPatients
+      parameters:
+        - name: doctorId
+          in: path
+          description: Inserting the doctor id
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: 'Updating Data Successfully'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientObject'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+        '403':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+  '/v1/dietaryManagement/{dietId}':
+    put:
+      tags:
+        - DietaryManagement
+      summary: Updates a dietary managment
+      description: updates the dietary management of a patient
+      operationId: UpdateDietaryManagement
+      parameters:
+        - name: dietId
+          in: path
+          description: the id of the diet that is going to be updated
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DietaryManagementModel'
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+        '422':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Missing values
+      x-ms-visibility: important
+    delete:
+      tags:
+        - DietaryManagement
+      summary: Delete a dietary managment
+      description: Delete a dietary managment of a patient
+      operationId: DeleteDietaryManagement
+      parameters:
+        - name: dietId
+          in: path
+          description: the id of the diet that is going to be updated
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Removing Data Successfully
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+        '422':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
+  /v1/dietaryManagement:
+    post:
+      tags:
+        - DietaryManagement
+      summary: Create anew dietary managment
+      description: Create anew dietary managment of a patient
+      operationId: CreateDieataryManagement
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DietaryManagementModel'
+      responses:
+        '200':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Inserting Data Successfully
+        '400':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: 'Authorization Error: No acces'
+        '422':
+          description: Payload of String
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/String'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
+  '/v1/dietaryManagement/{patientId}':
+    get:
+      tags:
+        - DietaryManagement
+      summary: Updates a dietary managment
+      description: updates the dietary management of a patient
+      operationId: GetDietaryManagementByPatient
+      parameters:
+        - name: patientId
+          in: path
+          description: the id of the diet that is going to be updated
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: Payload of DietaryView
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DietaryView'
+          x-ms-summary: 'Result: OK'
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+        '404':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
+  /v1/doctor/me:
+    get:
+      tags:
+        - Doctor
+      summary: Get User As Patient from Acces Token
+      description: Get User As Patient from Acces Token
+      operationId: LoginDoctor
+      responses:
+        '200':
+          description: Payload of DoctorLogin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorLogin'
+          x-ms-summary: 'Result: OK'
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+        '404':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
+  /v1/patient/me:
+    get:
+      tags:
+        - Patient
+      summary: Get User As Patient from Acces Token
+      description: Get User As Patient from Acces Token
+      operationId: LoginPatient
+      responses:
+        '200':
+          description: Payload of PatientLogin
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientLogin'
+          x-ms-summary: 'Result: OK'
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+        '404':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Incorrect values
+      x-ms-visibility: important
 components:
   schemas:
-    weight:
-      type: object
-      required:
-        - amount
-        - unit
-      properties:
-        amount:
-         type: string
-         example: "83.50"
-        unit:
-         type: string
-         enum:
-           - "kg"
-           - "g"
-           - "mg"
-           - "lb"
-           - "oz"
-         example: "kg"
-    patient:
-      allOf:
-        - $ref: '#/components/schemas/account'
-        - type: object
-          properties:
-            patientId:
-              type: integer
-              example: 4334
-            doctorId:
-              type: integer
-              example: 123
-            birthdate:
-              type: string
-              example: "2019-08-30"
-            weight:
-              $ref: '#/components/schemas/weight'
-    diary:
-      type: object
-      required:
-        - patientId
-      properties:
-        diaryId:
-         type: integer
-         example: 4334
-        patientId:
-         type: integer
-         example: 4334
-        consumedfoods:
-         type: array
-         items:
-           $ref: '#/components/schemas/foodConsumption'
-        representingDate:
-         type: string
-         example: "2019-08-30"
-    Nutrient:
+    Consumption:
       type: object
       properties:
+        FoodName:
+          type: string
+        KCal:
+          type: number
+          format: float
+        Protein:
+          type: number
+          format: float
+        Fiber:
+          type: number
+          format: float
+        Calium:
+          type: number
+          format: float
+        Sodium:
+          type: number
+          format: float
+        Amount:
+          type: integer
+          format: int32
+        WeightUnitId:
+          type: number
+          format: float
+        Date:
+          type: string
+          format: date-time
+        PatientId:
+          type: integer
+          format: int32
+        Id:
+          type: integer
+          format: int32
+    WaterConsumptionModel:
+      type: object
+      properties:
+        Id:
+          type: integer
+          format: int32
+        Amount:
+          type: number
+          format: double
+        Date:
+          type: string
+          format: date-time
+        PatientId:
+          type: integer
+          format: int32
+    Meal:
+      type: object
+      properties:
+        MealId:
+          type: integer
+          format: int32
         Name:
+          type: string
+        PatientId:
+          type: integer
+          format: int32
+        KCal:
+          type: number
+          format: float
+        Protein:
+          type: number
+          format: float
+        Fiber:
+          type: number
+          format: float
+        Calcium:
+          type: number
+          format: float
+        Sodium:
+          type: number
+          format: float
+        PortionSize:
+          type: number
+          format: float
+        WeightUnitId:
+          type: number
+          format: float
+    SwaggerRegisterDoctor:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        location:
+          type: string
+    DietaryManagementModel:
+      type: object
+      properties:
+        Id:
+          type: integer
+          format: int32
+        Description:
           type: string
         Amount:
           type: integer
-        Active:
+          format: int32
+        IsActive:
           type: boolean
+        PatientId:
+          type: integer
+          format: int32
+    SwaggerRegisterPatient:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        dateOfBirth:
+          type: string
+        weight:
+          type: number
+          format: float
+        doctorId:
+          type: integer
+          format: int32
+    String:
+      type: string
     Error:
       type: object
       properties:
-        code:
+        Title:
           type: string
-        message:
+        Description:
           type: string
-      required:
-        - code
-        - message
-    TestObject:
+    ConsumptionView:
       type: object
-      required:
-        - id
-        - description
       properties:
-        id:
+        PatientId:
           type: integer
-        description:
-          type: string
-          example: This is object number X
-    account:
-      type: object
-      required:
-        - account_id
-        - name
-        - password
-        - passwordSalt
-        - email
-      properties:
-        account_id:
+          format: int32
+        ConsumptionId:
           type: integer
-        patientId:
+          format: int32
+        FoodName:
+          type: string
+        KCal:
+          type: number
+          format: float
+        Protein:
+          type: number
+          format: float
+        Fiber:
+          type: number
+          format: float
+        Calium:
+          type: number
+          format: float
+        Sodium:
+          type: number
+          format: float
+        Amount:
           type: integer
-        name:
-          type: string
-        password:
-          type: string
-        passwordSalt:
-          type: string
-        email:
-          type: string
-    doctor:
-      allOf:
-        - $ref: '#/components/schemas/account'
-        - type: object
-          required:
-            - doctor_id
-            - location
+          format: int32
+        Weight:
+          type: object
           properties:
-            doctor_id:
-             type: integer
-            birthdate:
-             type: integer
-    dietarymanagement:
+            Id:
+              type: integer
+              format: int32
+            Unit:
+              type: string
+            Short:
+              type: string
+        Date:
+          type: string
+          format: date-time
+        Valid:
+          type: boolean
+    PatientConsumptionsView:
       type: object
-      required:
-        - dietarymanagement_id
-        - maxAmount
-        - patientId
-        - dietaryManagement_id
-        - active
-        - desirableAmount
       properties:
-        id:
-         type: integer
-        amount:
-         type: string
-        patientId:
-         type: integer
-        dietaryRestrictionid:
-         type: integer
-        active:
-         type: boolean
-    DietaryRestriction:
+        Consumptions:
+          type: array
+          items:
+            type: object
+            properties:
+              ConsumptionId:
+                type: integer
+                format: int32
+              FoodName:
+                type: string
+              KCal:
+                type: number
+                format: float
+              Protein:
+                type: number
+                format: float
+              Fiber:
+                type: number
+                format: float
+              Calium:
+                type: number
+                format: float
+              Sodium:
+                type: number
+                format: float
+              Amount:
+                type: integer
+                format: int32
+              Weight:
+                type: object
+                properties:
+                  Id:
+                    type: integer
+                    format: int32
+                  Unit:
+                    type: string
+                  Short:
+                    type: string
+              Date:
+                type: string
+                format: date-time
+              Valid:
+                type: boolean
+        KCalTotal:
+          type: number
+          format: float
+        ProteinTotal:
+          type: number
+          format: float
+        FiberTotal:
+          type: number
+          format: float
+        CaliumTotal:
+          type: number
+          format: float
+        SodiumTotal:
+          type: number
+          format: float
+    WaterConsumptionDaily:
       type: object
-      required:
-        - id
-        - description
       properties:
-        id:
-         type: integer
-        description:
-         type: string
-    waterConsumption:
+        Total:
+          type: number
+          format: double
+        MinimumRestriction:
+          type: integer
+          format: int32
+        WaterConsumptions:
+          type: array
+          items:
+            type: object
+            properties:
+              WeightUnit:
+                type: object
+                properties:
+                  Id:
+                    type: integer
+                    format: int32
+                  Unit:
+                    type: string
+                  Short:
+                    type: string
+              Error:
+                type: boolean
+              Id:
+                type: integer
+                format: int32
+              Amount:
+                type: number
+                format: double
+              Date:
+                type: string
+                format: date-time
+              PatientId:
+                type: integer
+                format: int32
+    'WaterConsumptionViewModel':
+      type: array
+      items:
+        type: object
+        properties:
+          WeightUnit:
+            type: object
+            properties:
+              Id:
+                type: integer
+                format: int32
+              Unit:
+                type: string
+              Short:
+                type: string
+          Error:
+            type: boolean
+          Id:
+            type: integer
+            format: int32
+          Amount:
+            type: number
+            format: double
+          Date:
+            type: string
+            format: date-time
+          PatientId:
+            type: integer
+            format: int32
+    'PatientObject':
+      type: array
+      items:
+        type: object
+        properties:
+          PatientId:
+            type: integer
+            format: int32
+          FirstName:
+            type: string
+          LastName:
+            type: string
+          DateOfBirth:
+            type: string
+            format: date-time
+          WeightInKilograms:
+            type: number
+            format: float
+          Guid:
+            type: string
+    'DoctorModel':
+      type: array
+      items:
+        type: object
+        properties:
+          DoctorId:
+            type: integer
+            format: int32
+          FirstName:
+            type: string
+          LastName:
+            type: string
+          Location:
+            type: string
+    DoctorLogin:
       type: object
-      required:
-        - water_id
-        - date
-        - amount
-        - patientId
       properties:
-        water_id:
-         type: integer
-        date:
-         type: string
-        amount:
-         type: string
-        patientId:
-         type: integer
-    # food:
-    #   type: object
-    #   required:
-    #     - foodConsumptionId
-    #     - diaryId
-    #     - amount
-    #     - date
-    #   properties:
-    #     foodId:
-    #      type: integer
-    #      example: 4334
-    #     diaryId:
-    #      type: integer
-    #      example: 742
-    #     amount:
-    #       type: integer
-    #       example: 200
-    #     date:
-    #      type: string
-    #      example: "2018-06-13"
-
-    consumption:
+        Account:
+          type: object
+          properties:
+            AccountId:
+              type: integer
+              format: int32
+            Role:
+              type: string
+        Doctor:
+          type: object
+          properties:
+            DoctorId:
+              type: integer
+              format: int32
+            FirstName:
+              type: string
+            LastName:
+              type: string
+            Location:
+              type: string
+        Auth:
+          type: object
+          properties:
+            Guid:
+              type: string
+            Token:
+              type: object
+              properties:
+                Scheme:
+                  type: string
+                AccesCode:
+                  type: string
+    DoctorModelArray:
+      type: array
+      properties:
+        DoctorId:
+          type: integer
+          format: int32
+        FirstName:
+          type: string
+        LastName:
+          type: string
+        Location:
+          type: string
+    DietaryView:
       type: object
-      required:
-        - id
-        - diaryId
-        - foodName
-        - amount
-        - date
-        - kcal
-        - protein
-        - fiber
-        - calcium
-        - sodium
       properties:
-        food_id:
-         type: integer
-        diary_id:
-         type: integer
-        foodName:
-         type: string
-        amount: 
-         type: string
-        date:
-         type: string
-        kcal:
-         type: string
-        protein:
-         type: string
-        fiber:
-         type: string
-        calcium:
-         type: string
-        sodium:
-         type: string
-  responses:
-    NotFound:
-      description: Not found
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Error'
-  
-  parameters:
-    endDate:
-      name: endDate
-      in: query
-      required: true
-      description: the end of a period
-      schema:
-        type: string
-        example: "2019-09-30"
-    beginDate:
-      name: beginDate
-      in: query
-      required: true
-      description: the beginning of a period
-      schema:
-        type: string
-        example: "2019-08-30"
-    patientId:
-      name: patientId
-      in: path
-      required: true
-      description: The id of the patient
-      schema:
-        type: integer
-    date:
-      name: date
-      in: path
-      required: true
-      description: A date value.
-      schema:
-        type: string
-        example: "2019-08-30"
-    dietId:
-      name: dietId
-      in: path
-      required: true
-      description: the id of the diet
-      schema:
-        type: integer
-    doctorId:
-      name: doctorId
-      in: path
-      required: true
-      description: the id of the doctor
-      schema:
-        type: integer
-  requestBodies:
-    dietarymanagment:
-      description: the diet management that needs to be updated
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/updatedDietmangement'
-    WaterConsumption:
-      description: the water consumption of that day
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/waterConsumption'
-    Addfood:
-      description: Add the amount of a specific food Item to the diary
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/addingfood'
-
+        restrictions:
+          type: array
+          items:
+            type: object
+            properties:
+              Id:
+                type: integer
+                format: int32
+              Description:
+                type: string
+        DietaryManagements:
+          type: array
+          items:
+            type: object
+            properties:
+              Id:
+                type: integer
+                format: int32
+              Description:
+                type: string
+              Amount:
+                type: integer
+                format: int32
+              IsActive:
+                type: boolean
+              PatientId:
+                type: integer
+                format: int32
+    PatientLogin:
+      type: object
+      properties:
+        Account:
+          type: object
+          properties:
+            AccountId:
+              type: integer
+              format: int32
+            Role:
+              type: string
+        Patient:
+          type: object
+          properties:
+            PatientId:
+              type: integer
+              format: int32
+            FirstName:
+              type: string
+            LastName:
+              type: string
+            DateOfBirth:
+              type: string
+              format: date-time
+            WeightInKilograms:
+              type: number
+              format: float
+            Guid:
+              type: string
+        Doctor:
+          type: object
+          properties:
+            DoctorId:
+              type: integer
+              format: int32
+            FirstName:
+              type: string
+            LastName:
+              type: string
+            Location:
+              type: string
+        AuthLogin:
+          type: object
+          properties:
+            Guid:
+              type: string
+            Token:
+              type: object
+              properties:
+                Scheme:
+                  type: string
+                AccesCode:
+                  type: string
   securitySchemes:
-    oAuth2: 
-      type: oauth2
-      flows:
-        implicit:
-          authorizationUrl: 'https://domain.test/api/oauth/dialog'
-          scopes:
-            read: example read scope
-            patient: Only patients
-            doctor: Only Doctors
-            admin: Only for administrators
-            write: example write scope
+    bearerAuth:            # arbitrary name for the security scheme
+      type: http
+      scheme: bearer
+      bearerFormat: JWT    # optional, arbitrary value for documentation purposes
+      
+security:
+  - bearerAuth: []
