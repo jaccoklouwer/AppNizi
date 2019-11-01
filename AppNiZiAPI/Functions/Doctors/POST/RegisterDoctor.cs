@@ -34,7 +34,7 @@ namespace AppNiZiAPI.Functions.Doctor.POST
         [OpenApiRequestBody("application/json", typeof(SwaggerRegisterDoctor), Description = "New doctor")] 
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Doctor))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.Doctor))] HttpRequest req,
             ILogger log)
         {
             AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);

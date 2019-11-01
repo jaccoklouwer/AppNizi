@@ -30,7 +30,7 @@ namespace AppNiZiAPI.Functions.Meal.POST
         [OpenApiRequestBody("application/json", typeof(Models.Meal), Description = "The meal object to be added")]
         [OpenApiParameter("patientId", Description = "The patient who is adding the meal", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion+Routes.AddMeal))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous,  "post", Route = (Routes.APIVersion+Routes.AddMeal))] HttpRequest req,
             ILogger log,int patientId)
         {
             #region AuthCheck

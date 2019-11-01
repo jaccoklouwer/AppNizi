@@ -29,7 +29,7 @@ namespace AppNiZiAPI
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorIncorrectId)]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.Consumption))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.Consumption))] HttpRequest req,
             ILogger log, string consumptionId)
         {
             log.LogDebug($"Triggered '" + nameof(GetConsumptionById) + "' with parameter: '" + consumptionId + "'");

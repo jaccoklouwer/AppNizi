@@ -36,7 +36,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
         [OpenApiParameter("date", Description = "Inserting the date", In = ParameterLocation.Query, Required = true, Type = typeof(string))] 
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.GetDailyWaterConsumption))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetDailyWaterConsumption))] HttpRequest req,
             ILogger log, int patientId)
         {
             #region AuthCheck

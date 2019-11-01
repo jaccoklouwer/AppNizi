@@ -29,7 +29,7 @@ namespace AppNiZiAPI
         /*[OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorDelete)]*/
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.Consumption))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = (Routes.APIVersion + Routes.Consumption))] HttpRequest req,
             ILogger log, string consumptionId)
         {
             log.LogDebug($"Triggered '" + nameof(DeleteConsumptionById) + "' with parameter: '"+ consumptionId +"'");

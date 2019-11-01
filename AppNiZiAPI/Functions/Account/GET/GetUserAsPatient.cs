@@ -34,7 +34,7 @@ namespace AppNiZiAPI.Functions.Account.GET
         [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)] 
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.Patients + Routes.Me))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.Patients + Routes.Me))] HttpRequest req,
             ILogger log)
         {
             // Auth check

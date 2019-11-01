@@ -34,7 +34,7 @@ namespace AppNiZiAPI.Functions.Patients.DELETE
         [OpenApiParameter("patientId", Description = "Inserting the patient id", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.SpecificPatient))] HttpRequest req, int patientId,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = (Routes.APIVersion + Routes.SpecificPatient))] HttpRequest req, int patientId,
             ILogger log)
         {
             if (patientId == 0)

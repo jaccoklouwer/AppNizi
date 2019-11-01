@@ -32,7 +32,7 @@ namespace AppNiZiAPI.Functions.Food
         [OpenApiParameter("patientId", Description = "the id of the patient thats going to get the item", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function,  "get", Route = (Routes.APIVersion + Routes.GetFavoriteFood))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous,  "get", Route = (Routes.APIVersion + Routes.GetFavoriteFood))] HttpRequest req,
             ILogger log, int patientId)
         {
 

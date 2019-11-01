@@ -31,7 +31,7 @@ namespace AppNiZiAPI.Functions.Food
         [OpenApiParameter("patientId", Description = "the id of the patient thats favoriting the food", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
         [OpenApiParameter("foodId", Description = "the fooditem to be favorited", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion + Routes.PostFavoriteFood))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous,  "post", Route = (Routes.APIVersion + Routes.PostFavoriteFood))] HttpRequest req,
             ILogger log)
         {
             int foodId;

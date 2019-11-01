@@ -34,7 +34,7 @@ namespace AppNiZiAPI.Functions.Account.POST
         [OpenApiRequestBody("application/json", typeof(SwaggerRegisterPatient), Description = "New patient")]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Patients))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.Patients))] HttpRequest req,
             ILogger log)
         {
             // Auth check

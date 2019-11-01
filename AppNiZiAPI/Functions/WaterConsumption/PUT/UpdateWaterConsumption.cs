@@ -33,7 +33,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.PUT
         [OpenApiRequestBody("application/json", typeof(WaterConsumptionModel), Description = "Id can be null or zero")]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.SingleWaterConsumption))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = (Routes.APIVersion + Routes.SingleWaterConsumption))] HttpRequest req,
             ILogger log, int waterId)
         {
             int patientId = await DIContainer.Instance.GetService<IAuthorization>().GetUserId(req);

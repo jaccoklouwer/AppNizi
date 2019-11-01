@@ -31,7 +31,7 @@ namespace AppNiZiAPI
         /*[OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPost)]*/
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Consumptions))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.Consumptions))] HttpRequest req,
             ILogger log)
         {
             log.LogDebug($"Triggered '" + nameof(AddConsumption) + "'");

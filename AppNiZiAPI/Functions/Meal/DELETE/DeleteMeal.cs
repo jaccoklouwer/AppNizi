@@ -33,7 +33,7 @@ namespace AppNiZiAPI.Functions.Meal.DELETE
         [OpenApiParameter("patientId", Description = "the id of the patient thats going to delete his meal", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         [OpenApiParameter("mealId", Description = "The meal to delete", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", "post", Route = ( Routes.APIVersion + Routes.DeleteMeal))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", "post", Route = ( Routes.APIVersion + Routes.DeleteMeal))] HttpRequest req,
             ILogger log,int patientId,int mealId)
         {
             // Auth check
