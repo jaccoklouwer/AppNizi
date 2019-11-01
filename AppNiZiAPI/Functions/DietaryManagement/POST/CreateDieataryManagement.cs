@@ -24,12 +24,14 @@ namespace AppNiZiAPI.Functions.DietaryManagement.POST
     public static class DieataryManagement
     {
         [FunctionName(nameof(CreateDieataryManagement))]
+        #region swagger
         [OpenApiOperation("CreateDieataryManagement", "DietaryManagement", Summary = "Create anew dietary managment", Description = "Create anew dietary managment of a patient", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKPost)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
         [OpenApiResponseBody(HttpStatusCode.UnprocessableEntity, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
-        [OpenApiRequestBody("application/json", typeof(DietaryManagementModel), Description = "the new values of the dietaryManagement")]
+        [OpenApiRequestBody("application/json", typeof(DietaryManagementModel), Description = "the new values of the dietaryManagement")] 
+        #endregion
         public static async Task<IActionResult> CreateDieataryManagement(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.DietaryManagement))] HttpRequest req,
             ILogger log)

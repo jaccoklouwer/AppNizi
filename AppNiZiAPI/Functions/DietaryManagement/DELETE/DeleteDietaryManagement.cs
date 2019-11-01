@@ -23,13 +23,16 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
     public static class DietaryManagement
     {
         [FunctionName(nameof(DeleteDietaryManagement))]
+
+        #region swagger
         [OpenApiOperation(nameof(DeleteDietaryManagement), "DietaryManagement", Summary = "Delete a dietary managment", Description = "Delete a dietary managment of a patient", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKDelete)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
         [OpenApiResponseBody(HttpStatusCode.UnprocessableEntity, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
         [OpenApiParameter("dietId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
-        [OpenApiRequestBody("patientId", typeof(int), Description ="the id of a patient for authentication")]
+        [OpenApiRequestBody("patientId", typeof(int), Description = "the id of a patient for authentication")] 
+        #endregion
         public static async Task<IActionResult> DeleteDietaryManagement(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId,
             ILogger log)
