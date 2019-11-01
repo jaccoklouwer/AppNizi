@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "AppNiZiAPI": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "sqldb_connection": "Server=tcp:appnizi.database.windows.net,1433;Initial Catalog=AppNiziDatabase;Persist Security Info=False;User ID=AppNizi;Password=ProjectCloud!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;"
+      }
+    }
+  }
+}
