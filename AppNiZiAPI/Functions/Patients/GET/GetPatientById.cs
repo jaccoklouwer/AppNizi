@@ -15,31 +15,30 @@ using AppNiZiAPI.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Security;
 using Newtonsoft.Json.Linq;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using Microsoft.OpenApi.Models;
 
 namespace AppNiZiAPI.Functions.Patients.GET
 {
     public static class GetPatientById
     {
         [FunctionName("GetPatientByID")]
+        #region Swagger
+        [OpenApiOperation("GetPatientByID", "Patient", Summary = "Get specific patient", Description = "Get specific patient", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(PatientObject), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiParameter("patientId", Description = "Inserting the patient id", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.SpecificPatient))] HttpRequest req, int patientId,
             ILogger log)
         {
-            bool isDoctor = false;
-            if (patientId == 0)
-                return new BadRequestObjectResult("No patientId parameter passed.");
-
-            try
-            {
-                var content = await new StreamReader(req.Body).ReadToEndAsync();
-                JObject jsonParsed = JObject.Parse(content);
-                if (jsonParsed.ContainsKey("Role") && jsonParsed["Role"].ToString() == "Doctor")
-                    isDoctor = true;
-            }
-            catch{}
-
             #region AuthCheck
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId, isDoctor);
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
@@ -52,7 +51,7 @@ namespace AppNiZiAPI.Functions.Patients.GET
                 // Return object if possible
                 return patient != null
                 ? (ActionResult)new OkObjectResult(patient)
-                : new BadRequestObjectResult("Bad request. Check GUID.");
+                : new BadRequestResult();
             }
             catch (Exception ex)
             {

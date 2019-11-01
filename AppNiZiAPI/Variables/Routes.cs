@@ -16,7 +16,7 @@ namespace AppNiZiAPI.Variables
         // Patients
         public const string Patients = "/patient";
         public const string Me = "/me";
-        public const string SpecificPatient = "/patient/{patientId:int}";
+        public const string SpecificPatient = "/patient/{patientId}";
 
         // Doctors
         public const string GetDoctorPatients = "/doctor/{doctorId}/patients";
