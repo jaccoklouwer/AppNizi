@@ -19,7 +19,7 @@ namespace AppNiZiAPI.Models.Repositories
             {
 
                 conn.Open();
-                var text = $"SELECT * FROM Food WHERE id = '{foodId}'";
+                var text = $"SELECT Food.*, WeightUnit.unit from Food Inner Join WeightUnit On  food.weight_unit_id = WeightUnit.id where food.id = '{foodId}'";
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {
@@ -28,70 +28,54 @@ namespace AppNiZiAPI.Models.Repositories
                     {
                         // TODO OOOH doe dit anders indexes zo gevaarlijk
                         food.FoodId = (int)reader["id"];
-                        food.Name = reader.GetString(1);
-                        food.KCal = (float)reader.GetDouble(2);
-                        food.Protein = (float)reader.GetDouble(3);
-                        food.Fiber = (float)reader.GetDouble(4);
-                        food.Calcium = (float)reader.GetDouble(5);
-                        food.Sodium = (float)reader.GetDouble(6);
-                        food.PortionSize = (float)reader.GetDouble(7);
-                        //dit kan ik gebruiken om enum weightunit te pakken?
-                        // Mitch - Zou het via een inner join doen al direct uit db
-                        /*
-                         * SELECT *.f, description.w
-                         * FROM Food as f, WeightUnit? as w
-                         * WHERE f.weight_unit_id = w.id
-                         * 
-                         * en dan food.WeightUnitDescription = reader[description];
-                         */
-                        //TODO dit zo doen weightunitid(int) moet een weighunit(string) worden
-                        food.WeightUnitId = (int)reader["weight_unit_id"];
+                        //food.Name = reader.GetString(1);
+                        food.Name = (string)reader["name"];
+                        food.KCal = (double)reader["kcal"];
+                        food.Protein = (double)reader["protein"];
+                        food.Fiber = (double)reader["fiber"];
+                        food.Calcium = (double)reader["calcium"];
+                        food.Sodium = (double)reader["sodium"];
+                        food.PortionSize = (double)reader["portion_size"];
+                        food.Picture = (string)reader["picture"];
+                        food.WeightUnit = (string)reader["unit"];
                     }
                 }
                 conn.Close();
             }
             return food;
         }
-        public List<Food> Search(string foodname)
+        public List<Food> Search(string foodname,int count)
         {
             
             List<Food> foods = new List<Food>();
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
-            //Todo controleer op lengte (moet minstens 2 zijn)
             using (conn)
             {
 
                 conn.Open();
-                var text = $"SELECT * FROM Food Where name LIKE  '{foodname}%'";
-
-                using (SqlCommand cmd = new SqlCommand(text, conn))
+                var text = $"SELECT TOP {count} * FROM Food Inner Join WeightUnit On  food.weight_unit_id = WeightUnit.id Where name LIKE '{foodname}%'";
+                SqlCommand sqlCmd = new SqlCommand(text, conn);
+                //sqlCmd.Parameters.Add("@COUNT", SqlDbType.Int).Value = count;
+                using (sqlCmd)
                 {
                     //Todo limit dit met een count parameter anders gaan we straks 200 ap*** ophalen)
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    //Done
+                    SqlDataReader reader = sqlCmd.ExecuteReader();
                     while (reader.Read())
                     {
                         Food food = new Food
                         {
                             // Uit lezen bijv
                             FoodId = (int)reader["id"],
-                            Name = reader.GetString(1),
-                            KCal = (float)reader.GetDouble(2),
-                            Protein = (float)reader.GetDouble(3),
-                            Fiber = (float)reader.GetDouble(4),
-                            Calcium = (float)reader.GetDouble(5),
-                            Sodium = (float)reader.GetDouble(6),
-                            PortionSize = (float)reader.GetDouble(7),
-                            //dit kan ik gebruiken om enum weightunit te pakken?
-                            // Mitch - Zou het via een inner join doen al direct uit db
-                            /*
-                             * SELECT *.f, description.w
-                             * FROM Food as f, WeightUnit? as w
-                             * WHERE f.weight_unit_id = w.id
-                             * 
-                             * en dan food.WeightUnitDescription = reader[description];
-                             */
-                            //TODO
-                            WeightUnitId = (int)reader["weight_unit_id"]
+                            Name = (string)reader["name"],
+                            KCal = (double)reader["kcal"],
+                            Protein = (double)reader["protein"],
+                            Fiber = (double)reader["fiber"],
+                            Calcium = (double)reader["calcium"],
+                            Sodium = (double)reader["sodium"],
+                            PortionSize = (double)reader["portion_size"],
+                            Picture = (string)reader["picture"],
+                            WeightUnit = (string)reader["unit"]
                         };
                         foods.Add(food);
                     }
@@ -118,26 +102,16 @@ namespace AppNiZiAPI.Models.Repositories
                     {
                         Food food = new Food
                         {
-                            // Uit lezen bijv
                             FoodId = (int)reader["id"],
-                            Name = reader.GetString(1),
-                            KCal = (float)reader.GetDouble(2),
-                            Protein = (float)reader.GetDouble(3),
-                            Fiber = (float)reader.GetDouble(4),
-                            Calcium = (float)reader.GetDouble(5),
-                            Sodium = (float)reader.GetDouble(6),
-                            PortionSize = (float)reader.GetDouble(7),
-                            //dit kan ik gebruiken om enum weightunit te pakken?
-                            // Mitch - Zou het via een inner join doen al direct uit db
-                            /*
-                             * SELECT *.f, description.w
-                             * FROM Food as f, WeightUnit? as w
-                             * WHERE f.weight_unit_id = w.id
-                             * 
-                             * en dan food.WeightUnitDescription = reader[description];
-                             */
-                            //TODO
-                            WeightUnitId = (int)reader["weight_unit_id"]
+                            Name = (string)reader["name"],
+                            KCal = (double)reader["kcal"],
+                            Protein = (double)reader["protein"],
+                            Fiber = (double)reader["fiber"],
+                            Calcium = (double)reader["calcium"],
+                            Sodium = (double)reader["sodium"],
+                            PortionSize = (double)reader["portion_size"],
+                            Picture = (string)reader["picture"],
+                            WeightUnit = (string)reader["unit"]
                         };
                         foods.Add(food);
                     }
@@ -185,6 +159,27 @@ namespace AppNiZiAPI.Models.Repositories
             }
 
             return succes;
+        }
+
+        public bool UnFavorite(int patient_id, int food_id)
+        {
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
+            bool success = false;
+            string sqlQuery = "DELETE FROM MyFood WHERE patient_id=@PATIENT_ID AND food_id=@FOOD_ID";
+
+            using (conn)
+            {
+                conn.Open();
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, conn);
+                sqlCmd.Parameters.Add("@PATIENT_ID", SqlDbType.Int).Value = patient_id;
+                sqlCmd.Parameters.Add("@FOOD_ID", SqlDbType.Int).Value = food_id;
+                int rows = sqlCmd.ExecuteNonQuery();
+
+                if (rows != 0)
+                    success = true;
+            }
+            return success;
         }
     }
 }

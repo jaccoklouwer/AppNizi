@@ -25,12 +25,11 @@ namespace AppNiZiAPI.Functions.Food
     public static class GetFavoriteFood
     {
         [FunctionName("GetFavoriteFood")]
-        [OpenApiOperation("GetFavoriteFood", "Food", Summary = "Gets the users favorite foods", Description = "Retrieves the favorited fooditems of the specified patientID", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
-        [OpenApiParameter("patientId", Description = "the id of the patient thats going to get the item", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
-        
+        //[OpenApiOperation("GetFavoriteFood", "Food", Summary = "Gets the users favorite foods", Description = "Retrieves the favorited fooditems of the specified patientID", Visibility = OpenApiVisibilityType.Important)]
+        //[OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
+        //[OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        //[OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
+        //[OpenApiParameter("patientId", Description = "the id of the patient thats going to get the item", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous,  "get", Route = (Routes.APIVersion + Routes.GetFavoriteFood))] HttpRequest req,
             ILogger log, int patientId)
@@ -40,7 +39,6 @@ namespace AppNiZiAPI.Functions.Food
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
-            //TODO maak dit minder lelijk
 
             IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
             List<Models.Food> food = foodRepository.Favorites(patientId);

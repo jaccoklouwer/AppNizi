@@ -31,9 +31,10 @@ namespace AppNiZiAPI.Functions.Food
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
         [OpenApiParameter("patientId", Description = "the id of the patient thats going to get the item", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         [OpenApiParameter("foodName", Description = "The letters to use in the search", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
+        [OpenApiParameter("count", Description = "amount of items to retrieve", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.FoodByPartialname))] HttpRequest req,
-            ILogger log,int patientId, string foodName)
+            ILogger log,int patientId, string foodName, int count)
         {
 
             // Auth check
@@ -44,7 +45,7 @@ namespace AppNiZiAPI.Functions.Food
             //TODO maak dit minder lelijk
 
             IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
-            List<Models.Food> food = foodRepository.Search(foodName);
+            List<Models.Food> food = foodRepository.Search(foodName,count);
 
             //TODO convert to JSON
             var jsonFood = JsonConvert.SerializeObject(food);
