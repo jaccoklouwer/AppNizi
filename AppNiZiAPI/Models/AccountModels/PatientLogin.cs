@@ -7,7 +7,7 @@ namespace AppNiZiAPI.Models.AccountModels
     public class PatientLogin
     {
         public AccountModel Account { get; set; }
-        public PatientObject Patient { get; set; }
+        public Patient Patient { get; set; }
         public DoctorModel Doctor { get; set; }
         public AuthLogin AuthLogin { get; set; }
     }

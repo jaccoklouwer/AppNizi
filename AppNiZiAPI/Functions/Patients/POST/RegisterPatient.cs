@@ -53,7 +53,7 @@ namespace AppNiZiAPI.Functions.Account.POST
 
                 newPatient = new PatientLogin
                 {
-                    Patient = new PatientObject
+                    Patient = new Patient
                     {
                         FirstName = jsonParsed["firstName"].ToString(),
                         LastName = jsonParsed["lastName"].ToString(),

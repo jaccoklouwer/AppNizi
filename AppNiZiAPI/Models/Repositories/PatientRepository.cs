@@ -12,8 +12,8 @@ namespace AppNiZiAPI.Models.Repositories
 {
     public interface IPatientRepository
     {
-        PatientObject Select(int id);
-        PatientObject Select(string guid);
+        Patient Select(int id);
+        Patient Select(string guid);
         List<PatientView> List(int count);
         bool Delete(int patientId);
         PatientLogin GetPatientInfo(string guid);
@@ -25,12 +25,12 @@ namespace AppNiZiAPI.Models.Repositories
         /// <summary>
         /// Select patient by ID.
         /// </summary>
-        public PatientObject Select(int id)
+        public Patient Select(int id)
         {
             if (id == 0)
-                return null;
+                return new Patient();
 
-            PatientObject patient = null;
+            Patient patient = new Patient();
 
             using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -46,28 +46,24 @@ namespace AppNiZiAPI.Models.Repositories
 
                 while (reader.Read())
                 {
-                    patient = new PatientObject()
-                    {
-                        PatientId = (int)reader["id"],
-                        Guid = reader["guid"].ToString(),
-                        DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
-                        WeightInKilograms = Convert.ToInt32(reader["weight"]),
-                        FirstName = reader["first_name"].ToString(),
-                        LastName = reader["last_name"].ToString()
-                        
-                    };
+                    patient.PatientId = (int)reader["id"];
+                    patient.Guid = reader["guid"].ToString();
+                    patient.DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]);
+                    patient.WeightInKilograms = Convert.ToInt32(reader["weight"]);
+                    patient.FirstName = reader["first_name"].ToString();
+                    patient.LastName = reader["last_name"].ToString();
                 }
             }
 
             return patient;
         }
 
-        public PatientObject Select(string guid)
+        public Patient Select(string guid)
         {
             if (string.IsNullOrEmpty(guid))
                 return null;
 
-            PatientObject patient = null;
+            Patient patient = null;
 
             using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -80,7 +76,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 while (reader.Read())
                 {
-                    patient = new PatientObject()
+                    patient = new Patient()
                     {
                         Guid = reader["guid"].ToString(),
                         DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
@@ -162,7 +158,7 @@ namespace AppNiZiAPI.Models.Repositories
             return GetPatientInfo(newPatient.Patient.Guid);
         }
 
-        private int RegisterAccount(PatientObject patient)
+        private int RegisterAccount(Patient patient)
         {
             string sqlQuery =
                 "INSERT INTO Account(first_name, last_name, role) " +
@@ -226,7 +222,7 @@ namespace AppNiZiAPI.Models.Repositories
                     return false;
             }
 
-            sqlQuery = 
+            sqlQuery =
                 "DELETE FROM patient WHERE id=@PATIENTID;" +
                 "DELETE FROM Account WHERE id=@ACCOUNTID";
 
@@ -273,14 +269,14 @@ namespace AppNiZiAPI.Models.Repositories
                         Role = (string)reader["role_name"]
                     };
 
-                    PatientObject patient = new PatientObject
+                    Patient patient = new Patient
                     {
                         DateOfBirth = (DateTime)reader["date_of_birth"],
                         FirstName = (string)reader["first_name"],
                         LastName = (string)reader["last_name"],
                         Guid = (string)reader["guid"],
                         PatientId = (int)reader["patient_id"],
-                        WeightInKilograms =  float.Parse(reader["weight"].ToString())
+                        WeightInKilograms = float.Parse(reader["weight"].ToString())
                     };
 
                     DoctorModel doctor = new DoctorModel
@@ -300,6 +296,6 @@ namespace AppNiZiAPI.Models.Repositories
                 conn.Close();
             }
             return patientLogin;
-        } 
+        }
     }
 }

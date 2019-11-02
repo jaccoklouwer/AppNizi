@@ -12,9 +12,9 @@ namespace AppNiZiAPI.Models.Repositories
 {
     class DoctorRepository : IDoctorRepository
     {
-        public List<PatientObject> GetDoctorPatients(int doctorId)
+        public List<Patient> GetDoctorPatients(int doctorId)
         {
-            List<PatientObject> list = new List<PatientObject>();
+            List<Patient> list = new List<Patient>();
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
                 conn.Open();
@@ -31,7 +31,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 while (reader.Read())
                 {
-                    PatientObject patient = new PatientObject();
+                    Patient patient = new Patient();
                     patient.FirstName = reader["first_name"].ToString();
                     patient.LastName = reader["last_name"].ToString();
                     patient.DateOfBirth = (DateTime)reader["date_of_birth"];
@@ -265,7 +265,7 @@ namespace AppNiZiAPI.Models.Repositories
 
     public interface IDoctorRepository
     {
-        List<PatientObject> GetDoctorPatients(int doctorId);
+        List<Patient> GetDoctorPatients(int doctorId);
         DoctorLogin GetLoggedInDoctor(string guid);
         List<DoctorModel> GetDoctors();
         DoctorLogin RegisterDoctor(DoctorLogin newDoctor);

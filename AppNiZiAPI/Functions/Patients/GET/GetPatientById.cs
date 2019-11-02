@@ -19,6 +19,9 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using Microsoft.OpenApi.Models;
+using AppNiZiAPI.Services;
+using System.Collections.Generic;
+using static AppNiZiAPI.Services.PatientService;
 
 namespace AppNiZiAPI.Functions.Patients.GET
 {
@@ -27,7 +30,7 @@ namespace AppNiZiAPI.Functions.Patients.GET
         [FunctionName("GetPatientByID")]
         #region Swagger
         [OpenApiOperation("GetPatientByID", "Patient", Summary = "Get specific patient", Description = "Get specific patient", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(PatientObject), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Patient), Summary = Messages.OKUpdate)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
@@ -43,22 +46,17 @@ namespace AppNiZiAPI.Functions.Patients.GET
                 return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
 
-            try
-            {
-                IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
-                PatientObject patient = patientRepository.Select(patientId);
+            IPatientService patientRepository = DIContainer.Instance.GetService<IPatientService>();
+            Dictionary<ServiceDictionaryKey, object> dictionary = patientRepository.TryGetPatientById(patientId);
 
-                // Return object if possible
-                return patient != null
-                ? (ActionResult)new OkObjectResult(patient)
-                : new BadRequestResult();
-            }
-            catch (Exception ex)
-            {
-                // Build error message and return it.
-                string callbackMessage = new MessageHandler().BuildErrorMessage(ex);
-                return new BadRequestObjectResult(callbackMessage);
-            }
+            // Returns a build error message
+            if (dictionary.ContainsKey(ServiceDictionaryKey.ERROR))
+                return new BadRequestObjectResult(dictionary[ServiceDictionaryKey.ERROR]);
+
+            // Return object if possible
+            return dictionary.ContainsKey(ServiceDictionaryKey.OBJECT)
+            ? (ActionResult)new OkObjectResult(dictionary[ServiceDictionaryKey.OBJECT])
+            : new BadRequestResult();
         }
     }
 }

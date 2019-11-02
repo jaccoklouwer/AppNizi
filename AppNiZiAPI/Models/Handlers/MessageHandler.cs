@@ -4,7 +4,12 @@ using System.Text;
 
 namespace AppNiZiAPI.Models.Handlers
 {
-    class MessageHandler
+    public interface IFeedbackHandler
+    {
+        string BuildErrorMessage(Exception ex);
+    }
+
+    public class FeedbackHandler : IFeedbackHandler
     {
         /// <summary>
         /// Builds a feedback message for an error caught.

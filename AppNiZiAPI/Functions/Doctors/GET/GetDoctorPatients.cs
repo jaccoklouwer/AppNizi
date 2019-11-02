@@ -26,7 +26,7 @@ namespace AppNiZiAPI.Functions.Doctor.GET
         [FunctionName("GetDoctorPatients")]
         #region Swagger
         [OpenApiOperation("GetDoctorPatients", "Doctor", Summary = "Get the patients from a doctor", Description = "Get the patients from a doctor", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(PatientObject[]), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Patient[]), Summary = Messages.OKUpdate)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
@@ -43,7 +43,7 @@ namespace AppNiZiAPI.Functions.Doctor.GET
             #endregion
 
             IDoctorRepository doctorRepository = DIContainer.Instance.GetService<IDoctorRepository>();
-            List<PatientObject> patients = doctorRepository.GetDoctorPatients(doctorId);
+            List<Patient> patients = doctorRepository.GetDoctorPatients(doctorId);
 
             return patients != null
                 ? (ActionResult)new OkObjectResult(patients)

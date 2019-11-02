@@ -27,7 +27,7 @@ namespace AppNiZiAPI.Functions.Doctor.DELETE
         [FunctionName("DeleteDoctor")]
         #region Swagger
         [OpenApiOperation("DeleteDoctor", "Doctor", Summary = "Delete specific doctor", Description = "Delete specific doctor", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(PatientObject[]), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Patient[]), Summary = Messages.OKUpdate)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
@@ -55,7 +55,7 @@ namespace AppNiZiAPI.Functions.Doctor.DELETE
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new MessageHandler().BuildErrorMessage(e));
+                return new BadRequestObjectResult(new FeedbackHandler().BuildErrorMessage(e));
             }
         }
     }
