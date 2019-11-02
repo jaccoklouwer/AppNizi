@@ -5,7 +5,12 @@ using System.Text;
 
 namespace AppNiZiAPI.Models.Handler
 {
-    class QueryHandler
+    public interface IQueryHelper
+    {
+        int ExtractIntegerFromRequestQuery(string variableName, HttpRequest req);
+    }
+
+    public class QueryHelper : IQueryHelper
     {
         public int ExtractIntegerFromRequestQuery(string variableName, HttpRequest req)
         {

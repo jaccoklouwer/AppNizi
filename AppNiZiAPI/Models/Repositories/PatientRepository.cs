@@ -14,7 +14,7 @@ namespace AppNiZiAPI.Models.Repositories
     {
         Patient Select(int id);
         Patient Select(string guid);
-        List<PatientView> List(int count);
+        List<Patient> List(int count);
         bool Delete(int patientId);
         PatientLogin GetPatientInfo(string guid);
         PatientLogin RegisterPatient(PatientLogin newPatient);
@@ -61,9 +61,9 @@ namespace AppNiZiAPI.Models.Repositories
         public Patient Select(string guid)
         {
             if (string.IsNullOrEmpty(guid))
-                return null;
+                return new Patient();
 
-            Patient patient = null;
+            Patient patient = new Patient();
 
             using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -84,23 +84,27 @@ namespace AppNiZiAPI.Models.Repositories
                     };
                 }
             }
+
             return patient;
         }
 
         /// <summary>
         /// Select all patients, up to count amount.
         /// </summary>
-        public List<PatientView> List(int count)
+        public List<Patient> List(int count)
         {
             if (count == 0)
                 count = 999999;
 
-            List<PatientView> patients = new List<PatientView>();
+            List<Patient> patients = new List<Patient>();
 
             using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
                 sqlConn.Open();
-                string sqlQuery = $"SELECT TOP(@COUNT) * FROM patient";
+                string sqlQuery = $"SELECT TOP(@COUNT) p.*, a.* " +
+                    $"FROM Patient AS p " +
+                    $"INNER JOIN Account AS A ON p.account_id = a.id " +
+                    $"WHERE p.id=@ID";
 
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@COUNT", SqlDbType.Int).Value = count;
@@ -108,18 +112,22 @@ namespace AppNiZiAPI.Models.Repositories
 
                 while (reader.Read())
                 {
-                    PatientView patient = new PatientView
+                    Patient patient = new Patient
                     {
-                        GUID = reader["guid"].ToString(),
-                        dateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
-                        weight = Convert.ToInt32(reader["weight"]),
-                        id = Convert.ToInt32(reader["weight"])
+                        PatientId = (int)reader["id"],
+                        Guid = reader["guid"].ToString(),
+                        DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
+                        WeightInKilograms = Convert.ToInt32(reader["weight"]),
+                        FirstName = reader["first_name"].ToString(),
+                        LastName = reader["last_name"].ToString()
                     };
 
                     patients.Add(patient);
                 }
+
                 sqlConn.Close();
             }
+
             return patients;
         }
 

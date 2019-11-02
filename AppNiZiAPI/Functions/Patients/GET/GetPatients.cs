@@ -24,6 +24,8 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using System.Net;
 using Microsoft.OpenApi.Models;
+using AppNiZiAPI.Services;
+using static AppNiZiAPI.Services.PatientService;
 
 namespace AppNiZiAPI.Functions.Patients
 {
@@ -45,21 +47,19 @@ namespace AppNiZiAPI.Functions.Patients
             [HttpTrigger(AuthorizationLevel.Admin, "get", Route = (Routes.APIVersion + Routes.Patients))] HttpRequest req,
             ILogger log)
         {
-            // Authorization
-            //if (!await Authorization.CheckAuthorization(req.Headers)){ return new BadRequestObjectResult(Messages.AuthNoAcces);}
-
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            int count = new QueryHandler().ExtractIntegerFromRequestQuery("count", req);
+            IPatientService patientService = DIContainer.Instance.GetService<IPatientService>();
+            Dictionary<ServiceDictionaryKey, object> dictionary = await patientService.TryListPatients(req);
 
-            IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
-            List<PatientView> patients = patientRepository.List(count);
+            // Returns a build error message
+            if (dictionary.ContainsKey(ServiceDictionaryKey.ERROR))
+                return new BadRequestObjectResult(dictionary[ServiceDictionaryKey.ERROR]);
 
-            dynamic data = JsonConvert.SerializeObject(patients);
-            
-            return patients != null
-                ? (ActionResult)new OkObjectResult(data)
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            // Return object if possible
+            return dictionary.ContainsKey(ServiceDictionaryKey.VALUE)
+            ? (ActionResult)new OkObjectResult(dictionary[ServiceDictionaryKey.VALUE])
+            : new BadRequestResult();
         }
     }
 }

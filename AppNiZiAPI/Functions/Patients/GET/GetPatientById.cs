@@ -46,16 +46,16 @@ namespace AppNiZiAPI.Functions.Patients.GET
                 return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
 
-            IPatientService patientRepository = DIContainer.Instance.GetService<IPatientService>();
-            Dictionary<ServiceDictionaryKey, object> dictionary = patientRepository.TryGetPatientById(patientId);
+            IPatientService patientService = DIContainer.Instance.GetService<IPatientService>();
+            Dictionary<ServiceDictionaryKey, object> dictionary = await patientService.TryGetPatientById(patientId);
 
             // Returns a build error message
             if (dictionary.ContainsKey(ServiceDictionaryKey.ERROR))
                 return new BadRequestObjectResult(dictionary[ServiceDictionaryKey.ERROR]);
 
             // Return object if possible
-            return dictionary.ContainsKey(ServiceDictionaryKey.OBJECT)
-            ? (ActionResult)new OkObjectResult(dictionary[ServiceDictionaryKey.OBJECT])
+            return dictionary.ContainsKey(ServiceDictionaryKey.VALUE)
+            ? (ActionResult)new OkObjectResult(dictionary[ServiceDictionaryKey.VALUE])
             : new BadRequestResult();
         }
     }

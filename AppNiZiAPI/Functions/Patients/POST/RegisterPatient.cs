@@ -19,6 +19,8 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using System.Net;
 using AppNiZiAPI.Models.SwaggerModels;
+using AppNiZiAPI.Services;
+using System.Collections.Generic;
 
 namespace AppNiZiAPI.Functions.Account.POST
 {
@@ -40,46 +42,20 @@ namespace AppNiZiAPI.Functions.Account.POST
             // Auth check
             AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
             if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            PatientLogin newPatient;
 
-            try
-            {
-                StreamReader streamReader = new StreamReader(req.Body);
-                var content = await streamReader.ReadToEndAsync();
-                streamReader.Dispose();
+            log.LogInformation("C# HTTP trigger function processed a request.");
 
-                // Parse Patient Info
-                JObject jsonParsed = JObject.Parse(content);
+            IPatientService patientService = DIContainer.Instance.GetService<IPatientService>();
+            Dictionary<ServiceDictionaryKey, object> dictionary = await patientService.TryRegisterPatient(req, authLogin);
 
-                newPatient = new PatientLogin
-                {
-                    Patient = new Patient
-                    {
-                        FirstName = jsonParsed["firstName"].ToString(),
-                        LastName = jsonParsed["lastName"].ToString(),
-                        DateOfBirth = (DateTime)jsonParsed["dateOfBirth"],
-                        WeightInKilograms = (float)jsonParsed["weight"],
-                        Guid = authLogin.Guid
-                    },
-                    Doctor = new DoctorModel
-                    {
-                        DoctorId = (int)jsonParsed["doctorId"]
-                    }
-                };
-            }
-            catch (Exception e)
-            {
-                log.LogInformation(e.Message);
-                return new BadRequestResult();
-            }
-            
-            IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
-            newPatient = patientRepository.RegisterPatient(newPatient);
-            newPatient.AuthLogin = authLogin;
+            // Returns a build error message
+            if (dictionary.ContainsKey(ServiceDictionaryKey.ERROR))
+                return new BadRequestObjectResult(dictionary[ServiceDictionaryKey.ERROR]);
 
-            return newPatient != null
-                ? (ActionResult)new OkObjectResult(newPatient)
-                : new BadRequestResult();
+            // Return object if possible
+            return dictionary.ContainsKey(ServiceDictionaryKey.VALUE)
+            ? (ActionResult)new OkObjectResult(dictionary[ServiceDictionaryKey.VALUE])
+            : new BadRequestResult();
         }
     }
 }
