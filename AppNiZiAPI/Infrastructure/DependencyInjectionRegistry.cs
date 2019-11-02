@@ -8,22 +8,18 @@ namespace AppNiZiAPI.Infrastructure
     {
         public static IServiceCollection AddRepositoryServices(this IServiceCollection services)
         {
+            services.AddSingleton<IAccountRepository, AccountRepository>();
             services.AddSingleton<IPatientRepository, PatientRepository>();
+            services.AddSingleton<IDoctorRepository, DoctorRepository>();
 
             services.AddSingleton<IAuthorizationRepository, AuthorizationRepository>();
             services.AddSingleton<IAuthorization, Authorization>();
 
-            services.AddSingleton<IFoodRepository, FoodRepository>();
-
-            services.AddSingleton<IMealRepository, MealRepository>();
             services.AddSingleton<IDietaryManagementRepository, DietaryManagementRepository>();
+            services.AddSingleton<IFoodRepository, FoodRepository>();
+            services.AddSingleton<IMealRepository, MealRepository>();
             services.AddSingleton<IWaterRepository, WaterRepository>();
-
             services.AddSingleton<IConsumptionRepository, ConsumptionRespository>();
-
-            services.AddSingleton<IDoctorRepository, DoctorRepository>();
-
-            services.AddSingleton<IAccountRepository, AccountRepository>();
 
             return services;
         }

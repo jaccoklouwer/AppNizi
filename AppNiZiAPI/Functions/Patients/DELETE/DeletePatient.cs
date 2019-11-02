@@ -57,7 +57,7 @@ namespace AppNiZiAPI.Functions.Patients.DELETE
             catch (Exception ex)
             {
                 // Build error message and return it.
-                return new BadRequestObjectResult(new MessageHandler().BuildErrorMessage(ex));
+                return new BadRequestObjectResult(new FeedbackHandler().BuildErrorMessage(ex));
             }
         }
     }
