@@ -7,20 +7,17 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using AppNiZiAPI.Variables;
-using AppNiZiAPI.Security;
 
-namespace AppNiZiAPI.Functions.WaterConsumption.POST
+namespace AppNiZiAPI.Functions.Patients.PUT
 {
-    public static class InsterWaterConsumption
+    public static class ChangeDoctor
     {
-        [FunctionName("InsterWaterConsumption")]
+        [FunctionName("ChangeDoctor")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.PostWaterConsumption))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
-            // PatientId nog ophalen
-            if (!await Authorization.CheckAuthorization(req, 11)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
+            log.LogInformation("C# HTTP trigger function processed a request.");
 
             string name = req.Query["name"];
 

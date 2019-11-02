@@ -16,20 +16,38 @@ using AppNiZiAPI.Security;
 using Microsoft.Net.Http.Headers;
 using System.Net.Http.Headers;
 
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using Microsoft.OpenApi.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 
 namespace AppNiZiAPI
 {
     public static class FoodByName
     {
         [FunctionName("Food")]
+        [OpenApiOperation("GetFoodById", "Food", Summary = "Gets the requested FoodItem", Description = "updates the dietary management of a patient", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
+        [OpenApiParameter("patientId", Description = "the id of the patient thats going to get the item", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiParameter("foodId", Description = "the id of food item to be retrieved", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.FoodByName))] HttpRequest req,
-            ILogger log, string foodName)
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.FoodById))] HttpRequest req,
+            ILogger log,int patientId, int foodId)
         {
 
-            //if (!await Authorization.CheckAuthorization(req.Headers)) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            //TODO maak dit minder lelijk(iets minder lelijk nu maar wil graag van de specificatie models.food af)
-            Food food = new FoodRepository().Select(foodName);
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult((int)authResult.StatusCode);
+            #endregion
+
+            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
+            //FoodRepository foodRepository = new FoodRepository();
+            Food food = foodRepository.Select(foodId);
 
             var jsonFood = JsonConvert.SerializeObject(food);
             return jsonFood != null

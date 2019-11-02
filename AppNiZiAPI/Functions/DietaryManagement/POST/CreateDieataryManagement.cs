@@ -8,39 +8,53 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net;
-using AppNiZiAPI.Models;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Models.Dietarymanagement;
+using AppNiZiAPI.Infrastructure;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using Microsoft.OpenApi.Models;
+using AppNiZiAPI.Security;
+using AppNiZiAPI.Models;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.POST
 {
     public static class DieataryManagement
     {
-        [OpenApiOperation("get")]
-        [OpenApiRequestBody("application / json", typeof(DietaryManagementModel))]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string))]
         [FunctionName(nameof(CreateDieataryManagement))]
+        #region swagger
+        [OpenApiOperation("CreateDieataryManagement", "DietaryManagement", Summary = "Create anew dietary managment", Description = "Create anew dietary managment of a patient", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKPost)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiResponseBody(HttpStatusCode.UnprocessableEntity, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
+        [OpenApiRequestBody("application/json", typeof(DietaryManagementModel), Description = "the new values of the dietaryManagement")] 
+        #endregion
         public static async Task<IActionResult> CreateDieataryManagement(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.DietaryManagement))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.DietaryManagement))] HttpRequest req,
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
             log.LogInformation("C# HTTP trigger function processed a request.");
-            //if (!await Authorization.CheckAuthorization(req.Headers)) { return new UnauthorizedResult(); }
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             if (string.IsNullOrEmpty(requestBody))
                 return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues);
-            IDietaryManagementRepository repository = new DietaryManagementRepository();
-            
+            IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
+
             try
             {
                 DietaryManagementModel dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
+
+
+                #region AuthCheck
+                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, dietary.PatientId);
+                if (!authResult.Result)
+                    return new StatusCodeResult((int)authResult.StatusCode);
+                #endregion
+                
                 bool success = repository.AddDietaryManagement(dietary);
                 if (success)
                 {

@@ -22,9 +22,15 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Python_tests.py" />
+    <Compile Include="tests\py_test.py" />
+    <Compile Include="tests\run_test.py" />
+    <Compile Include="tests\singleCalltestingApiTesting.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="tests\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.targets" />
   <!-- Uncomment the CoreCompile target to enable the Build command in

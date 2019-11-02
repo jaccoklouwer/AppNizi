@@ -11,17 +11,37 @@ using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
 using System.Collections.Generic;
 using AppNiZiAPI.Variables;
+using AppNiZiAPI.Security;
+
+using AppNiZiAPI.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using Microsoft.OpenApi.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 
 namespace AppNiZiAPI.Functions.Meal.GET
 {
     public static class GetMeals
     {
         [FunctionName("GetMeals")]
+        [OpenApiOperation("GetMeals", "Meal", Summary = "Retrieves meals", Description = "retrieves the meals of the specified user", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
+        [OpenApiParameter("patientId", Description = "The patient which meals will be retrieved", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion+Routes.GetMeals))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion+Routes.GetMeals))] HttpRequest req,
             ILogger log,int patientId)
         {
-            List<Models.Meal> meals = new MealRepository().GetMyMeals(patientId);
+            // Auth check
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult((int)authResult.StatusCode);
+
+            IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
+            List<Models.Meal> meals = mealRepository.GetMyMeals(patientId);
 
             var jsonMeals = JsonConvert.SerializeObject(meals);
             return jsonMeals != null

@@ -1,17 +1,13 @@
 ﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
-namespace AppNiZiAPI.Models
+namespace AppNiZiAPI.Models.Dietarymanagement
 {
     public class DietaryManagementModel
     {
         /// <summary>
         /// Diet Id
         /// </summary>
-        [Required]
         [JsonProperty("id")]
         public int Id { get; set; }
 

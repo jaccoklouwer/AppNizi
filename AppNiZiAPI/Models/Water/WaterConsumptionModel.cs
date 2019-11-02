@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace AppNiZiAPI.Models
@@ -15,5 +16,6 @@ namespace AppNiZiAPI.Models
     class WaterConsumptionViewModel : WaterConsumptionModel
     {
         public WeightUnitModel WeightUnit { get; set; }
+        public bool Error { get; set; }
     }
 }

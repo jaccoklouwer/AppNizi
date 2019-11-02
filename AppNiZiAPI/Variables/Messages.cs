@@ -16,6 +16,7 @@ namespace AppNiZiAPI.Variables
 
         public const string ErrorDelete = "Removing Data Failed";
         public const string ErrorPost = "Inserting Data Failed";
+        public const string ErrorPut = "Updating Data Failed";
 
         // Auth
         public const string AuthNoAcces = "Authorization Error: No acces";

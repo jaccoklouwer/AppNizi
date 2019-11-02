@@ -7,31 +7,59 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models.Repositories;
-using System.Net;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Infrastructure;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using Microsoft.OpenApi.Models;
+using AppNiZiAPI.Models;
+using AppNiZiAPI.Security;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
 {
     public static class DietaryManagement
     {
-        [OpenApiOperation("delete")]
-        [OpenApiParameter("dietId", In = ParameterLocation.Path, Required = false, Type = typeof(int))]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string))]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string))]
         [FunctionName(nameof(DeleteDietaryManagement))]
+
+        #region swagger
+        [OpenApiOperation(nameof(DeleteDietaryManagement), "DietaryManagement", Summary = "Delete a dietary managment", Description = "Delete a dietary managment of a patient", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKDelete)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
+        [OpenApiResponseBody(HttpStatusCode.UnprocessableEntity, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
+        [OpenApiParameter("dietId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiRequestBody("patientId", typeof(int), Description = "the id of a patient for authentication")] 
+        #endregion
         public static async Task<IActionResult> DeleteDietaryManagement(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId,
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
             log.LogInformation("C# HTTP trigger function processed a request.");
-            //if (!await Authorization.CheckAuthorization(req, patientId)) { return new UnauthorizedResult(); }
 
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            int patientId;
+            if (string.IsNullOrEmpty(requestBody))
+                return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues);
+            try
+            {
+                patientId = JsonConvert.DeserializeObject<int>(requestBody);
+            }
+            catch (Exception)
+            {
+                return new UnprocessableEntityObjectResult(Messages.ErrorIncorrectId);
+            }
 
-            IDietaryManagementRepository repository = new DietaryManagementRepository();
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult((int)authResult.StatusCode);
+            #endregion
+
+            IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
             bool success;
             try
             {

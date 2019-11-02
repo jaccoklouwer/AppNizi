@@ -8,20 +8,36 @@ using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
 using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.Repositories;
-using System.Collections.Generic;
 using System;
 using System.Globalization;
+using Microsoft.Extensions.DependencyInjection;
+using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Security;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using System.Net;
+using Microsoft.OpenApi.Models;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 
 namespace AppNiZiAPI
 {
     public static class GetConsumptionsForPatientBetweenDates
     {
         [FunctionName("GetConsumptionsForPatientBetweenDates")]
+        #region Swagger
+        [OpenApiOperation(nameof(GetConsumptionsForPatientBetweenDates), "Consumption", Summary = "Gets all consumptions for a patient between 2 dates", Description = "Gets all consumptions for a patientid between a startdate and enddate", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiParameter("patientId", Description = "the id of the patient which adds a consumption", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
+        [OpenApiParameter("startDate", Description = "the start date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiParameter("endDate", Description = "the end date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(PatientConsumptionsView))]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorIncorrectId)]
+        #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", Route = (Routes.APIVersion + Routes.Consumptions))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.Consumptions))] HttpRequest req,
             ILogger log)
         {
+            log.LogDebug($"Triggered '" + nameof(GetConsumptionsForPatientBetweenDates) + "'");
+
             DateTime startDate;
             DateTime endDate;
             string patientIdString;
@@ -42,10 +58,17 @@ namespace AppNiZiAPI
                 return new BadRequestObjectResult(Messages.ErrorMissingValues);
             }
         
-            if (!int.TryParse(patientIdString, out int patientId)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);      
-            List<Consumption> consumption = new ConsumptionRespository().GetConsumptionsForPatientBetweenDates(patientId, startDate, endDate);
+            if (!int.TryParse(patientIdString, out int patientId)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
 
-            var consumptionJson = JsonConvert.SerializeObject(consumption);
+            // Auth check
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            if (!authResult.Result)
+                return new StatusCodeResult((int)authResult.StatusCode);
+
+            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
+            PatientConsumptionsView consumptions = new PatientConsumptionsView(consumptionRepository.GetConsumptionsForPatientBetweenDates(patientId, startDate, endDate));
+
+            var consumptionJson = JsonConvert.SerializeObject(consumptions);
             return consumptionJson != null
                 ? (ActionResult)new OkObjectResult(consumptionJson)
                 : new BadRequestObjectResult(Messages.ErrorIncorrectId);
