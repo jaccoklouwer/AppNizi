@@ -28,8 +28,8 @@ namespace AppNiZiAPI.Functions.Food.DELETE
         [FunctionName("UnFavoriteFood")]
         [OpenApiOperation("Delete Favorite Food", "Food", Summary = "Unfavorites the fooditem", Description = "Deletes the connection between the patient and this fooditem in essence unfavoriting it", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorMissingValues)]
         [OpenApiParameter("patientId", Description = "the id of the patient thats unfavoriting the food", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
         [OpenApiParameter("foodId", Description = "the fooditem to be unfavorited", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(

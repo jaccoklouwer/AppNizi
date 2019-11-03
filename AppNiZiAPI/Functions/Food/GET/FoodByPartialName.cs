@@ -28,10 +28,9 @@ namespace AppNiZiAPI.Functions.Food
     {
         [FunctionName("FoodByPartialName")]
         [OpenApiOperation("SearchFood", "Food", Summary = "Searches the FoodDB", Description = "Allows you to search the food Database and gets items that start with the supplied letters", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
-        [OpenApiParameter("patientId", Description = "the id of the patient thats going to get the item", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Models.Food[]), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorMissingValues)]
         [OpenApiParameter("foodName", Description = "The letters to use in the search", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
         [OpenApiParameter("count", Description = "amount of items to retrieve", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(

@@ -27,9 +27,9 @@ namespace AppNiZiAPI.Functions.Meal.POST
     {
         [FunctionName("AddMeal")]
         [OpenApiOperation("AddMeal", "Meal", Summary = "Adds a meal", Description = "Adds a meal to the specified patient", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Models.Meal), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorMissingValues)]
         [OpenApiRequestBody("application/json", typeof(Models.Meal), Description = "The meal object to be added")]
         [OpenApiParameter("patientId", Description = "The patient who is adding the meal", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(

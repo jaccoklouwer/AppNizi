@@ -31,10 +31,10 @@ namespace AppNiZiAPI.Functions.Meal.DELETE
         [FunctionName("DeleteMeal")]
         [OpenApiOperation("DeleteMeal", "Meal", Summary = "Deletes a meal", Description = "Removes the meal of the specified user", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
-        [OpenApiParameter("patientId", Description = "the id of the patient thats going to delete his meal", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
-        [OpenApiParameter("mealId", Description = "The meal to delete", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorMissingValues)]
+        [OpenApiParameter("patientId", Description = "the id of the patient thats going to delete his meal", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
+        [OpenApiParameter("mealId", Description = "The meal to delete", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", "post", Route = ( Routes.APIVersion + Routes.DeleteMeal))] HttpRequest req,
             ILogger log)

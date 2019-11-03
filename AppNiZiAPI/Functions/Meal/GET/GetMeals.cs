@@ -28,9 +28,9 @@ namespace AppNiZiAPI.Functions.Meal.GET
     {
         [FunctionName("GetMeals")]
         [OpenApiOperation("GetMeals", "Meal", Summary = "Retrieves meals", Description = "retrieves the meals of the specified user", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Models.Meal[]), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorMissingValues)]
         [OpenApiParameter("patientId", Description = "The patient which meals will be retrieved", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         
         public static async Task<IActionResult> Run(
