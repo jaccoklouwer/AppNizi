@@ -3,23 +3,24 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Threading.Tasks;
 using AppNiZiAPI.Models.Dietarymanagement;
 
 namespace AppNiZiAPI.Models.Repositories
 {
     public interface IDietaryManagementRepository
     {
-        bool AddDietaryManagement(DietaryManagementModel dietary);
-        bool DeleteDietaryManagement(int id);
-        List<DietaryManagementModel> GetDietaryManagementByPatient(int patientId);
-        List<DietaryRestriction> GetDietaryRestrictions();
-        bool UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement);
+        Task<bool> AddDietaryManagement(DietaryManagementModel dietary);
+        Task<bool> DeleteDietaryManagement(int id);
+        Task<List<DietaryManagementModel>> GetDietaryManagementByPatientAsync(int patientId);
+        Task<List<DietaryRestriction>> GetDietaryRestrictions();
+        Task<bool> UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement);
     }
 
     public class DietaryManagementRepository : Repository, IDietaryManagementRepository
     {
 
-        public List<DietaryManagementModel> GetDietaryManagementByPatient(int patientId)
+        public async Task<List<DietaryManagementModel>> GetDietaryManagementByPatientAsync(int patientId)
         {
 
             List<DietaryManagementModel> dietaryManagementModels = new List<DietaryManagementModel>();
@@ -54,10 +55,10 @@ namespace AppNiZiAPI.Models.Repositories
                 }
             }
             conn.Close();
-            return dietaryManagementModels;
+            return await Task.FromResult(dietaryManagementModels);
         }
 
-        public List<DietaryRestriction> GetDietaryRestrictions()
+        public async Task<List<DietaryRestriction>> GetDietaryRestrictions()
         {
             List<DietaryRestriction> dietaryRestrictions = new List<DietaryRestriction>();
             conn.Open();
@@ -84,11 +85,11 @@ namespace AppNiZiAPI.Models.Repositories
             }
 
             conn.Close();
-            return dietaryRestrictions;
+            return await Task.FromResult(dietaryRestrictions);
         }
 
 
-        public bool UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement)
+        public async Task<bool> UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement)
         {
 
             conn.Open();
@@ -108,11 +109,11 @@ namespace AppNiZiAPI.Models.Repositories
             command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietaryManagement.IsActive;
             command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
 
-            return command.ExecuteNonQuery() > 0;
+            return await Task.FromResult(command.ExecuteNonQuery() > 0);
 
         }
 
-        public bool DeleteDietaryManagement(int id)
+        public async Task<bool> DeleteDietaryManagement(int id)
         {
 
             conn.Open();
@@ -123,7 +124,7 @@ namespace AppNiZiAPI.Models.Repositories
             {
                 SqlCommand command = new SqlCommand(query, conn);
                 command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
-                return command.ExecuteNonQuery() > 0;
+                return await Task.FromResult(command.ExecuteNonQuery() > 0);
             }
             catch (Exception)
             {
@@ -133,7 +134,7 @@ namespace AppNiZiAPI.Models.Repositories
 
         }
 
-        public bool AddDietaryManagement(DietaryManagementModel dietary)
+        public async Task<bool> AddDietaryManagement(DietaryManagementModel dietary)
         {
             conn.Open();
             var query = @"INSERT INTO DietaryManagement
@@ -160,7 +161,7 @@ namespace AppNiZiAPI.Models.Repositories
                 command.Parameters.Add("@AMOUNT", SqlDbType.Int).Value = dietary.Amount;
                 command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietary.PatientId;
                 command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietary.IsActive;
-                return command.ExecuteNonQuery() > 0;
+                return await Task.FromResult(command.ExecuteNonQuery() > 0);
             }
             catch (Exception e)
             {
