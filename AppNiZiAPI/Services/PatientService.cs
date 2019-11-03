@@ -4,8 +4,10 @@ using AppNiZiAPI.Models.AccountModels;
 using AppNiZiAPI.Models.Handler;
 using AppNiZiAPI.Models.Handlers;
 using AppNiZiAPI.Models.Repositories;
+using AppNiZiAPI.Security;
 using AppNiZiAPI.Services.Helpers;
 using AppNiZiAPI.Services.Serializer;
+using AppNiZiAPI.Variables;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -20,10 +22,10 @@ namespace AppNiZiAPI.Services
     {
         IMessageHandler FeedbackHandler { get; }
 
-        Task<Dictionary<ServiceDictionaryKey, object>> TryGetPatientById(string idText);
+        Task<Dictionary<ServiceDictionaryKey, object>> TryGetPatientById(HttpRequest request, string idText);
         Task<Dictionary<ServiceDictionaryKey, object>> TryListPatients(HttpRequest request);
-        Task<Dictionary<ServiceDictionaryKey, object>> TryRegisterPatient(HttpRequest request, AuthLogin authLogin);
-        Task<Dictionary<ServiceDictionaryKey, object>> TryDeletePatient(string idText);
+        Task<Dictionary<ServiceDictionaryKey, object>> TryRegisterPatient(HttpRequest request);
+        Task<Dictionary<ServiceDictionaryKey, object>> TryDeletePatient(HttpRequest request, string idText);
     }
 
     public class PatientService : IPatientService
@@ -31,20 +33,30 @@ namespace AppNiZiAPI.Services
         public IMessageHandler FeedbackHandler { get; }
 
         private readonly IPatientRepository _patientRepository;
+        private readonly IFoodRepository _foodRepository;
+        private readonly IAccountRepository _accountRepository;
+        private readonly IDietaryManagementRepository _dietaryManagementRepository;
+
         private readonly IMessageSerializer _messageSerializer;
         private readonly IQueryHelper _queryHelper;
+        private readonly IAuthorization _authorizationService;
 
-        public PatientService(IPatientRepository patientRepository,
+        public PatientService(IPatientRepository patientRepository, IFoodRepository foodRepository,
+            IAccountRepository accountRepository, IDietaryManagementRepository dietaryManagementRepository,
             IMessageHandler feedbackHandler, IMessageSerializer messageSerializer,
-            IQueryHelper queryHelper)
+            IQueryHelper queryHelper, IAuthorization authorizationService)
         {
             _patientRepository = patientRepository;
+            this._foodRepository = foodRepository;
+            this._accountRepository = accountRepository;
+            this._dietaryManagementRepository = dietaryManagementRepository;
             this.FeedbackHandler = feedbackHandler;
             _messageSerializer = messageSerializer;
             _queryHelper = queryHelper;
+            this._authorizationService = authorizationService;
         }
 
-        public async Task<Dictionary<ServiceDictionaryKey, object>> TryGetPatientById(string idText)
+        public async Task<Dictionary<ServiceDictionaryKey, object>> TryGetPatientById(HttpRequest req, string idText)
         {
             Dictionary<ServiceDictionaryKey, object> dictionary = new Dictionary<ServiceDictionaryKey, object>();
 
@@ -54,6 +66,11 @@ namespace AppNiZiAPI.Services
             try
             {
                 int id = Int32.Parse(idText);
+
+                // Auth
+                if (!await IsAuthorized(dictionary, req, id))
+                    return dictionary;
+
                 Patient patient = _patientRepository.Select(id);
 
                 if (patient.PatientId <= 0)
@@ -110,16 +127,27 @@ namespace AppNiZiAPI.Services
             return dictionary;
         }
 
-        public async Task<Dictionary<ServiceDictionaryKey, object>> TryRegisterPatient(HttpRequest request, AuthLogin authLogin)
+        public async Task<Dictionary<ServiceDictionaryKey, object>> TryRegisterPatient(HttpRequest request)
         {
             Dictionary<ServiceDictionaryKey, object> dictionary = new Dictionary<ServiceDictionaryKey, object>();
 
             try
             {
+                // Auth
+                AuthLogin authLogin = await _authorizationService.LoginAuthAsync(request);
+                if (authLogin == null)
+                {
+                    dictionary.Add(ServiceDictionaryKey.ERROR, Messages.AuthNoAcces);
+                    dictionary.Add(ServiceDictionaryKey.HTTPSTATUSCODE, HttpStatusCode.Unauthorized);
+                    return dictionary;
+                }
+
+                // Creation
                 PatientLogin newPatient = await _messageSerializer.Deserialize<PatientLogin>(request.Body);
                 newPatient = _patientRepository.RegisterPatient(newPatient);
                 newPatient.AuthLogin = authLogin;
 
+                // Serialization
                 dynamic data = _messageSerializer.Serialize(newPatient);
                 dictionary.Add(ServiceDictionaryKey.VALUE, data);
             }
@@ -131,7 +159,7 @@ namespace AppNiZiAPI.Services
             return dictionary;
         }
 
-        public async Task<Dictionary<ServiceDictionaryKey, object>> TryDeletePatient(string idText)
+        public async Task<Dictionary<ServiceDictionaryKey, object>> TryDeletePatient(HttpRequest req, string idText)
         {
             Dictionary<ServiceDictionaryKey, object> dictionary = new Dictionary<ServiceDictionaryKey, object>();
 
@@ -140,17 +168,22 @@ namespace AppNiZiAPI.Services
 
             try
             {
-                int id = Int32.Parse(idText);
-                bool success = _patientRepository.Delete(id);
+                int patientId = Int32.Parse(idText);
 
-                if (!success)
+                // Auth
+                if (!await IsAuthorized(dictionary, req, patientId))
+                    return dictionary;
+
+                // Deleting
+                int accountId = _patientRepository.Select(patientId).AccountId;
+                if (!await TryPerformDelete(patientId, accountId))
                 {
-                    dictionary.Add(ServiceDictionaryKey.ERROR, $"Deletion failed for given ID: {id}");
+                    dictionary.Add(ServiceDictionaryKey.ERROR, $"Deletion failed for given ID: {patientId}. Does patient exist?");
                     dictionary.Add(ServiceDictionaryKey.HTTPSTATUSCODE, HttpStatusCode.NotFound);
                     return dictionary;
                 }
 
-                dictionary.Add(ServiceDictionaryKey.VALUE, $"Deleted patient with ID: {id}");
+                dictionary.Add(ServiceDictionaryKey.VALUE, $"Deleted patient with ID: {patientId}");
             }
             catch (Exception ex)
             {
@@ -159,6 +192,20 @@ namespace AppNiZiAPI.Services
 
             return dictionary;
         }
+
+        private async Task<bool> TryPerformDelete(int patientId, int accountId)
+        {
+            await _dietaryManagementRepository.DeleteByPatientId(patientId);
+            _foodRepository.Delete(patientId);
+            bool success = _patientRepository.Delete(patientId);
+
+            if (accountId > 0)
+                _accountRepository.Delete(accountId);
+
+            return success;
+        }
+
+
 
         //private void ReadBody(Stream stream)
         //{
@@ -183,6 +230,20 @@ namespace AppNiZiAPI.Services
         //        }
         //    };
         //}
+
+        private async Task<bool> IsAuthorized(Dictionary<ServiceDictionaryKey, object> dict, HttpRequest req, int id)
+        {
+            AuthResultModel authResult = await _authorizationService.AuthForDoctorOrPatient(req, id);
+
+            if (!authResult.Result)
+            {
+                dict.Add(ServiceDictionaryKey.ERROR, $"Authorization check wasn't passed.");
+                HttpStatusCode httpStatusCode = (HttpStatusCode)(int)authResult.StatusCode;
+                dict.Add(ServiceDictionaryKey.HTTPSTATUSCODE, httpStatusCode);
+            }
+
+            return authResult.Result;
+        }
 
         private void AddErrorMessage(Dictionary<ServiceDictionaryKey, object> dict, Exception ex)
         {

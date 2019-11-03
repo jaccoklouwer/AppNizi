@@ -45,12 +45,33 @@ namespace AppNiZiAPI.Models.Repositories
                 return (int)sqlCmd.ExecuteScalar();
             }
         }
+
+        public bool Delete(int accountId)
+        {
+            bool success = false;
+
+            string sqlQuery = "DELETE FROM account WHERE id=@ID";
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                sqlConn.Open();
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.Add("@ID", SqlDbType.Int).Value = accountId;
+
+                int rows = sqlCmd.ExecuteNonQuery();
+                if (rows > 0)
+                    success = true;
+            }
+
+            return success;
+        }
     }
 
     public interface IAccountRepository
     {
         bool CheckIfExists(string guid);
         int RegisterAccount(string firstName, string lastName, int role);
-
+        bool Delete(int accountId);
     }
 }

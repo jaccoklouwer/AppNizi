@@ -47,6 +47,8 @@ namespace AppNiZiAPI.Models.Repositories
                 while (reader.Read())
                 {
                     patient.PatientId = (int)reader["id"];
+                    patient.DoctorId = (int)reader["doctor_id"];
+                    patient.AccountId = (int)reader["account_id"];
                     patient.Guid = reader["guid"].ToString();
                     patient.DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]);
                     patient.WeightInKilograms = Convert.ToInt32(reader["weight"]);
@@ -206,32 +208,9 @@ namespace AppNiZiAPI.Models.Repositories
         public bool Delete(int patientId)
         {
             bool success = false;
-            int accountId = 0;
 
-            string sqlQuery = "SELECT account_id FROM Patient WHERE id=@PATIENTID";
-            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
-            {
-                sqlConn.Open();
 
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
-                sqlCmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
-
-                try
-                {
-                    accountId = (int)sqlCmd.ExecuteScalar();
-                    sqlConn.Close();
-                }
-                catch
-                {
-                    return false;
-                }
-                if (accountId == 0)
-                    return false;
-            }
-
-            sqlQuery =
-                "DELETE FROM patient WHERE id=@PATIENTID;" +
-                "DELETE FROM Account WHERE id=@ACCOUNTID";
+            string sqlQuery = "DELETE FROM patient WHERE id=@PATIENTID";
 
             using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -239,12 +218,12 @@ namespace AppNiZiAPI.Models.Repositories
 
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
-                sqlCmd.Parameters.Add("@ACCOUNTID", SqlDbType.Int).Value = accountId;
 
                 int rows = sqlCmd.ExecuteNonQuery();
                 if (rows > 0)
                     success = true;
             }
+
             return success;
         }
 

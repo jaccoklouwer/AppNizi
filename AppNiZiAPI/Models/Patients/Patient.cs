@@ -6,7 +6,8 @@ namespace AppNiZiAPI.Models
 {
     public struct Patient
     {
-        public Patient(int patientId, string firstName, string lastName, DateTime dateOfBirth, float weightInKilograms, string guid)
+        public Patient(int patientId, string firstName, string lastName, DateTime dateOfBirth, float weightInKilograms, string guid,
+            int accountId, int doctorId)
         {
             PatientId = patientId;
             FirstName = firstName;
@@ -14,9 +15,13 @@ namespace AppNiZiAPI.Models
             DateOfBirth = dateOfBirth;
             WeightInKilograms = weightInKilograms;
             Guid = guid;
+            AccountId = accountId;
+            DoctorId = doctorId;
         }
 
         public int PatientId { get; set; }
+        public int AccountId { get; set; }
+        public int DoctorId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
@@ -26,13 +31,14 @@ namespace AppNiZiAPI.Models
 
     public struct PatientReturnModel
     {
-        public PatientReturnModel(int id, string firstName, string lastName, DateTime dateOfBirth, float weightInKilograms)
+        public PatientReturnModel(int id, string firstName, string lastName, DateTime dateOfBirth, float weightInKilograms, int doctorId)
         {
             Id = id;
             FirstName = firstName;
             LastName = lastName;
             DateOfBirth = dateOfBirth;
             WeightInKilograms = weightInKilograms;
+            HandlingDoctorId = doctorId;
         }
 
         public PatientReturnModel(Patient patient)
@@ -42,9 +48,11 @@ namespace AppNiZiAPI.Models
             LastName = patient.LastName;
             DateOfBirth = patient.DateOfBirth;
             WeightInKilograms = patient.WeightInKilograms;
+            HandlingDoctorId = patient.DoctorId;
         }
 
         public int Id { get; set; }
+        public int HandlingDoctorId { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public DateTime DateOfBirth { get; set; }
