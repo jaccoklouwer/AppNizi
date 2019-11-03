@@ -1,6 +1,7 @@
 ﻿using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Models;
 using AppNiZiAPI.Models.AccountModels;
+using AppNiZiAPI.Models.Enum;
 using AppNiZiAPI.Models.Handler;
 using AppNiZiAPI.Models.Handlers;
 using AppNiZiAPI.Models.Repositories;
@@ -144,8 +145,28 @@ namespace AppNiZiAPI.Services
 
                 // Creation
                 PatientLogin newPatient = await _messageSerializer.Deserialize<PatientLogin>(request.Body);
+                newPatient.Account = _accountRepository.RegisterAccount(newPatient.Patient, Role.Patient);
+
                 newPatient = _patientRepository.RegisterPatient(newPatient);
+                newPatient.Patient = _patientRepository.Select(newPatient.Patient.PatientId);
+
                 newPatient.AuthLogin = authLogin;
+
+                //PatientLogin newPatient = new PatientLogin
+                //{
+                //    Patient = new Patient
+                //    {
+                //        FirstName = "Jim",
+                //        LastName = "Pickem",
+                //        DateOfBirth = DateTime.Now,
+                //        WeightInKilograms = (float)88.3,
+                //        Guid = authLogin.Guid
+                //    },
+                //    Doctor = new DoctorModel
+                //    {
+                //        DoctorId = 2
+                //    }
+                //};
 
                 // Serialization
                 dynamic data = _messageSerializer.Serialize(newPatient);
@@ -205,32 +226,6 @@ namespace AppNiZiAPI.Services
             return success;
         }
 
-
-
-        //private void ReadBody(Stream stream)
-        //{
-
-
-        //    // Parse Patient Info
-        //    JObject jsonParsed = JObject.Parse(content);
-
-        //    newPatient = new PatientLogin
-        //    {
-        //        Patient = new Patient
-        //        {
-        //            FirstName = jsonParsed["firstName"].ToString(),
-        //            LastName = jsonParsed["lastName"].ToString(),
-        //            DateOfBirth = (DateTime)jsonParsed["dateOfBirth"],
-        //            WeightInKilograms = (float)jsonParsed["weight"],
-        //            Guid = authLogin.Guid
-        //        },
-        //        Doctor = new DoctorModel
-        //        {
-        //            DoctorId = (int)jsonParsed["doctorId"]
-        //        }
-        //    };
-        //}
-
         private async Task<bool> IsAuthorized(Dictionary<ServiceDictionaryKey, object> dict, HttpRequest req, int id)
         {
             AuthResultModel authResult = await _authorizationService.AuthForDoctorOrPatient(req, id);
@@ -259,3 +254,53 @@ namespace AppNiZiAPI.Services
         HTTPSTATUSCODE
     }
 }
+
+/*/
+ {
+    "Account": null,
+    "Patient": {
+        "PatientId": 0,
+        "AccountId": 0,
+        "DoctorId": 0,
+        "FirstName": "Jim",
+        "LastName": "Pickem",
+        "DateOfBirth": "2019-11-03T19:28:10.5222753+01:00",
+        "WeightInKilograms": 88.3,
+        "Guid": "dVYtmSw5m819mX2nS2raMZwo5lXcwDg6"
+    },
+    "Doctor": {
+        "DoctorId": 2,
+        "FirstName": null,
+        "LastName": null,
+        "Location": null
+    },
+    "AuthLogin": null
+}
+ * 
+ * 
+ */
+
+
+//private void ReadBody(Stream stream)
+//{
+
+
+//    // Parse Patient Info
+//    JObject jsonParsed = JObject.Parse(content);
+
+//    newPatient = new PatientLogin
+//    {
+//        Patient = new Patient
+//        {
+//            FirstName = jsonParsed["firstName"].ToString(),
+//            LastName = jsonParsed["lastName"].ToString(),
+//            DateOfBirth = (DateTime)jsonParsed["dateOfBirth"],
+//            WeightInKilograms = (float)jsonParsed["weight"],
+//            Guid = authLogin.Guid
+//        },
+//        Doctor = new DoctorModel
+//        {
+//            DoctorId = (int)jsonParsed["doctorId"]
+//        }
+//    };
+//}

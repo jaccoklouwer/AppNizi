@@ -4,8 +4,10 @@ using System.Text;
 
 namespace AppNiZiAPI.Models
 {
-    public struct Patient
+    public class Patient
     {
+        public Patient() { }
+
         public Patient(int patientId, string firstName, string lastName, DateTime dateOfBirth, float weightInKilograms, string guid,
             int accountId, int doctorId)
         {

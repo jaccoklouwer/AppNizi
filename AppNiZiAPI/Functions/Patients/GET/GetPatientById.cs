@@ -42,9 +42,11 @@ namespace AppNiZiAPI.Functions.Patients.GET
             string patientId,
             ILogger log)
         {
+            log.LogInformation("C# HTTP trigger function processed a request.");
+
             // Logic
             Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IPatientService>()
-                .TryGetPatientById(patientId);
+                .TryGetPatientById(req, patientId);
 
             // Response
             return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
