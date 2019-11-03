@@ -17,6 +17,9 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using System.Collections.Generic;
+using AppNiZiAPI.Services;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Meal.POST
 {
@@ -40,17 +43,10 @@ namespace AppNiZiAPI.Functions.Meal.POST
             #endregion
 
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IMealService>().TryAddMeal(patientId, req);
 
-            Models.Meal meal = new Models.Meal();
-            JsonConvert.PopulateObject(requestBody, meal);
-            meal.PatientId = patientId;
-            IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
-            bool succes = mealRepository.AddMeal(meal);
 
-            return succes != false
-                ? (ActionResult)new OkObjectResult(succes)
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

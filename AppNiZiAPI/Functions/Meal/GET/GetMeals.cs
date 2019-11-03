@@ -19,6 +19,8 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Services;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Meal.GET
 {
@@ -40,13 +42,10 @@ namespace AppNiZiAPI.Functions.Meal.GET
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
 
-            IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
-            List<Models.Meal> meals = mealRepository.GetMyMeals(patientId);
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IMealService>().TryGetMeals(patientId);
 
-            var jsonMeals = JsonConvert.SerializeObject(meals);
-            return jsonMeals != null
-                ? (ActionResult)new OkObjectResult(jsonMeals)
-                : new BadRequestObjectResult(Messages.ErrorMissingValues);
+
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

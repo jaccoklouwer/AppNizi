@@ -19,6 +19,8 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Services;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Food
 {
@@ -34,20 +36,14 @@ namespace AppNiZiAPI.Functions.Food
             [HttpTrigger(AuthorizationLevel.Anonymous,  "get", Route = (Routes.APIVersion + Routes.GetFavoriteFood))] HttpRequest req,
             ILogger log, int patientId)
         {
-
             // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
 
-            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
-            List<Models.Food> food = foodRepository.Favorites(patientId);
-            //TODO convert to JSON
-            var jsonFood = JsonConvert.SerializeObject(food);
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IFoodService>().TryGetFavoriteFood(patientId);
 
-            return food != null
-                ? (ActionResult)new OkObjectResult(food)
-                : new BadRequestObjectResult(Messages.ErrorMissingValues);
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

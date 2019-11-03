@@ -43,6 +43,8 @@ namespace AppNiZiAPI.Infrastructure
         public static IServiceCollection AddAPIServices(this IServiceCollection services)
         {
             services.AddSingleton<IPatientService, PatientService>();
+            services.AddSingleton<IFoodService, FoodService>();
+            services.AddSingleton<IMealService, MealService>();
 
             return services;
         }

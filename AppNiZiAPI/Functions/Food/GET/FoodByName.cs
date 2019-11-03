@@ -22,6 +22,9 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Services;
+using System.Collections.Generic;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI
 {
@@ -36,23 +39,19 @@ namespace AppNiZiAPI
         [OpenApiParameter("foodId", Description = "the id of food item to be retrieved", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.FoodById))] HttpRequest req,
-            ILogger log,int patientId, int foodId)
+            ILogger log, int foodId)
         {
-
+            int patientId = await DIContainer.Instance.GetService<IAuthorization>().GetUserId(req);
             #region AuthCheck
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
 
-            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
-            //FoodRepository foodRepository = new FoodRepository();
-            Food food = foodRepository.Select(foodId);
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IFoodService>().TryGetFoodById(foodId);
 
-            var jsonFood = JsonConvert.SerializeObject(food);
-            return jsonFood != null
-                ? (ActionResult)new OkObjectResult(jsonFood)
-                : new BadRequestObjectResult(Messages.ErrorMissingValues);
+
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

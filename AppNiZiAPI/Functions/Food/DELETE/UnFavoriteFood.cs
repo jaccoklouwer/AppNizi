@@ -17,6 +17,9 @@ using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Security;
 using Microsoft.Extensions.DependencyInjection;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Services;
+using System.Collections.Generic;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Food.DELETE
 {
@@ -33,32 +36,16 @@ namespace AppNiZiAPI.Functions.Food.DELETE
             [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.UnFavoriteFood))] HttpRequest req,
             ILogger log)
         {
-            int foodId;
-            int patientId;
-
-            try
-            {
-                //TODO haal patient id op een coole manier op
-                foodId = Convert.ToInt32(req.Query["foodId"].ToString());
-                patientId = Convert.ToInt32(req.Query["patientId"].ToString());
-            }
-            catch (Exception)
-            {
-                return new BadRequestObjectResult(Messages.ErrorMissingValues);
-            }
-
+            int patientId = await DIContainer.Instance.GetService<IAuthorization>().GetUserId(req);
             // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
 
-            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IFoodService>().TryDeleteFavoriteFood(req);
 
-            bool succes = foodRepository.UnFavorite(patientId, foodId);
 
-            return succes != false
-                ? (ActionResult)new OkObjectResult($"favorite deleted")
-                : new BadRequestObjectResult("oopsiewoopsie er is een fout begaan banaan");
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

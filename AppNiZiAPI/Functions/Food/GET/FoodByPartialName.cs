@@ -19,6 +19,8 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Services.Handlers;
+using AppNiZiAPI.Services;
 
 namespace AppNiZiAPI.Functions.Food
 {
@@ -34,24 +36,18 @@ namespace AppNiZiAPI.Functions.Food
         [OpenApiParameter("count", Description = "amount of items to retrieve", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.FoodByPartialname))] HttpRequest req,
-            ILogger log,int patientId, string foodName, int count)
+            ILogger log,string foodName, int count)
         {
-
+            int patientId = await DIContainer.Instance.GetService<IAuthorization>().GetUserId(req);
             // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
 
-            //TODO maak dit minder lelijk
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IFoodService>().TryGetFoodBySearch(foodName,count);
 
-            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
-            List<Models.Food> food = foodRepository.Search(foodName,count);
 
-            //TODO convert to JSON
-            var jsonFood = JsonConvert.SerializeObject(food);
-            return food != null
-                ? (ActionResult)new OkObjectResult(food)
-                : new BadRequestObjectResult(Messages.ErrorMissingValues);
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

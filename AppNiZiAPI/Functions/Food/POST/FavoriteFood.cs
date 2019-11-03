@@ -18,6 +18,9 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using System.Collections.Generic;
+using AppNiZiAPI.Services;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Food
 {
@@ -34,32 +37,17 @@ namespace AppNiZiAPI.Functions.Food
             [HttpTrigger(AuthorizationLevel.Anonymous,  "post", Route = (Routes.APIVersion + Routes.PostFavoriteFood))] HttpRequest req,
             ILogger log)
         {
-            int foodId;
-            int patientId;
-          
-            try
-            {
-                //TODO haal patient id op een coole manier op
-                foodId = Convert.ToInt32(req.Query["foodId"].ToString());
-                patientId = Convert.ToInt32(req.Query["patientId"].ToString());
-            }
-            catch (Exception)
-            {
-                return new BadRequestObjectResult(Messages.ErrorMissingValues);
-            }
+            int patientId = await DIContainer.Instance.GetService<IAuthorization>().GetUserId(req);
 
             // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
 
-            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IFoodService>().TryPostFavoriteFood(req);
 
-            bool succes = foodRepository.Favorite(patientId,foodId);
 
-            return succes != false
-                ? (ActionResult)new OkObjectResult($"alles is super sexy en je hebt een fav gedaan")
-                : new BadRequestObjectResult("oopsiewoopsie er is een fout begaan banaan");
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }
