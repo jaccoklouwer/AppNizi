@@ -10,6 +10,6 @@ namespace AppNiZiAPI.Models.Repositories
         bool DeleteMeal(int patient_id, int meal_id);
         List<Meal> GetMyMeals(int patient_id);
 
-        Meal GetMealbyId(int id);
+        Meal GetMealbyName(string name);
     }
 }
