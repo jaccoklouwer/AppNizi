@@ -9,7 +9,7 @@ namespace AppNiZiAPI.Models.Repositories
     class MealRepository :IMealRepository
     {
         //TODO laat add en delete iets teruggeven
-        public bool AddMeal(Meal meal)
+        public Meal AddMeal(Meal meal)
         {
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
 
@@ -47,7 +47,7 @@ namespace AppNiZiAPI.Models.Repositories
                 int rows = sqlCmd.ExecuteNonQuery();
             }
             conn.Close();
-            return true;
+            return GetMealbyId(meal.MealId);
         }
 
         public bool DeleteMeal(int patient_id, int meal_id)
@@ -70,6 +70,40 @@ namespace AppNiZiAPI.Models.Repositories
                     success = true;
             }
             return success;
+        }
+
+        public Meal GetMealbyId(int id)
+        {
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
+            Meal meal = new Meal();
+            using (conn)
+            {
+
+                conn.Open();
+                var text = $"SELECT * FROM Meal where id = {id}";
+
+                using (SqlCommand cmd = new SqlCommand(text, conn))
+                {
+                    SqlDataReader reader = cmd.ExecuteReader();
+                    while (reader.Read())
+                    {
+                        // Uit lezen bijv
+                        meal.MealId = (int)reader["id"];
+                        meal.PatientId = (int)reader["patient_id"];
+                        meal.Name = (string)reader["name"];
+                        meal.KCal = (double)reader["kcal"];
+                        meal.Protein = (double)reader["protein"];
+                        meal.Fiber = (double)reader["fiber"];
+                        meal.Calcium = (double)reader["calcium"];
+                        meal.Sodium = (double)reader["sodium"];
+                        meal.PortionSize = (double)reader["portion_size"];
+                        meal.Picture = (string)reader["picture"];
+                        meal.WeightUnit = (string)reader["unit"];
+                    }
+                }
+                conn.Close();
+            }
+            return meal;
         }
 
         public List<Meal> GetMyMeals(int patient_id)

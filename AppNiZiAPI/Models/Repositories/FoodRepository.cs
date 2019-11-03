@@ -93,7 +93,7 @@ namespace AppNiZiAPI.Models.Repositories
             {
 
                 conn.Open();
-                var text = $"Select* from Food Inner Join MyFood On Food.id = MyFood.food_id where patient_id ="+ patientId;
+                var text = $"Select* from Food Inner Join MyFood On Food.id = MyFood.food_id Inner Join Weightunit on Food.weight_unit_id = Weightunit.id where patient_id ="+ patientId;
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {
@@ -125,13 +125,11 @@ namespace AppNiZiAPI.Models.Repositories
         {
             bool succes = true;
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
-            //TODO patient_id kan uit ingelogde user komen
+            
             StringBuilder sqlQuery = new StringBuilder();
             sqlQuery.Append("INSERT INTO MyFood (food_id, patient_id) ");
             sqlQuery.Append("VALUES (@FOODID, @PATIENTID) ");
-            // ff als een loser doen
-            // als een loser werkt het wel :)
-            // TODO doe dit als een winner
+            
             SqlParameter param1 = new SqlParameter();
             param1.ParameterName = "@FOODID";
             param1.Value = food_id;
@@ -139,6 +137,8 @@ namespace AppNiZiAPI.Models.Repositories
             SqlParameter param2 = new SqlParameter();
             param2.ParameterName = "@PATIENTID";
             param2.Value = patient_id;
+
+            int rows=0;
             try
             {
                 using (conn)
@@ -149,7 +149,7 @@ namespace AppNiZiAPI.Models.Repositories
                     sqlCmd.Parameters.Add(param1);
                     sqlCmd.Parameters.Add(param2);
                     //TODO TEST DIT
-                    sqlCmd.ExecuteNonQuery();
+                    rows = sqlCmd.ExecuteNonQuery();
                 }
                 conn.Close();
             }
@@ -157,7 +157,10 @@ namespace AppNiZiAPI.Models.Repositories
             {
                 succes = false;
             }
-
+            if (rows<=0)
+            {
+                succes = false;
+            }
             return succes;
         }
 

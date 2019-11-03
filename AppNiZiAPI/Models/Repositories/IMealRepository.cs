@@ -6,9 +6,10 @@ namespace AppNiZiAPI.Models.Repositories
 {
     interface IMealRepository
     {
-        bool AddMeal(Meal meal);
+        Meal AddMeal(Meal meal);
         bool DeleteMeal(int patient_id, int meal_id);
         List<Meal> GetMyMeals(int patient_id);
 
+        Meal GetMealbyId(int id);
     }
 }

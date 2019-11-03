@@ -55,7 +55,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.POST
                     return new StatusCodeResult((int)authResult.StatusCode);
                 #endregion
                 
-                bool success = repository.AddDietaryManagement(dietary);
+                bool success = await repository.AddDietaryManagement(dietary);
                 if (success)
                 {
                     return new OkObjectResult(Messages.OKPost);

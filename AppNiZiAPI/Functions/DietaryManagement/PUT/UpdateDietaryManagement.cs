@@ -59,7 +59,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.PUT
                     return new StatusCodeResult((int)authResult.StatusCode);
                 #endregion
 
-                bool success = repository.UpdateDietaryManagement(dietId, dietary);
+                bool success = await repository.UpdateDietaryManagement(dietId, dietary);
 
                 if (success)
                 {
