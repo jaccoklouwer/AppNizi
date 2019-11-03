@@ -54,7 +54,7 @@ namespace AppNiZiAPI.Functions.Meal.DELETE
             catch (Exception ex)
             {
                 // Build error message and return it.
-                string callbackMessage = new FeedbackHandler().BuildErrorMessage(ex);
+                string callbackMessage = new MessageHandler().BuildErrorMessage(ex);
                 return new BadRequestObjectResult(callbackMessage);
             }
         }

@@ -14,7 +14,8 @@ namespace AppNiZiAPI.Variables
         public const string SwaggerJson = "swagger/json";
 
         // Patients
-        public const string Patients = "/patient";
+        public const string Patient = "/patient";
+        public const string Patients = "/patients";
         public const string Me = "/me";
         public const string SpecificPatient = "/patient/{patientId}";
 

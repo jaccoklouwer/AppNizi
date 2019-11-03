@@ -17,7 +17,7 @@ namespace AppNiZiAPI.Services.Helpers
         public static void AddErrorMessage<ServiceDictionaryKey>(this Dictionary<ServiceDictionaryKey, object> dictionary,
                 ServiceDictionaryKey key,
                 Exception ex,
-                IFeedbackHandler feedbackHandler)
+                IMessageHandler feedbackHandler)
         {
             string callbackMessage = feedbackHandler.BuildErrorMessage(ex);
             dictionary.Add(key, callbackMessage);

@@ -22,6 +22,7 @@ using Microsoft.OpenApi.Models;
 using AppNiZiAPI.Services;
 using System.Collections.Generic;
 using static AppNiZiAPI.Services.PatientService;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Patients.GET
 {
@@ -37,26 +38,22 @@ namespace AppNiZiAPI.Functions.Patients.GET
         [OpenApiParameter("patientId", Description = "Inserting the patient id", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.SpecificPatient))] HttpRequest req, int patientId,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.SpecificPatient))] HttpRequest req, 
+            string patientId,
             ILogger log)
         {
             #region AuthCheck
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
-            if (!authResult.Result)
-                return new StatusCodeResult((int)authResult.StatusCode);
+            //AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
+            //if (!authResult.Result)
+            //    return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
 
-            IPatientService patientService = DIContainer.Instance.GetService<IPatientService>();
-            Dictionary<ServiceDictionaryKey, object> dictionary = await patientService.TryGetPatientById(patientId);
+            // Logic
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IPatientService>()
+                .TryGetPatientById(patientId);
 
-            // Returns a build error message
-            if (dictionary.ContainsKey(ServiceDictionaryKey.ERROR))
-                return new BadRequestObjectResult(dictionary[ServiceDictionaryKey.ERROR]);
-
-            // Return object if possible
-            return dictionary.ContainsKey(ServiceDictionaryKey.VALUE)
-            ? (ActionResult)new OkObjectResult(dictionary[ServiceDictionaryKey.VALUE])
-            : new BadRequestResult();
+            // Response
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

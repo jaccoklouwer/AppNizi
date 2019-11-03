@@ -55,7 +55,7 @@ namespace AppNiZiAPI.Functions.Doctor.DELETE
             }
             catch (Exception e)
             {
-                return new BadRequestObjectResult(new FeedbackHandler().BuildErrorMessage(e));
+                return new BadRequestObjectResult(new MessageHandler().BuildErrorMessage(e));
             }
         }
     }

@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -17,43 +18,50 @@ namespace AppNiZiAPI.Services
 {
     public interface IPatientService
     {
-        Task<Dictionary<ServiceDictionaryKey, object>> TryGetPatientById(int id);
-        Task<Dictionary<ServiceDictionaryKey, object>> TryListPatients(HttpRequest request);
+        IMessageHandler FeedbackHandler { get; }
 
+        Task<Dictionary<ServiceDictionaryKey, object>> TryGetPatientById(string idText);
+        Task<Dictionary<ServiceDictionaryKey, object>> TryListPatients(HttpRequest request);
         Task<Dictionary<ServiceDictionaryKey, object>> TryRegisterPatient(HttpRequest request, AuthLogin authLogin);
-        Task<Dictionary<ServiceDictionaryKey, object>> TryDeletePatient(int id);
+        Task<Dictionary<ServiceDictionaryKey, object>> TryDeletePatient(string idText);
     }
 
     public class PatientService : IPatientService
     {
+        public IMessageHandler FeedbackHandler { get; }
+
         private readonly IPatientRepository _patientRepository;
-        private readonly IFeedbackHandler _feedbackHandler;
         private readonly IMessageSerializer _messageSerializer;
         private readonly IQueryHelper _queryHelper;
 
         public PatientService(IPatientRepository patientRepository,
-            IFeedbackHandler feedbackHandler, IMessageSerializer messageSerializer,
+            IMessageHandler feedbackHandler, IMessageSerializer messageSerializer,
             IQueryHelper queryHelper)
         {
             _patientRepository = patientRepository;
-            _feedbackHandler = feedbackHandler;
+            this.FeedbackHandler = feedbackHandler;
             _messageSerializer = messageSerializer;
             _queryHelper = queryHelper;
         }
 
-        public async Task<Dictionary<ServiceDictionaryKey, object>> TryGetPatientById(int id)
+        public async Task<Dictionary<ServiceDictionaryKey, object>> TryGetPatientById(string idText)
         {
             Dictionary<ServiceDictionaryKey, object> dictionary = new Dictionary<ServiceDictionaryKey, object>();
 
-            if (id <= 0)
-            {
-                dictionary.Add(ServiceDictionaryKey.ERROR, "No ID passed.");
+            if (!_queryHelper.IsValidId(dictionary, idText))
                 return dictionary;
-            }
 
             try
             {
+                int id = Int32.Parse(idText);
                 Patient patient = _patientRepository.Select(id);
+
+                if (patient.PatientId <= 0)
+                {
+                    dictionary.Add(ServiceDictionaryKey.ERROR, $"No patient found for given ID: {id}.");
+                    dictionary.Add(ServiceDictionaryKey.HTTPSTATUSCODE, HttpStatusCode.NotFound);
+                    return dictionary;
+                }
 
                 PatientReturnModel returnModel = new PatientReturnModel()
                 {
@@ -69,7 +77,7 @@ namespace AppNiZiAPI.Services
             }
             catch (Exception ex)
             {
-                dictionary.AddErrorMessage(ServiceDictionaryKey.ERROR, ex, _feedbackHandler);
+                dictionary.AddErrorMessage(ServiceDictionaryKey.ERROR, ex, FeedbackHandler);
             }
 
             return dictionary;
@@ -96,7 +104,7 @@ namespace AppNiZiAPI.Services
             }
             catch (Exception ex)
             {
-                dictionary.AddErrorMessage(ServiceDictionaryKey.ERROR, ex, _feedbackHandler);
+                dictionary.AddErrorMessage(ServiceDictionaryKey.ERROR, ex, FeedbackHandler);
             }
 
             return dictionary;
@@ -117,30 +125,36 @@ namespace AppNiZiAPI.Services
             }
             catch (Exception ex)
             {
-                dictionary.AddErrorMessage(ServiceDictionaryKey.ERROR, ex, _feedbackHandler);
+                dictionary.AddErrorMessage(ServiceDictionaryKey.ERROR, ex, FeedbackHandler);
             }
 
             return dictionary;
         }
 
-        public async Task<Dictionary<ServiceDictionaryKey, object>> TryDeletePatient(int id)
+        public async Task<Dictionary<ServiceDictionaryKey, object>> TryDeletePatient(string idText)
         {
             Dictionary<ServiceDictionaryKey, object> dictionary = new Dictionary<ServiceDictionaryKey, object>();
 
-            if(id <= 0)
-            {
-                dictionary.Add(ServiceDictionaryKey.ERROR, "No ID passed.");
+            if (!_queryHelper.IsValidId(dictionary, idText))
                 return dictionary;
-            }
 
             try
             {
+                int id = Int32.Parse(idText);
                 bool success = _patientRepository.Delete(id);
-                dictionary.Add(ServiceDictionaryKey.VALUE, success);
+
+                if (!success)
+                {
+                    dictionary.Add(ServiceDictionaryKey.ERROR, $"Deletion failed for given ID: {id}");
+                    dictionary.Add(ServiceDictionaryKey.HTTPSTATUSCODE, HttpStatusCode.NotFound);
+                    return dictionary;
+                }
+
+                dictionary.Add(ServiceDictionaryKey.VALUE, $"Deleted patient with ID: {id}");
             }
             catch (Exception ex)
             {
-                dictionary.AddErrorMessage(ServiceDictionaryKey.ERROR, ex, _feedbackHandler);
+                dictionary.AddErrorMessage(ServiceDictionaryKey.ERROR, ex, FeedbackHandler);
             }
 
             return dictionary;
@@ -172,7 +186,7 @@ namespace AppNiZiAPI.Services
 
         private void AddErrorMessage(Dictionary<ServiceDictionaryKey, object> dict, Exception ex)
         {
-            string callbackMessage = _feedbackHandler.BuildErrorMessage(ex);
+            string callbackMessage = FeedbackHandler.BuildErrorMessage(ex);
             dict.Add(ServiceDictionaryKey.ERROR, callbackMessage);
         }
     }
@@ -180,6 +194,7 @@ namespace AppNiZiAPI.Services
     public enum ServiceDictionaryKey
     {
         VALUE,
-        ERROR
+        ERROR,
+        HTTPSTATUSCODE
     }
 }

@@ -3,6 +3,7 @@ using AppNiZiAPI.Models.Handlers;
 using AppNiZiAPI.Models.Repositories;
 using AppNiZiAPI.Security;
 using AppNiZiAPI.Services;
+using AppNiZiAPI.Services.Handlers;
 using AppNiZiAPI.Services.Serializer;
 using Microsoft.Extensions.DependencyInjection;
 using RestSharp.Serializers;
@@ -33,7 +34,8 @@ namespace AppNiZiAPI.Infrastructure
         {
             services.AddSingleton<IMessageSerializer, JsonMessageSerializer>();
             services.AddSingleton<IQueryHelper, QueryHelper>();
-            services.AddSingleton<IFeedbackHandler, FeedbackHandler>();
+            services.AddSingleton<IMessageHandler, MessageHandler>();
+            services.AddSingleton<IResponseHandler, ResponseHandler>();
 
             return services;
         }
