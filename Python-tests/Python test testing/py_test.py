@@ -117,11 +117,10 @@ def test_getfoodbyid():
     j = getfoodbysearch()
     assert v.validate(j[0]) == True
     assert j[0]['foodId'] == 1
-#deze function is inderdaad niet werkend goed werk python
-#def test_getfoodfavorites():
-#    v = Validator(foodschema)
-#    j = getfoodfavorites()
-#    assert v.validate(j[0]) == True
+def test_getfoodfavorites():
+    v = Validator(foodschema)
+    j = getfoodfavorites()
+    assert v.validate(j[0]) == True
 def test_postfoodfavorite():
     r = postfoodfavorite()
     assert r == 200

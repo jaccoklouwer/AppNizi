@@ -19,6 +19,8 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Services.Handlers;
+using AppNiZiAPI.Services;
 
 namespace AppNiZiAPI.Functions.Food
 {
@@ -26,32 +28,25 @@ namespace AppNiZiAPI.Functions.Food
     {
         [FunctionName("FoodByPartialName")]
         [OpenApiOperation("SearchFood", "Food", Summary = "Searches the FoodDB", Description = "Allows you to search the food Database and gets items that start with the supplied letters", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
-        [OpenApiParameter("patientId", Description = "the id of the patient thats going to get the item", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Models.Food[]), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorMissingValues)]
         [OpenApiParameter("foodName", Description = "The letters to use in the search", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
         [OpenApiParameter("count", Description = "amount of items to retrieve", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.FoodByPartialname))] HttpRequest req,
-            ILogger log,int patientId, string foodName, int count)
+            ILogger log,string foodName, int count)
         {
-
+            int patientId = await DIContainer.Instance.GetService<IAuthorization>().GetUserId(req);
             // Auth check
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
 
-            //TODO maak dit minder lelijk
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IFoodService>().TryGetFoodBySearch(foodName,count);
 
-            IFoodRepository foodRepository = DIContainer.Instance.GetService<IFoodRepository>();
-            List<Models.Food> food = foodRepository.Search(foodName,count);
 
-            //TODO convert to JSON
-            var jsonFood = JsonConvert.SerializeObject(food);
-            return food != null
-                ? (ActionResult)new OkObjectResult(food)
-                : new BadRequestObjectResult(Messages.ErrorMissingValues);
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }
