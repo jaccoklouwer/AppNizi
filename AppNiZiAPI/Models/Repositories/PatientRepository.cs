@@ -103,8 +103,7 @@ namespace AppNiZiAPI.Models.Repositories
                 sqlConn.Open();
                 string sqlQuery = $"SELECT TOP(@COUNT) p.*, a.* " +
                     $"FROM Patient AS p " +
-                    $"INNER JOIN Account AS A ON p.account_id = a.id " +
-                    $"WHERE p.id=@ID";
+                    $"INNER JOIN Account AS A ON p.account_id = a.id";
 
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@COUNT", SqlDbType.Int).Value = count;

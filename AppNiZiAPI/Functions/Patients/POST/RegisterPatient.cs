@@ -21,6 +21,7 @@ using System.Net;
 using AppNiZiAPI.Models.SwaggerModels;
 using AppNiZiAPI.Services;
 using System.Collections.Generic;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Account.POST
 {
@@ -36,7 +37,7 @@ namespace AppNiZiAPI.Functions.Account.POST
         [OpenApiRequestBody("application/json", typeof(SwaggerRegisterPatient), Description = "New patient")]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.Patients))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.Patient))] HttpRequest req,
             ILogger log)
         {
             // Auth check
@@ -45,17 +46,12 @@ namespace AppNiZiAPI.Functions.Account.POST
 
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            IPatientService patientService = DIContainer.Instance.GetService<IPatientService>();
-            Dictionary<ServiceDictionaryKey, object> dictionary = await patientService.TryRegisterPatient(req, authLogin);
+            // Logic
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IPatientService>()
+                .TryRegisterPatient(req, authLogin);
 
-            // Returns a build error message
-            if (dictionary.ContainsKey(ServiceDictionaryKey.ERROR))
-                return new BadRequestObjectResult(dictionary[ServiceDictionaryKey.ERROR]);
-
-            // Return object if possible
-            return dictionary.ContainsKey(ServiceDictionaryKey.VALUE)
-            ? (ActionResult)new OkObjectResult(dictionary[ServiceDictionaryKey.VALUE])
-            : new BadRequestResult();
+            // Response
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

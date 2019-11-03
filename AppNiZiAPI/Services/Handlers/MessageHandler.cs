@@ -1,15 +1,18 @@
-﻿using System;
+﻿using AppNiZiAPI.Services;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace AppNiZiAPI.Models.Handlers
 {
-    public interface IFeedbackHandler
+    public interface IMessageHandler
     {
         string BuildErrorMessage(Exception ex);
     }
 
-    public class FeedbackHandler : IFeedbackHandler
+    public class MessageHandler : IMessageHandler
     {
         /// <summary>
         /// Builds a feedback message for an error caught.
@@ -39,3 +42,4 @@ namespace AppNiZiAPI.Models.Handlers
         }
     }
 }
+

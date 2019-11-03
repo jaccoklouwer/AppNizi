@@ -26,6 +26,7 @@ using System.Net;
 using Microsoft.OpenApi.Models;
 using AppNiZiAPI.Services;
 using static AppNiZiAPI.Services.PatientService;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Patients
 {
@@ -49,17 +50,12 @@ namespace AppNiZiAPI.Functions.Patients
         {
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            IPatientService patientService = DIContainer.Instance.GetService<IPatientService>();
-            Dictionary<ServiceDictionaryKey, object> dictionary = await patientService.TryListPatients(req);
+            // Logic
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IPatientService>()
+                .TryListPatients(req);
 
-            // Returns a build error message
-            if (dictionary.ContainsKey(ServiceDictionaryKey.ERROR))
-                return new BadRequestObjectResult(dictionary[ServiceDictionaryKey.ERROR]);
-
-            // Return object if possible
-            return dictionary.ContainsKey(ServiceDictionaryKey.VALUE)
-            ? (ActionResult)new OkObjectResult(dictionary[ServiceDictionaryKey.VALUE])
-            : new BadRequestResult();
+            // Response
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

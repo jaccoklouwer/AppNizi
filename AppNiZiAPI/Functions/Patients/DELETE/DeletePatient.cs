@@ -21,6 +21,7 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using Microsoft.OpenApi.Models;
 using AppNiZiAPI.Services;
 using System.Collections.Generic;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Patients.DELETE
 {
@@ -37,29 +38,24 @@ namespace AppNiZiAPI.Functions.Patients.DELETE
         #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = (Routes.APIVersion + Routes.SpecificPatient))] HttpRequest req,
-            int patientId,
+            string patientId,
             ILogger log)
         {
             #region AuthCheck
-            if (patientId != 0)
-            {
-                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
-                if (!authResult.Result)
-                    return new StatusCodeResult((int)authResult.StatusCode);
-            }
+            //if (patientId != 0)
+            //{
+            //    AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
+            //    if (!authResult.Result)
+            //        return new StatusCodeResult((int)authResult.StatusCode);
+            //}
             #endregion
 
-            IPatientService patientService = DIContainer.Instance.GetService<IPatientService>();
-            Dictionary<ServiceDictionaryKey, object> dictionary = await patientService.TryDeletePatient(patientId);
+            // Logic
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IPatientService>()
+                .TryDeletePatient(patientId);
 
-            // Returns a build error message
-            if (dictionary.ContainsKey(ServiceDictionaryKey.ERROR))
-                return new BadRequestObjectResult(dictionary[ServiceDictionaryKey.ERROR]);
-
-            // Return object if possible
-            return dictionary.ContainsKey(ServiceDictionaryKey.VALUE)
-            ? (ActionResult)new OkObjectResult(dictionary[ServiceDictionaryKey.VALUE])
-            : new BadRequestResult();
+            // Response
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }
