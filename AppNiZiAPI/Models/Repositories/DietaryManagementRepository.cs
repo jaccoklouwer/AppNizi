@@ -12,6 +12,9 @@ namespace AppNiZiAPI.Models.Repositories
     {
         Task<bool> AddDietaryManagement(DietaryManagementModel dietary);
         Task<bool> DeleteDietaryManagement(int id);
+
+        Task<bool> DeleteByPatientId(int patientId);
+
         Task<List<DietaryManagementModel>> GetDietaryManagementByPatientAsync(int patientId);
         Task<List<DietaryRestriction>> GetDietaryRestrictions();
         Task<bool> UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement);
@@ -108,9 +111,8 @@ namespace AppNiZiAPI.Models.Repositories
             command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietaryManagement.PatientId;
             command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietaryManagement.IsActive;
             command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
-
+            conn.Close();
             return await Task.FromResult(command.ExecuteNonQuery() > 0);
-
         }
 
         public async Task<bool> DeleteDietaryManagement(int id)
@@ -124,11 +126,12 @@ namespace AppNiZiAPI.Models.Repositories
             {
                 SqlCommand command = new SqlCommand(query, conn);
                 command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+                conn.Close();
                 return await Task.FromResult(command.ExecuteNonQuery() > 0);
             }
             catch (Exception)
             {
-
+                conn.Close();
                 return false;
             }
 
@@ -161,13 +164,36 @@ namespace AppNiZiAPI.Models.Repositories
                 command.Parameters.Add("@AMOUNT", SqlDbType.Int).Value = dietary.Amount;
                 command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietary.PatientId;
                 command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietary.IsActive;
+                conn.Close();
                 return await Task.FromResult(command.ExecuteNonQuery() > 0);
             }
             catch (Exception e)
             {
+                conn.Close();
                 throw e;
             }
 
+        }
+
+        public async Task<bool> DeleteByPatientId(int patientId)
+        {
+            bool success = false;
+
+            string sqlQuery = "DELETE FROM DietaryManagement WHERE patient_id = @ID";
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                sqlConn.Open();
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.Add("@ID", SqlDbType.Int).Value = patientId;
+
+                int rows = sqlCmd.ExecuteNonQuery();
+                if (rows > 0)
+                    success = true;
+            }
+
+            return success;
         }
     }
 }

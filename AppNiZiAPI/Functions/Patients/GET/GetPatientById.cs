@@ -38,19 +38,15 @@ namespace AppNiZiAPI.Functions.Patients.GET
         [OpenApiParameter("patientId", Description = "Inserting the patient id", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.SpecificPatient))] HttpRequest req, 
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.SpecificPatient))] HttpRequest req,
             string patientId,
             ILogger log)
         {
-            #region AuthCheck
-            //AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
-            //if (!authResult.Result)
-            //    return new StatusCodeResult((int)authResult.StatusCode);
-            #endregion
+            log.LogInformation("C# HTTP trigger function processed a request.");
 
             // Logic
             Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IPatientService>()
-                .TryGetPatientById(patientId);
+                .TryGetPatientById(req, patientId);
 
             // Response
             return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);

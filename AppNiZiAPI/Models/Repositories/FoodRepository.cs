@@ -8,7 +8,7 @@ using System.Text;
 
 namespace AppNiZiAPI.Models.Repositories
 {
-    class FoodRepository: IFoodRepository
+   public class FoodRepository: IFoodRepository
     {
         //change to Id
         public Food Select(int foodId)
@@ -182,6 +182,27 @@ namespace AppNiZiAPI.Models.Repositories
                 if (rows != 0)
                     success = true;
             }
+            return success;
+        }
+
+        public bool Delete(int patientId)
+        {
+            bool success = false;
+
+            string sqlQuery = "DELETE FROM MyFood WHERE patient_id=@ID";
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                sqlConn.Open();
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.Add("@ID", SqlDbType.Int).Value = patientId;
+
+                int rows = sqlCmd.ExecuteNonQuery();
+                if (rows > 0)
+                    success = true;
+            }
+
             return success;
         }
     }

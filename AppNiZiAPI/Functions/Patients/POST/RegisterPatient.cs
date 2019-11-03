@@ -40,15 +40,11 @@ namespace AppNiZiAPI.Functions.Account.POST
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.Patient))] HttpRequest req,
             ILogger log)
         {
-            // Auth check
-            AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
-            if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             // Logic
             Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IPatientService>()
-                .TryRegisterPatient(req, authLogin);
+                .TryRegisterPatient(req);
 
             // Response
             return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
