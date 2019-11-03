@@ -30,16 +30,20 @@ namespace AppNiZiAPI.Functions.DietaryManagement.GET
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
         [OpenApiResponseBody(HttpStatusCode.NotFound, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
-        [OpenApiParameter("patientId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))] 
+        [OpenApiParameter("patientId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(string))] 
         #endregion
         public static async Task<IActionResult> GetDietaryManagementByPatient(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, int patientId,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetDietaryManagement))] HttpRequest req, string patientId,
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
 
+            int id;
+            if (!int.TryParse(patientId, out id))
+                return new UnprocessableEntityObjectResult(Messages.ErrorIncorrectId);
+
             #region AuthCheck
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, id);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
                 #endregion
@@ -50,8 +54,8 @@ namespace AppNiZiAPI.Functions.DietaryManagement.GET
             try
             {
                 IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
-                dietaryManagementModels = repository.GetDietaryManagementByPatient(patientId);
-                dietaryRestrictions = repository.GetDietaryRestrictions();
+                dietaryManagementModels = await repository.GetDietaryManagementByPatientAsync(id);
+                dietaryRestrictions = await repository.GetDietaryRestrictions();
                 view = new DietaryView();
                 view.DietaryManagements = dietaryManagementModels;
                 view.restrictions = dietaryRestrictions;

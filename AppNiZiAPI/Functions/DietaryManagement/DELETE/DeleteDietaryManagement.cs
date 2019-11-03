@@ -30,15 +30,19 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
         [OpenApiResponseBody(HttpStatusCode.UnprocessableEntity, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
-        [OpenApiParameter("dietId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
+        [OpenApiParameter("dietId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(string))]
         [OpenApiRequestBody("patientId", typeof(int), Description = "the id of a patient for authentication")] 
         #endregion
         public static async Task<IActionResult> DeleteDietaryManagement(
-            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, int dietId,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = (Routes.APIVersion + Routes.DietaryManagementById))] HttpRequest req, string dietId,
             ILogger log)
         {
             //link voor swagger https://devkimchi.com/2019/02/02/introducing-swagger-ui-on-azure-functions/
             log.LogInformation("C# HTTP trigger function processed a request.");
+            int id;
+
+            if (!int.TryParse(dietId, out id))
+                return new UnprocessableEntityObjectResult(Messages.ErrorIncorrectId);
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             int patientId;
@@ -63,7 +67,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
             bool success;
             try
             {
-                success = repository.DeleteDietaryManagement(dietId);
+                success = await repository.DeleteDietaryManagement(id);
             }
             catch (Exception)
             {
