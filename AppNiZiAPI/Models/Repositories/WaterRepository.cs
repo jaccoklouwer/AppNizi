@@ -124,7 +124,7 @@ namespace AppNiZiAPI.Models.Repositories
             return waterConsumptions;
         }
 
-        public Result InsertWaterConsumption(WaterConsumptionModel model, bool update)
+        public WaterConsumptionModel InsertWaterConsumption(WaterConsumptionModel model, bool update)
         {
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -140,6 +140,7 @@ namespace AppNiZiAPI.Models.Repositories
                 {
                     sqlQuery =
                     $"INSERT INTO WaterConsumption(date, amount, patient_id, weight_unit_id) " +
+                    $"OUTPUT Inserted.id " +
                     $"VALUES(@DATE,@AMOUNT ,@PATIENTID, 7)";
                 }
 
@@ -153,13 +154,14 @@ namespace AppNiZiAPI.Models.Repositories
 
                 conn.Open();
 
-                int result = cmd.ExecuteNonQuery();
+                int result = (int)cmd.ExecuteScalar();
+                model.Id = result;
                 conn.Close();
 
-                if (result > 0)
-                    return new Result { Succesfull = true, Message = Messages.OKPost };
+                if (result != 0)
+                    return model;
             }
-            return new Result { Succesfull = false, Message = Messages.ErrorPost };
+            return null;
         }
 
         public bool RemoveWaterConsumptions(int patientId, int waterId)
@@ -229,7 +231,7 @@ namespace AppNiZiAPI.Models.Repositories
     {
         WaterConsumptionDaily GetDailyWaterConsumption(int patientId, DateTime date);
         List<WaterConsumptionViewModel> GetWaterConsumptionPeriod(int patientId, DateTime beginDate, DateTime endDate);
-        Result InsertWaterConsumption(WaterConsumptionModel model, bool update);
+        WaterConsumptionModel InsertWaterConsumption(WaterConsumptionModel model, bool update);
         WaterConsumptionModel GetSingleWaterConsumption(int patientId, int waterId);
         bool RemoveWaterConsumptions(int patientId, int waterId);
     }
