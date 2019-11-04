@@ -18,6 +18,7 @@ namespace AppNiZiAPI.Variables
         public const string Patients = "/patients";
         public const string Me = "/me";
         public const string SpecificPatient = "/patient/{patientId}";
+        public const string All = "/all";
 
         // Doctors
         public const string GetDoctorPatients = "/doctor/{doctorId}/patients";
@@ -58,6 +59,8 @@ namespace AppNiZiAPI.Variables
         //Account
         public const string RegisterPatient = "/patients/register";
         public const string Account = "/account";
+        public const string LoginDoctor = "/login/doctor";
+        public const string LoginPatient = "/login/patient";
 
 
     }
