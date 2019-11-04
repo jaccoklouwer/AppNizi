@@ -33,10 +33,10 @@ namespace AppNiZiAPI.Services
         private readonly IMessageSerializer _messageSerializer;
         private readonly IQueryHelper _queryHelper;
 
-        public DIetaryManagementService(IMessageHandler feedbackHandler, IDietaryManagementRepository mealRepository, IMessageSerializer messageSerializer, IQueryHelper queryHelper)
+        public DIetaryManagementService(IMessageHandler feedbackHandler, IDietaryManagementRepository dietaryManagementRepository, IMessageSerializer messageSerializer, IQueryHelper queryHelper)
         {
             this.FeedbackHandler = feedbackHandler;
-            _dietaryManagmentRepository = mealRepository;
+            _dietaryManagmentRepository = dietaryManagementRepository;
             _messageSerializer = messageSerializer;
             _queryHelper = queryHelper;
         }
@@ -47,8 +47,8 @@ namespace AppNiZiAPI.Services
 
             try
             {
-                dietary = await _dietaryManagmentRepository.AddDietaryManagement(dietary);
-                dynamic data = _messageSerializer.Serialize(dietary);
+                bool susces = await _dietaryManagmentRepository.AddDietaryManagement(dietary);
+                dynamic data = _messageSerializer.Serialize(susces);
                 dictionary.Add(ServiceDictionaryKey.VALUE, data);
             }
             catch (Exception ex)
@@ -89,7 +89,7 @@ namespace AppNiZiAPI.Services
 
             try
             {
-                List<DietaryManagementModel> dietaryManagement = await _dietaryManagmentRepository.GetDietaryManagementByPatient(patientId);
+                List<DietaryManagementModel> dietaryManagement = await _dietaryManagmentRepository.GetDietaryManagementByPatientAsync(patientId);
                 List<DietaryRestriction> restrictions = await _dietaryManagmentRepository.GetDietaryRestrictions();
 
                 if (dietaryManagement.Count <= 0)
@@ -129,8 +129,8 @@ namespace AppNiZiAPI.Services
             try
             {
 
-                dietary = await _dietaryManagmentRepository.UpdateDietaryManagement(id, dietary);
-                dynamic data = _messageSerializer.Serialize(dietary);
+                bool succes = await _dietaryManagmentRepository.UpdateDietaryManagement(id, dietary);
+                dynamic data = _messageSerializer.Serialize(succes);
                 dictionary.Add(ServiceDictionaryKey.VALUE, data);
             }
             catch (Exception ex)

@@ -193,7 +193,7 @@ namespace AppNiZiAPI.Models.Repositories
                     success = true;
             }
 
-            return success;
+            return await Task.FromResult(success);
         }
     }
 }
