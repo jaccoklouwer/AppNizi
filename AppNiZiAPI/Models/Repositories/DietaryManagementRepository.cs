@@ -111,8 +111,9 @@ namespace AppNiZiAPI.Models.Repositories
             command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietaryManagement.PatientId;
             command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietaryManagement.IsActive;
             command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+            bool succes = (command.ExecuteNonQuery() > 0);
             conn.Close();
-            return await Task.FromResult(command.ExecuteNonQuery() > 0);
+            return await Task.FromResult(succes);
         }
 
         public async Task<bool> DeleteDietaryManagement(int id)
@@ -126,8 +127,9 @@ namespace AppNiZiAPI.Models.Repositories
             {
                 SqlCommand command = new SqlCommand(query, conn);
                 command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+                bool succes = (command.ExecuteNonQuery() > 0);
                 conn.Close();
-                return await Task.FromResult(command.ExecuteNonQuery() > 0);
+                return await Task.FromResult(succes);
             }
             catch (Exception)
             {
@@ -164,8 +166,9 @@ namespace AppNiZiAPI.Models.Repositories
                 command.Parameters.Add("@AMOUNT", SqlDbType.Int).Value = dietary.Amount;
                 command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietary.PatientId;
                 command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietary.IsActive;
+                bool succes = (command.ExecuteNonQuery() > 0);
                 conn.Close();
-                return await Task.FromResult(command.ExecuteNonQuery() > 0);
+                return await Task.FromResult(succes);
             }
             catch (Exception e)
             {
