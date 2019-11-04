@@ -52,9 +52,11 @@ namespace AppNiZiAPI.Functions.WaterConsumption.PUT
                 {
                     PatientId = patientId,
                     Amount = (int)jsonParsed["amount"],
-                    Date = Convert.ToDateTime(jsonParsed["date"].ToString()),
                     Id = waterId
                 };
+                DateTime.TryParse(jsonParsed["date"].ToString(), out var date);
+                if (date != null)
+                    model.Date = date;
             }
             catch
             {
