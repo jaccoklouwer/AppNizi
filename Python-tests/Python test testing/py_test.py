@@ -388,10 +388,12 @@ def test_getwaterconsumption():
 
 def putwaterconsumption():
     r= requests.put(urlLocal+waterconsumption+"/23",data= json.dumps(waterconsumptionitem),headers = header)
-    return r.status_code
+    j = r.json()
+    return j
 def test_putwaterconsumption():
-    r = putwaterconsumption()
-    assert r == 200
+    v = Validator(waterconsumptionschema)
+    j = putwaterconsumption()
+    assert v.validate(j) == True
 
 
 #patient
