@@ -49,9 +49,6 @@ namespace AppNiZiAPI.Models.Repositories
 
         public DoctorLogin GetLoggedInDoctor(string guid)
         {
-#if DEBUG
-            guid = "jfjfjfj";
-#endif
             DoctorLogin doctorLogin = null;
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
