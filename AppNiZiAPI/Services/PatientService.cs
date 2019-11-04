@@ -25,8 +25,10 @@ namespace AppNiZiAPI.Services
 
         Task<Dictionary<ServiceDictionaryKey, object>> TryGetPatientById(HttpRequest request, string idText);
         Task<Dictionary<ServiceDictionaryKey, object>> TryListPatients(HttpRequest request);
-        Task<Dictionary<ServiceDictionaryKey, object>> TryRegisterPatient(HttpRequest request);
         Task<Dictionary<ServiceDictionaryKey, object>> TryDeletePatient(HttpRequest request, string idText);
+
+        Task<Dictionary<ServiceDictionaryKey, object>> TryRegisterPatient(HttpRequest request);
+        Task<Dictionary<ServiceDictionaryKey, object>> TryUpdatePatient(HttpRequest request);
     }
 
     public class PatientService : IPatientService
@@ -128,17 +130,60 @@ namespace AppNiZiAPI.Services
             return dictionary;
         }
 
+        public async Task<Dictionary<ServiceDictionaryKey, object>> TryUpdatePatient(HttpRequest request)
+        {
+            Dictionary<ServiceDictionaryKey, object> dictionary = new Dictionary<ServiceDictionaryKey, object>();
+
+            try
+            {
+                PatientUpdateModel patient = await _messageSerializer.Deserialize<PatientUpdateModel>(request.Body);
+
+                if (patient.PatientId <= 0)
+                {
+                    dictionary.Add(ServiceDictionaryKey.ERROR, "Please pass a valid patient ID to update.");
+                    return dictionary;
+                }
+
+                bool success = _patientRepository.Update(patient);
+
+                if (!success)
+                {
+                    dictionary.Add(ServiceDictionaryKey.ERROR, $"Update failed for given ID: {patient.PatientId}. Does patient exist?");
+                    dictionary.Add(ServiceDictionaryKey.HTTPSTATUSCODE, HttpStatusCode.NotFound);
+                    return dictionary;
+                }
+
+                dictionary.Add(ServiceDictionaryKey.VALUE, $"Deleted patient with ID: {patient.PatientId}");
+            }
+            catch (Exception ex)
+            {
+                dictionary.AddErrorMessage(ServiceDictionaryKey.ERROR, ex, FeedbackHandler);
+            }
+
+            return dictionary;
+        }
+
         public async Task<Dictionary<ServiceDictionaryKey, object>> TryRegisterPatient(HttpRequest request)
         {
             Dictionary<ServiceDictionaryKey, object> dictionary = new Dictionary<ServiceDictionaryKey, object>();
 
             try
             {
+                AuthLogin authLogin = null;
                 // Auth
-                AuthLogin authLogin = await _authorizationService.LoginAuthAsync(request);
-                if (authLogin == null)
+                try
                 {
-                    dictionary.Add(ServiceDictionaryKey.ERROR, Messages.AuthNoAcces);
+                    authLogin = await _authorizationService.LoginAuthAsync(request);
+                    if (authLogin == null)
+                    {
+                        dictionary.Add(ServiceDictionaryKey.ERROR, Messages.AuthNoAcces);
+                        dictionary.Add(ServiceDictionaryKey.HTTPSTATUSCODE, HttpStatusCode.Unauthorized);
+                        return dictionary;
+                    }
+                }
+                catch
+                {
+                    dictionary.Add(ServiceDictionaryKey.ERROR, "Auth threw an error. Has the token lifetime expired?");
                     dictionary.Add(ServiceDictionaryKey.HTTPSTATUSCODE, HttpStatusCode.Unauthorized);
                     return dictionary;
                 }
@@ -151,22 +196,6 @@ namespace AppNiZiAPI.Services
                 newPatient.Patient = _patientRepository.Select(newPatient.Patient.PatientId);
 
                 newPatient.AuthLogin = authLogin;
-
-                //PatientLogin newPatient = new PatientLogin
-                //{
-                //    Patient = new Patient
-                //    {
-                //        FirstName = "Jim",
-                //        LastName = "Pickem",
-                //        DateOfBirth = DateTime.Now,
-                //        WeightInKilograms = (float)88.3,
-                //        Guid = authLogin.Guid
-                //    },
-                //    Doctor = new DoctorModel
-                //    {
-                //        DoctorId = 2
-                //    }
-                //};
 
                 // Serialization
                 dynamic data = _messageSerializer.Serialize(newPatient);
