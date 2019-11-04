@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace AppNiZiAPI.Variables
+﻿namespace AppNiZiAPI.Variables
 {
     public static class Messages
     {
@@ -12,7 +8,10 @@ namespace AppNiZiAPI.Variables
         public const string ErrorMissingValues = "Missing values";
 
         public const string ErrorIncorrectId = "Incorrect id";
-        public const string ErrorInvalidDateValues = "Invalid date values";
+
+        // Consumption
+        public const string ErrorInvalidDateValues = "Invalid date value(s). Date format: yyyy-MM-dd";
+        public const string ErrorInvalidConsumptionObject = "Invalid Consumption object. Make sure all fields are present and have valid values";
 
         public const string ErrorDelete = "Removing Data Failed";
         public const string ErrorPost = "Inserting Data Failed";

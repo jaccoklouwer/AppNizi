@@ -19,7 +19,7 @@ namespace AppNiZiAPI
             conn.Open();
             try
             {
-                added = ConsumptionCommand1(insertQuery, consumption).ExecuteNonQuery() > 0;
+                added = ConsumptionCommand(insertQuery, consumption).ExecuteNonQuery() > 0;
             }
             catch (Exception)
             {
@@ -84,7 +84,7 @@ namespace AppNiZiAPI
                         consumption.Valid = true;
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     consumption.Valid = false;
                     return consumption;
@@ -169,7 +169,7 @@ namespace AppNiZiAPI
             conn.Open();
             try
             {
-                updated = ConsumptionCommand1(updateQuery, consumption).ExecuteNonQuery() > 0;
+                updated = ConsumptionCommand(updateQuery, consumption).ExecuteNonQuery() > 0;
             }
             catch (Exception)
             {
@@ -179,8 +179,7 @@ namespace AppNiZiAPI
             return updated;
         }
 
-        // TODO: Remove patientId and check earlier if patientId equals consumption.patient_id
-        private SqlCommand ConsumptionCommand1(string query, Consumption consumption)
+        private SqlCommand ConsumptionCommand(string query, Consumption consumption)
         {
             SqlCommand command = new SqlCommand(query, conn);
             command.Parameters.AddWithValue("@food_name", consumption.FoodName);
