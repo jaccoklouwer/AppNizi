@@ -418,27 +418,22 @@ def test_getdoctorme():
 
 #dietarymanagement
 def test_putdietarymanagement():
-    r= requests.put(urlLocal+dietarymanagement+"/8",data= json.dumps(dietarymanagementitem),headers = header)
+    r = requests.put(urlLocal+dietarymanagement+"/8", data= json.dumps(dietarymanagementitem), headers = header)
     assert r.status_code == 200
-    print(r.json())
 
 def test_deletedietarymanagement():
-    r= requests.delete(urlLocal+dietarymanagement+"/8",headers = header)
+    r = requests.delete(urlLocal+dietarymanagement+"/8", headers = header)
     assert r.status_code == 200
-    print(r.json())
 
 def test_postdietarymanagement():
-    r= requests.post(urlLocal+dietarymanagement,data = json.dumps(dietarymanagementitem) ,headers=header)
+    r = requests.post(urlLocal+dietarymanagement, data = json.dumps(dietarymanagementitem), headers=header)
     assert r.status_code == 200
-    print(r.json())
 
 def test_getdietarymanagement():
-    r= requests.get(urlLocal+dietarymanagement+"/11" ,headers=header)
-    j= r.json()
+    r = requests.get(urlLocal+dietarymanagement+"/17" ,headers=header)
+    j = r.json()
     assert r.status_code == 200
     assert len(j['Restrictions']) == 8
-    print(r.json())
-
 
 
 
