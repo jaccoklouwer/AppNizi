@@ -273,3 +273,4 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+Python-tests/.vscode/settings.json

@@ -119,6 +119,18 @@ waterconsumptionschema ={
         'date': {'type':'string'} , 
         'patientId': {'type':'number'} 
         }
+waterconsumptionperiodschema = {
+        'WeightUnit': {'type':'dict',
+                       'schema':{
+                               'Id': {'type':'number'}, 
+                               'Unit': {'type':'string'}, 
+                               'Short': {'type':'string'}}},
+        'Error': {'type':'boolean'} , 
+        'Id': {'type':'number'} , 
+        'Amount': {'type':'number'} , 
+        'Date': {'type':'string'} , 
+        'PatientId': {'type':'number'} 
+        }
 waterconsumptiondailyschema={
         'total':{'type':'number'},
         'minimumRestriction':{'type':'number'},
@@ -135,6 +147,7 @@ waterconsumptiondailyschema={
                                'date': {'type':'string'} , 
                                'patientId': {'type':'number'} }},
         }
+
 patientschema={
         'Id':{'type':'number'},
         'HandlingDoctorId':{'type':'number'},
@@ -277,25 +290,22 @@ headerdoctor ={
 
 #problematisch
 def getwaterconsumptionbydate():
-    r= requests.get(urlLocal+waterconsumptiondaily+patientid+"?date=2019-09-24" ,headers=header)
+    r= requests.get(urlLocal+waterconsumptiondaily+"/17&date=2019-12-07 " ,headers=header)
     j= r.json()
     return j
 def test_getwaterconsumptionbydate():
-    v = Validator(waterconsumptiondailyschema)
+    v = Validator(waterconsumptionschema)
     j = getwaterconsumptionbydate()
-    assert v.validate(j) == True
-    #assert j['ConsumptionId'] ==9
-
+    assert v.validate(j['waterConsumptions'][0]) == True
 def getwaterconsumptionbydates():
-    r= requests.get(urlLocal+waterconsumptionperiod+"/17&startDate=2019-02-11&endDate=2019-04-11",headers=header)
-    print(r)
-    #j= r.json()
-    return r
-print(getwaterconsumptionbydates())
-#print(getwaterconsumptionbydates())
-#print(getwaterconsumptionbydates())
+    r= requests.get(urlLocal+waterconsumptionperiod+"/17?beginDate=2019-01-01&endDate=2019-12-30",headers=header)
+    j= r.json()
+    return j
+#print(getwaterconsumptionbydates()[0])
 def test_getwaterconsumptionbydates():
-    assert 1==2
+    v = Validator(waterconsumptionperiodschema)
+    j = getwaterconsumptionbydates()
+    assert v.validate(j[0]) == True
 
 
 #consumption
@@ -307,12 +317,12 @@ def deleteconsumption(consumptionId):
     r= requests.delete(urlLocal+consumption+"/"+str(consumptionId),headers = header)
     return r.status_code
 #print(postconsumption())
-def test_postanddeleteconsumption():
-    j = postconsumption()
+#def test_postanddeleteconsumption():
+    #j = postconsumption()
     #j = r.json()
     
-    r2 = deleteconsumption(j['id'])
-    assert r2 == 200
+    #r2 = deleteconsumption(j['id'])
+    #assert r2 == 200
 
 def getconsumptionbyid():
     r= requests.get(urlLocal+consumption+"/21",headers = header)
@@ -343,30 +353,31 @@ def test_putconsumption():
     #wwater 
 def postwaterconsumption():
     r= requests.post(urlLocal+waterconsumption,data = json.dumps(waterconsumptionitem) ,headers=header)
-    return r.status_code
+    return r
 def test_postwaterconsumption():
     r = postwaterconsumption()
-    assert r == 200
+    assert r.status_code == 200 
 def getwaterconsumption():
-    r= requests.get(urlLocal+waterconsumption+"/2" ,headers=header)
+    r= requests.get(urlLocal+waterconsumption+"/22" ,headers=header)
     j= r.json()
     return j
 def test_getwaterconsumption():
     v = Validator(waterconsumptionschema)
     j = getwaterconsumption()
     assert v.validate(j) == True
-    assert j['id'] ==2  
+    assert j['id'] ==22  
 
 def putwaterconsumption():
-    r= requests.put(urlLocal+waterconsumption+"/2",data= json.dumps(waterconsumptionitem),headers = header)
+    r= requests.put(urlLocal+waterconsumption+"/22",data= json.dumps(waterconsumptionitem),headers = header)
     return r.status_code
 def test_putwaterconsumption():
-    assert 1==2
-def deletewaterconsumption():
-    r= requests.delete(urlLocal+waterconsumption+"/2",headers = header)
-    return r.status_code
-def test_deletewaterconsumption():
-    assert 1==2
+    r = putwaterconsumption()
+    assert r == 200
+#def deletewaterconsumption():
+#    r= requests.delete(urlLocal+waterconsumption+"/22",headers = header)
+#    return r.status_code
+#def test_deletewaterconsumption():
+#    assert 1==2
 
 #patient
 def getpatients():
@@ -386,11 +397,7 @@ def test_getpatientbyid():
     j = getpatients()
     assert v.validate(j) == True
     
-def deletepatient():
-    r= requests.delete(urlLocal+patient+"/11",headers = header)
-    return r.status_code
-def test_deletepatient():
-    assert 1==2
+
     
 #def registerpatient():
 #    r= requests.post(urlLocal+patient,data = json.dumps(patientregisteritem) ,headers=header)
@@ -416,11 +423,6 @@ def test_getdoctors():
     v = Validator(doctorschema)
     j = getdoctors()
     assert v.validate(j) == True
-def postdoctor():
-    r= requests.post(urlLocal+doctor,data = json.dumps(doctoritem) ,headers=headerdoctor)
-    return r.status_code
-def test_postdoctor():
-    assert 1==2
 def getdoctorbyid():
     r= requests.get(urlLocal+doctor+"/1" ,headers=header)
     j= r.json()
@@ -429,11 +431,6 @@ def test_getdoctorbyid():
     v = Validator(doctorschema)
     j = getdoctorbyid()
     assert v.validate(j) == True
-def deletedoctor():
-    r= requests.delete(urlLocal+doctor+"/2",headers = header)
-    return r.status_code
-def test_deletedoctor():
-    assert 1==2
 def getdoctorpatients():
     r= requests.get(urlLocal+doctor+"/2/patients" ,headers=headerdoctor)
     #j= r.json()

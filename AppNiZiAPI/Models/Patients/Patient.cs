@@ -60,6 +60,22 @@ namespace AppNiZiAPI.Models
         public DateTime DateOfBirth { get; set; }
         public float WeightInKilograms { get; set; }
     }
+
+    public struct PatientUpdateModel
+    {
+        public PatientUpdateModel(int patientId, DateTime dateOfBirth, float weightInKilograms, int doctorId)
+        {
+            PatientId = patientId;
+            DateOfBirth = dateOfBirth;
+            WeightInKilograms = weightInKilograms;
+            DoctorId = doctorId;
+        }
+
+        public int PatientId { get; set; }
+        public DateTime DateOfBirth { get; set; }
+        public float WeightInKilograms { get; set; }
+        public int DoctorId { get; set; }
+    }
 }
 
 
