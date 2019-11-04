@@ -35,64 +35,48 @@ namespace AppNiZiAPI.Security
         public bool UserAuth(int userId, string guid, bool isDoctor)
         {
             int outputUserId = 0;
-            var text = "";
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
                 conn.Open();
 
+                string sqlQuery;
                 if (isDoctor)
-                {
-#if DEBUG
-                    guid = "jfjfjfj";
-#endif
-                    text =
-                        $"SELECT id FROM Doctor WHERE guid = '{guid}'";
-                }
+                    sqlQuery = "SELECT id FROM Doctor WHERE guid = @GUID";
                 else
-                    text =
-                        $"SELECT id FROM Patient WHERE guid = '{guid}'";
+                    sqlQuery = "SELECT id FROM Patient WHERE guid = @GUID";
 
-                using (SqlCommand cmd = new SqlCommand(text, conn))
+                SqlCommand cmd = new SqlCommand(sqlQuery, conn);
+                cmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = guid;
+
+                try
                 {
-                    SqlDataReader reader = cmd.ExecuteReader();
-                    while (reader.Read())
-                    {
-                        outputUserId = (int)reader["id"];
-                    }
+                    outputUserId = (int)cmd.ExecuteScalar();
                 }
-                conn.Close();
+                catch { return false; }
             }
-
-            if (userId != outputUserId)
-                return false;
-            return true;
+            return userId == outputUserId;
         }
 
         public bool CheckDoctorAcces(int patientId, string guid)
         {
-            // VOOR TESTEN GEBRUIK DEZE GUID, doctor id is 1
-#if DEBUG
-
-            guid = "jfjfjfj";
-#endif
-
             bool result = false;
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
                 conn.Open();
-                var text =
-                    $"SELECT CASE WHEN EXISTS ( " +
-                    $"SELECT * FROM Patient " +
-                    $"LEFT OUTER JOIN Doctor ON Patient.doctor_id = Doctor.id " +
-                    $"WHERE Doctor.guid = '{guid}' AND Patient.id = {patientId} )" +
-                    $"THEN CAST (1 AS BIT) " +
-                    $"ELSE CAST (0 AS BIT) END";
 
-                using (SqlCommand cmd = new SqlCommand(text, conn))
-                {
-                    //SqlDataReader reader = cmd.ExecuteReader();
-                    result = (bool)cmd.ExecuteScalar();
-                }
+                string sqlQuery =
+                    "SELECT CASE WHEN EXISTS ( " +
+                    "SELECT * FROM Patient " +
+                    "LEFT OUTER JOIN Doctor ON Patient.doctor_id = Doctor.id " +
+                    "WHERE Doctor.guid = @GUID AND Patient.id = @PATIENTID )" +
+                    "THEN CAST (1 AS BIT) " +
+                    "ELSE CAST (0 AS BIT) END";
+
+                SqlCommand cmd = new SqlCommand(sqlQuery, conn);
+                cmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
+                cmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = guid;
+
+                result = (bool)cmd.ExecuteScalar();
                 conn.Close();
             }
             return result;

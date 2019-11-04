@@ -85,10 +85,6 @@ namespace AppNiZiAPI.Security
             if (!authGUID.AuthResult.Result)
                 return authGUID.AuthResult;
 
-#if DEBUG
-            authGUID.GUID = "jfjfjfj";
-#endif
-
             IAuthorizationRepository authRepository = DIContainer.Instance.GetService<IAuthorizationRepository>();
             if(authRepository.UserAuth(doctorId, authGUID.GUID, true))
                 return new AuthResultModel(true, AuthStatusCode.Ok);

@@ -8,6 +8,7 @@ Created on Sat Oct 26 11:44:21 2019
 import requests
 import json
 import cerberus
+import http.client
 from cerberus import Validator
 
 ##urls
@@ -19,7 +20,9 @@ foodFavorites="/food/favorite"
 
 patient ="/patient"
 patients ="/patients"
-patientMe ="/patients/me"
+patientMe ="/login/patient"
+
+doctorMe ="/login/doctor"
 
 doctor="/doctor"
 
@@ -118,8 +121,61 @@ waterconsumptionschema ={
         'date': {'type':'string'} , 
         'patientId': {'type':'number'} 
         }
+waterconsumptionperiodschema = {
+        'WeightUnit': {'type':'dict',
+                       'schema':{
+                               'Id': {'type':'number'}, 
+                               'Unit': {'type':'string'}, 
+                               'Short': {'type':'string'}}},
+        'Error': {'type':'boolean'} , 
+        'Id': {'type':'number'} , 
+        'Amount': {'type':'number'} , 
+        'Date': {'type':'string'} , 
+        'PatientId': {'type':'number'} 
+        }
+waterconsumptiondailyschema={
+        'total':{'type':'number'},
+        'minimumRestriction':{'type':'number'},
+        'waterConsumptions': {'type':'list',
+                              'schema':{
+                               'weightUnit': {'type':'dict',
+                                              'schema':{
+                                                      'id': {'type':'number'}, 
+                                                      'unit': {'type':'string'}, 
+                                                      'short': {'type':'string'}}},
+                               'error': {'type':'boolean'} , 
+                               'id': {'type':'number'} , 
+                               'amount': {'type':'number'} , 
+                               'date': {'type':'string'} , 
+                               'patientId': {'type':'number'} }},
+        }
 
-header = {"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik5ERkdPRFUxTnpJNFJEZ3lNakkxUmtFMU5EZ3dRMEUxTkVJM05UTTBSRGRFUTBFNE5FWkdNZyJ9.eyJpc3MiOiJodHRwczovL2FwcG5pemkuZXUuYXV0aDAuY29tLyIsInN1YiI6ImRWWXRtU3c1bTgxOW1YMm5TMnJhTVp3bzVsWGN3RGc2QGNsaWVudHMiLCJhdWQiOiJhcHBuaXppLm5sL2FwaSIsImlhdCI6MTU3Mjg2Nzg0MiwiZXhwIjoxNTcyOTU0MjQyLCJhenAiOiJkVll0bVN3NW04MTltWDJuUzJyYU1ad281bFhjd0RnNiIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.UBh4Sruso9KcD4sFU80VnRMfUKXlb3uXyucTfxEXZTfTvYGSx1cseqvbp2-kksASXYXiNCbv34iOTLWeHYddCemZT5w6BdgMducBt4Wf_BP_krbU0FiGxb71L88BLxVUU8QGtyBCfqyTBfgmjYDUNPDmJKWRB2CblGyLH481HkAHzymNkfw9xBHJTAvMLnNGo_msvWC_O0akJgAr3N9eTjGxlV1CNHtHzPEYOJasHe1WzTpfFEgEezSMo7eSkPIaLzP35HVpcBijesc5CR6pwo3mhElMN2lfIsduUQtS0PdCLbRlcv2f3m1xFqL3dI-qIlFvjxP0jxqfFeBbs3xyBA.eyJpc3MiOiJodHRwczovL2FwcG5pemkuZXUuYXV0aDAuY29tLyIsInN1YiI6ImRWWXRtU3c1bTgxOW1YMm5TMnJhTVp3bzVsWGN3RGc2QGNsaWVudHMiLCJhdWQiOiJhcHBuaXppLm5sL2FwaSIsImlhdCI6MTU3Mjc3OTM4OSwiZXhwIjoxNTcyODY1Nzg5LCJhenAiOiJkVll0bVN3NW04MTltWDJuUzJyYU1ad281bFhjd0RnNiIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.s2k8FrRkaTuoVx_uFBOhKTAS6avfBZJ1GSY8gfFG-FTD0krv_mzlnKhjNsrFUtPKeM9XTSYq1uvZYmFRmQvU_xEffji_Is_fnn0sjmGCgOG8WRntaF4zeipNn9Q276UCSgxnsTss5dO6ihAiXNZeDAWm6j7y5MHvoDzwwAnp_nxKrhQEwIar37faTRQduVoWlzXmudOJ2qv3j259nUqRNkB1MzK1XcPzt7k6V85ZOqrsUUg-oU2eSdlaMcDfyEo3w_rey8mcDFo4YmjhSSGSlp4TNHayNBCyeehzQWDAdIrq3Z7275PtDoIYTJDqrLYJcH5wyFUmezZ8GlpQMGmDRA"}
+patientschema={
+        'Id':{'type':'number'},
+        'HandlingDoctorId':{'type':'number'},
+        'FirstName':{'type':'string'},
+        'LastName':{'type':'string'},
+        'DateOfBirth': {'type':'string'},
+        'WeightInKilograms': {'type':'number'}
+        }
+patientmeschema={
+        'patientId':{'type':'number'}, 
+        'accountId': {'type':'number'}, 
+        'doctorId': {'type':'number'}, 
+        'firstName': {'type':'string'}, 
+        'lastName': {'type':'string'}, 
+        'dateOfBirth': {'type':'string'}, 
+        'weightInKilograms': {'type':'number'}, 
+        'guid': {'type':'string'}
+        }
+doctorschema={
+        
+        "doctorId": {'type':'number'},
+        "firstName": {'type':'string'},
+        "lastName": {'type':'string'},
+        "location": {'type':'string'}
+        }
+
 
 mealitem = {
   "mealId": 0,
@@ -136,29 +192,51 @@ mealitem = {
 }
 consumptionitem ={
   "FoodName": "teveel stront",
-  "KCal": 0,
-  "Protein": 0,
-  "Fiber": 0,
-  "Calium": 0,
-  "Sodium": 0,
-  "Amount": 20,
-  "WeightUnitId": 0,
+  "KCal": 3.0,
+  "Protein": 4.0,
+  "Fiber": 1.0,
+  "Calium": 3.0,
+  "Sodium": 2.0,
+  "Amount": 100,
+  "WeightUnitId": 1,
   "Date": "2019-11-03T14:16:29.305Z",
-  "PatientId": 11,
+  "PatientId": 17,
   "Id": 0
   }
 waterconsumptionitem={
-  "Id": 2,
+  "Id": 23,
   "amount": 100,
   "date": "2019-11-03T14:44:52.978Z",
   "PatientId": 11   
   }
-patientitem={
-  "firstName": "anus",
-  "lastName": "piraate",
-  "dateOfBirth": "11-11-2011",
-  "weight": 0,
-  "doctorId": 0
+patientregisteritem={
+  "Account": {
+    "AccountId": 0,
+    "Role": "string"
+  },
+  "Patient": {
+    "PatientId": 0,
+    "AccountId": 0,
+    "DoctorId": 0,
+    "FirstName": "string",
+    "LastName": "string",
+    "DateOfBirth": "2019-11-04T13:37:41.486Z",
+    "WeightInKilograms": 0,
+    "Guid": "string"
+  },
+  "Doctor": {
+    "DoctorId": 0,
+    "FirstName": "string",
+    "LastName": "string",
+    "Location": "string"
+  },
+  "AuthLogin": {
+    "Guid": "string",
+    "Token": {
+      "Scheme": "string",
+      "AccesCode": "string"
+    }
+  }
 }
 doctoritem={
   "firstName": "ho",
@@ -166,136 +244,253 @@ doctoritem={
   "location": "aarslaan"
 }
 dietarymanagementitem ={
-  "Id": 2,
-  "Description": "streng dieet",
-  "Amount": 50,
-  "IsActive": True,
-  "PatientId": 11
+    "Id": 0,
+    "Description": "Caloriebeperking",
+    "amount" : 1492,
+    "Patient": 17,
+    "isActive" : 1
 }
+
+patientitembody ={
+  "patientId": 17,
+        }
+
+#variablen
+patientid = "/17"
+
+def accestoken():
+    conn = http.client.HTTPSConnection("appnizi.eu.auth0.com")
+
+    payload = "{\"client_id\":\"dVYtmSw5m819mX2nS2raMZwo5lXcwDg6\",\"client_secret\":\"vN6N5HNG25MP-gjBPsVhf01dzuIPqAixFFImtGUU4vy4RuJwFEYcPnJg4r6EOOdr\",\"audience\":\"appnizi.nl/api\",\"grant_type\":\"client_credentials\"}"
+        
+    headers = { 'content-type': "application/json" }
+
+    conn.request("POST", "/oauth/token", payload, headers)
+
+    res = conn.getresponse()
+    data = res.read()
+    datadecoded = data.decode("utf-8")
+    splitdata = datadecoded.split('"')
+
+    return(splitdata[3])
+
+def accestokendoctor():
+    conn = http.client.HTTPSConnection("appnizi.eu.auth0.com")
+
+    payload = "{\"client_id\":\"lyvNV89UXHNVDC7D8XFdv35HIpPNzFum\",\"client_secret\":\"9sieaPoIz42CxkelXM8jk_izfyyoAzpOkPyXs_ceRW5KS5slO0phSS_CShFXcaGu\",\"audience\":\"appnizi.nl/api\",\"grant_type\":\"client_credentials\"}"
+
+    headers = { 'content-type': "application/json" }
+
+    conn.request("POST", "/oauth/token", payload, headers)
+
+    res = conn.getresponse()
+    data = res.read()
+
+    datadecoded = data.decode("utf-8")
+    splitdata = datadecoded.split('"')
+
+    return(splitdata[3])
+header = {
+        "Authorization": "Bearer "+accestoken(),
+        'content-type' : "application/json"
+        }
+headerdoctor ={
+        "Authorization": "Bearer "+accestokendoctor(),
+        'content-type' : "application/json"
+        }
+
 
 #problematisch
 def getwaterconsumptionbydate():
-    r= requests.get(urlLocal+waterconsumptiondaily+"/11?date=20-10-1993" ,headers=header)
-    print(r)
+    r= requests.get(urlLocal+waterconsumptiondaily+"/17&date=2019-12-07 " ,headers=header)
     j= r.json()
     return j
+def test_getwaterconsumptionbydate():
+    v = Validator(waterconsumptionschema)
+    j = getwaterconsumptionbydate()
+    assert v.validate(j['waterConsumptions'][0]) == True
 def getwaterconsumptionbydates():
-    r= requests.get(urlLocal+waterconsumptionperiod+"/11&startDate=11-02-2019&endDate=11-04-2019" ,headers=header)
-    print(r)
+    r= requests.get(urlLocal+waterconsumptionperiod+"/17?beginDate=2019-01-01&endDate=2019-12-30",headers=header)
     j= r.json()
     return j
+#print(getwaterconsumptionbydates()[0])
+def test_getwaterconsumptionbydates():
+    v = Validator(waterconsumptionperiodschema)
+    j = getwaterconsumptionbydates()
+    assert v.validate(j[0]) == True
 
-    
+
 #consumption
-def getconsumptionbyid():
-    r= requests.get(urlLocal+consumption+"/9",headers = header)
-    j= r.json()
+def postconsumption():
+    r= requests.post(urlLocal+consumptions,data = json.dumps(consumptionitem) ,headers=header)
+    j = r.json
     return j
 def deleteconsumption(consumptionId):
     r= requests.delete(urlLocal+consumption+"/"+str(consumptionId),headers = header)
     return r.status_code
-def postconsumption():
-    r= requests.post(urlLocal+consumptions,data = json.dumps(consumptionitem) ,headers=header)
-    return r.status_code
-def putconsumption():
-    r= requests.put(urlLocal+consumption+"/1",data= json.dumps(consumptionitem),headers = header)
-    return r.status_code
+#print(postconsumption())
+#def test_postanddeleteconsumption():
+    #j = postconsumption()
+    #j = r.json()
+    
+    #r2 = deleteconsumption(j['id'])
+    #assert r2 == 200
+
+def getconsumptionbyid():
+    r= requests.get(urlLocal+consumption+"/21",headers = header)
+    j= r.json()
+    return j
+def test_getconsumptionbyid():
+    v = Validator(consumptionschema)
+    j = getconsumptionbyid()
+    assert v.validate(j) == True
+    assert j['ConsumptionId'] ==21
+
 def getconsumptionbydate():
     r= requests.get(urlLocal+consumptions+"?patientId=11&startDate=11-02-2019&endDate=11-04-2019",headers = header)
     j= r.json()
     return j
+#def test_getconsumptionbydate():
+#    v = Validator(consumptiondateschema)
+#    j = getconsumptionbydate()
+#    assert v.validate(j) == True
 
-#wwater 
+    
+def putconsumption():
+    r= requests.put(urlLocal+consumption+"/1",data= json.dumps(consumptionitem),headers = header)
+    return r.status_code
+#def test_putconsumption():
+    #assert 1==2
+
+    #wwater 
 def postwaterconsumption():
     r= requests.post(urlLocal+waterconsumption,data = json.dumps(waterconsumptionitem) ,headers=header)
-    return r.status_code
-def getwaterconsumption():
-    r= requests.get(urlLocal+waterconsumption+"/2" ,headers=header)
-    j= r.json()
+    j = r.json()
     return j
 
+def deletewaterconsumption(id):
+    r= requests.delete(urlLocal+waterconsumption+"/"+str(id),headers = header)
+    return r.status_code
+def test_postanddeletewaterconsumption():
+    j = postwaterconsumption()
+    assert j['amount']==100
+    r = deletewaterconsumption(j['id'])
+    assert r == 200
+def getwaterconsumption():
+    r= requests.get(urlLocal+waterconsumption+"/23" ,headers=header)
+    j= r.json()
+    return j
+def test_getwaterconsumption():
+    v = Validator(waterconsumptionschema)
+    j = getwaterconsumption()
+    assert v.validate(j) == True
+    assert j['id'] ==23
+
 def putwaterconsumption():
-    r= requests.put(urlLocal+waterconsumption+"/2",data= json.dumps(waterconsumptionitem),headers = header)
-    return r.status_code
-def deletewaterconsumption():
-    r= requests.delete(urlLocal+waterconsumption+"/2",headers = header)
-    return r.status_code
+    r= requests.put(urlLocal+waterconsumption+"/23",data= json.dumps(waterconsumptionitem),headers = header)
+    j = r.json()
+    return j
+def test_putwaterconsumption():
+    v = Validator(waterconsumptionschema)
+    j = putwaterconsumption()
+    assert v.validate(j) == True
+
 
 #patient
 def getpatients():
     r= requests.get(urlLocal+patients ,headers=header)
     j= r.json()
-    return j
+    return j[0]
+def test_getpatients():
+    v = Validator(patientschema)
+    j = getpatients()
+    assert v.validate(j) == True
 def getpatientbyid():
-    r= requests.get(urlLocal+patient+"/11" ,headers=header)
+    r= requests.get(urlLocal+patient+"/17" ,headers=header)
     j= r.json()
     return j
-def deletepatient():
-    r= requests.delete(urlLocal+patient+"/11",headers = header)
-    return r.status_code
-def registerpatient():
-    r= requests.post(urlLocal+patient,data = json.dumps(patientitem) ,headers=header)
-    return r.status_code
+def test_getpatientbyid():
+    v = Validator(patientschema)
+    j = getpatients()
+    assert v.validate(j) == True
+    
+
+    
+#def registerpatient():
+#    r= requests.post(urlLocal+patient,data = json.dumps(patientregisteritem) ,headers=header)
+#    #j = r.json()
+#    return r.status_code
+#def test_registerpatient():
+#    r = registerpatient()
+#    assert r == 200
+    
 def getpatientme():
-    r= requests.get(urlLocal+patient+"/me" ,headers=header)
+    r= requests.get(urlLocal+patientMe ,headers=header)
     j= r.json()
     return j
+def test_getpatientme():
+    v = Validator(patientmeschema)
+    j = getpatientme()
+    validatethis = j['patient']
+    assert v.validate(validatethis) == True
 
 #doctor
 def getdoctors():
     r= requests.get(urlLocal+doctor ,headers=header)
     j= r.json()
-    return j
-def postdoctor():
-    r= requests.post(urlLocal+doctor,data = json.dumps(doctoritem) ,headers=header)
-    return r.status_code
+    return j[0]
+def test_getdoctors():
+    v = Validator(doctorschema)
+    j = getdoctors()
+    assert v.validate(j) == True
 def getdoctorbyid():
     r= requests.get(urlLocal+doctor+"/1" ,headers=header)
     j= r.json()
     return j
-def deletedoctor():
-    r= requests.delete(urlLocal+doctor+"/2",headers = header)
-    return r.status_code
+def test_getdoctorbyid():
+    v = Validator(doctorschema)
+    j = getdoctorbyid()
+    assert v.validate(j) == True
+    
 def getdoctorpatients():
-    r= requests.get(urlLocal+doctor+"/2/patients" ,headers=header)
-    j= r.json()
-    return j
+    r= requests.get(urlLocal+doctor+"/4/patients" ,headers=headerdoctor)
+    return r
+def test_getdoctorpatients():
+    r = getdoctorpatients()
+    #dit lijkt een beetje een rare maar er zijn geen patients gekoppeld aan deze jonge
+    #dus als ie leeg is dan is het 204
+    assert r.status_code == 204
+    
 def getdoctorme():
-    r= requests.get(urlLocal+doctor+"/me" ,headers=header)
+    r= requests.get(urlLocal+doctorMe ,headers=headerdoctor)
     j= r.json()
     return j
+def test_getdoctorme():
+    v = Validator(doctorschema)
+    j = getdoctorme()
+    assert v.validate(j['doctor'])== True
+
 #dietarymanagement
 def test_putdietarymanagement():
-    r= requests.put(urlLocal+dietarymanagement+"/8",data= json.dumps(dietarymanagementitem),headers = header)
+    r = requests.put(urlLocal+dietarymanagement+"/8", data= json.dumps(dietarymanagementitem), headers = header)
     assert r.status_code == 200
+
 def test_deletedietarymanagement():
-    r= requests.delete(urlLocal+dietarymanagement+"/8",headers = header)
+    r = requests.get(urlLocal+dietarymanagement+patientid ,headers=header)
+    j = r.json()
+    managements = j["Dietarymanagement"]
+    management = managements[len(managements) -1]
+    r = requests.delete(urlLocal+dietarymanagement+"/"+str(management["id"]), headers = header)
     assert r.status_code == 200
+
 def test_postdietarymanagement():
-    r= requests.post(urlLocal+dietarymanagement,data = json.dumps(dietarymanagementitem) ,headers=header)
+    r = requests.post(urlLocal+dietarymanagement, data = json.dumps(dietarymanagementitem), headers=header)
     assert r.status_code == 200
+
 def test_getdietarymanagement():
-    r= requests.get(urlLocal+dietarymanagement+"/11" ,headers=header)
-    j= r.json()
+    r = requests.get(urlLocal+dietarymanagement+patientid ,headers=header)
     assert r.status_code == 200
-    assert len(j['Restrictions']) == 8
 
-
-
-def test_getconsumptionbyid():
-    v = Validator(consumptionschema)
-    j = getconsumptionbyid()
-    assert v.validate(j) == True
-    assert j['ConsumptionId'] ==9
-def test_getwaterconsumption():
-    v = Validator(waterconsumptionschema)
-    j = getwaterconsumption()
-    assert v.validate(j) == True
-    assert j['id'] ==2  
-def test_getconsumptionbydate():
-    v = Validator(consumptiondateschema)
-    j = getconsumptionbydate()
-    assert v.validate(j) == True
     ##asser waarde nog te doen maar ik weet niet hoe ik iets terugkrijg hier wat niet leeg is
 
 
@@ -315,27 +510,33 @@ def getfoodbyid():
     j= r.json()
     return j
 def getfoodfavorites():
-    r= requests.get(urlLocal+foodFavorites+"/11",headers = header)
+    r= requests.get(urlLocal+foodFavorites+"/17",headers = header)
     j= r.json()
     return j
 def postfoodfavorite():
-    r= requests.post(urlLocal+foodFavorites+"?patientId=11&foodId=3",headers = header)
+    r= requests.post(urlLocal+foodFavorites+"?patientId=17&foodId=3",headers = header)
     return r.status_code
 def deletefoodfavorite():
-    r= requests.delete(urlLocal+foodFavorites+"?patientId=11&foodId=3",headers = header)
+    r= requests.delete(urlLocal+foodFavorites+"?patientId=17&foodId=3",headers = header)
     return r.status_code
 def getmeal():
-    r= requests.get(urlLocal+meal+"/11",headers=header)
+    r= requests.get(urlLocal+meal+"/17",headers=header)
     j= r.json()
     return j
 def postmeal():
-    r= requests.post(urlLocal+meal+"/11",data = json.dumps(mealitem) ,headers=header)
+    r= requests.post(urlLocal+meal+"/17",data = json.dumps(mealitem) ,headers=header)
     j= r.json()
     return j
 def deletemeal(mealId):
-    r= requests.delete(urlLocal+meal+"?patientId=11&mealId="+str(mealId),headers=header)
+    r= requests.delete(urlLocal+meal+"?patientId=17&mealId="+str(mealId),headers=header)
+    return r.status_code
+def putmeal():
+    r= requests.put(urlLocal+meal+"/17/9",data = json.dumps(mealitem),headers=header)
     return r.status_code
 #tests
+def test_putmeal():
+    r= putmeal()
+    assert r ==200
 def test_foodsearch():
     v = Validator(foodschema)
     j = getfoodbysearch()
@@ -360,12 +561,12 @@ def test_getmeal():
     v = Validator(mealschema)
     j = getmeal()
     assert v.validate(j[0]) == True
-    assert j[0]['PatientId'] == 11
+    assert j[0]['PatientId'] == 17
 def test_postanddeletemeal():
     v = Validator(mealschema)
     j = postmeal()
     assert v.validate(j) == True
-    assert j['PatientId'] == 11
+    assert j['PatientId'] == 17
     mealId = j['MealId']
     r = deletemeal(mealId)
     assert r == 200
