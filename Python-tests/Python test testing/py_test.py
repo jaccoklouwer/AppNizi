@@ -291,6 +291,8 @@ def getwaterconsumptionbydates():
     print(r)
     #j= r.json()
     return r
+print(getwaterconsumptionbydates())
+#print(getwaterconsumptionbydates())
 #print(getwaterconsumptionbydates())
 def test_getwaterconsumptionbydates():
     assert 1==2
@@ -347,7 +349,8 @@ def postwaterconsumption():
     r= requests.post(urlLocal+waterconsumption,data = json.dumps(waterconsumptionitem) ,headers=header)
     return r.status_code
 def test_postwaterconsumption():
-    assert 1==2
+    r = postwaterconsumption()
+    assert r == 200
 def getwaterconsumption():
     r= requests.get(urlLocal+waterconsumption+"/2" ,headers=header)
     j= r.json()
@@ -439,7 +442,6 @@ def getdoctorpatients():
     r= requests.get(urlLocal+doctor+"/2/patients" ,headers=headerdoctor)
     #j= r.json()
     return r
-print(getdoctorpatients())
 def test_getdoctorpatients():
     assert 1==2
 def getdoctorme():
