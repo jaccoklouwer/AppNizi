@@ -143,6 +143,13 @@ patientschema={
         'DateOfBirth': {'type':'string'},
         'WeightInKilograms': {'type':'number'}
         }
+doctorschema={
+        
+        "doctorId": {'type':'number'},
+        "firstName": {'type':'string'},
+        "lastName": {'type':'string'},
+        "location": {'type':'string'}
+        }
 
 
 mealitem = {
@@ -242,8 +249,28 @@ def accestoken():
 
     return(splitdata[3])
 
+def accestokendoctor():
+    conn = http.client.HTTPSConnection("appnizi.eu.auth0.com")
+
+    payload = "{\"client_id\":\"lyvNV89UXHNVDC7D8XFdv35HIpPNzFum\",\"client_secret\":\"9sieaPoIz42CxkelXM8jk_izfyyoAzpOkPyXs_ceRW5KS5slO0phSS_CShFXcaGu\",\"audience\":\"appnizi.nl/api\",\"grant_type\":\"client_credentials\"}"
+
+    headers = { 'content-type': "application/json" }
+
+    conn.request("POST", "/oauth/token", payload, headers)
+
+    res = conn.getresponse()
+    data = res.read()
+
+    datadecoded = data.decode("utf-8")
+    splitdata = datadecoded.split('"')
+
+    return(splitdata[3])
 header = {
         "Authorization": "Bearer "+accestoken(),
+        'content-type' : "application/json"
+        }
+headerdoctor ={
+        "Authorization": "Bearer "+accestokendoctor(),
         'content-type' : "application/json"
         }
 
@@ -272,36 +299,29 @@ def test_getwaterconsumptionbydates():
 #consumption
 def postconsumption():
     r= requests.post(urlLocal+consumptions,data = json.dumps(consumptionitem) ,headers=header)
+    j = r.json
+    return j
+def deleteconsumption(consumptionId):
+    r= requests.delete(urlLocal+consumption+"/"+str(consumptionId),headers = header)
     return r.status_code
 #print(postconsumption())
-def test_postconsumption():
-    assert 1==2
+def test_postanddeleteconsumption():
+    j = postconsumption()
+    #j = r.json()
+    
+    r2 = deleteconsumption(j['id'])
+    assert r2 == 200
+
 def getconsumptionbyid():
     r= requests.get(urlLocal+consumption+"/21",headers = header)
-    #j= r.json()
-    return r
-#print(getconsumptionbyid())
+    j= r.json()
+    return j
 def test_getconsumptionbyid():
     v = Validator(consumptionschema)
     j = getconsumptionbyid()
     assert v.validate(j) == True
-    assert j['ConsumptionId'] ==9
+    assert j['ConsumptionId'] ==21
 
-def deleteconsumption(consumptionId):
-    r= requests.delete(urlLocal+consumption+"/"+str(consumptionId),headers = header)
-    return r.status_code
-
-def test_deleteconsumption():
-    assert 1==2
-
-
-    
-def putconsumption():
-    r= requests.put(urlLocal+consumption+"/1",data= json.dumps(consumptionitem),headers = header)
-    return r.status_code
-def test_putconsumption():
-    assert 1==2
-    
 def getconsumptionbydate():
     r= requests.get(urlLocal+consumptions+"?patientId=11&startDate=11-02-2019&endDate=11-04-2019",headers = header)
     j= r.json()
@@ -310,6 +330,15 @@ def test_getconsumptionbydate():
     v = Validator(consumptiondateschema)
     j = getconsumptionbydate()
     assert v.validate(j) == True
+
+    
+def putconsumption():
+    r= requests.put(urlLocal+consumption+"/1",data= json.dumps(consumptionitem),headers = header)
+    return r.status_code
+def test_putconsumption():
+    assert 1==2
+    
+
     
     
     
@@ -364,19 +393,18 @@ def deletepatient():
 def test_deletepatient():
     assert 1==2
     
-def registerpatient():
-    r= requests.post(urlLocal+patient,data = json.dumps(patientregisteritem) ,headers=header)
-    #j = r.json()
-    return r.status_code
-def test_registerpatient():
-    r = registerpatient()
-    assert r == 200
+#def registerpatient():
+#    r= requests.post(urlLocal+patient,data = json.dumps(patientregisteritem) ,headers=header)
+#    #j = r.json()
+#    return r.status_code
+#def test_registerpatient():
+#    r = registerpatient()
+#    assert r == 200
     
 def getpatientme():
     r= requests.get(urlLocal+patient+"/me" ,headers=header)
     #j= r.json()
     return r
-print(getpatientme())
 def test_getpatientme():
     assert 1==2
 
@@ -384,11 +412,13 @@ def test_getpatientme():
 def getdoctors():
     r= requests.get(urlLocal+doctor ,headers=header)
     j= r.json()
-    return j
-def test_getdoctor():
-    assert 1==2
+    return j[0]
+def test_getdoctors():
+    v = Validator(doctorschema)
+    j = getdoctors()
+    assert v.validate(j) == True
 def postdoctor():
-    r= requests.post(urlLocal+doctor,data = json.dumps(doctoritem) ,headers=header)
+    r= requests.post(urlLocal+doctor,data = json.dumps(doctoritem) ,headers=headerdoctor)
     return r.status_code
 def test_postdoctor():
     assert 1==2
@@ -397,16 +427,19 @@ def getdoctorbyid():
     j= r.json()
     return j
 def test_getdoctorbyid():
-    assert 1==2
+    v = Validator(doctorschema)
+    j = getdoctorbyid()
+    assert v.validate(j) == True
 def deletedoctor():
     r= requests.delete(urlLocal+doctor+"/2",headers = header)
     return r.status_code
 def test_deletedoctor():
     assert 1==2
 def getdoctorpatients():
-    r= requests.get(urlLocal+doctor+"/2/patients" ,headers=header)
-    j= r.json()
-    return j
+    r= requests.get(urlLocal+doctor+"/2/patients" ,headers=headerdoctor)
+    #j= r.json()
+    return r
+print(getdoctorpatients())
 def test_getdoctorpatients():
     assert 1==2
 def getdoctorme():
@@ -462,32 +495,33 @@ def getfoodbyid():
     j= r.json()
     return j
 def getfoodfavorites():
-    r= requests.get(urlLocal+foodFavorites+"/11",headers = header)
+    r= requests.get(urlLocal+foodFavorites+"/17",headers = header)
     j= r.json()
     return j
 def postfoodfavorite():
-    r= requests.post(urlLocal+foodFavorites+"?patientId=11&foodId=3",headers = header)
+    r= requests.post(urlLocal+foodFavorites+"?patientId=17&foodId=3",headers = header)
     return r.status_code
 def deletefoodfavorite():
-    r= requests.delete(urlLocal+foodFavorites+"?patientId=11&foodId=3",headers = header)
+    r= requests.delete(urlLocal+foodFavorites+"?patientId=17&foodId=3",headers = header)
     return r.status_code
 def getmeal():
-    r= requests.get(urlLocal+meal+"/11",headers=header)
+    r= requests.get(urlLocal+meal+"/17",headers=header)
     j= r.json()
     return j
 def postmeal():
-    r= requests.post(urlLocal+meal+"/11",data = json.dumps(mealitem) ,headers=header)
+    r= requests.post(urlLocal+meal+"/17",data = json.dumps(mealitem) ,headers=header)
     j= r.json()
     return j
 def deletemeal(mealId):
-    r= requests.delete(urlLocal+meal+"?patientId=11&mealId="+str(mealId),headers=header)
+    r= requests.delete(urlLocal+meal+"?patientId=17&mealId="+str(mealId),headers=header)
     return r.status_code
 def putmeal():
     r= requests.put(urlLocal+meal+"/17/9",data = json.dumps(mealitem),headers=header)
     return r.status_code
 #tests
 def test_putmeal():
-    assert 1==2
+    r= putmeal()
+    assert r ==200
 def test_foodsearch():
     v = Validator(foodschema)
     j = getfoodbysearch()
@@ -512,12 +546,12 @@ def test_getmeal():
     v = Validator(mealschema)
     j = getmeal()
     assert v.validate(j[0]) == True
-    assert j[0]['PatientId'] == 11
+    assert j[0]['PatientId'] == 17
 def test_postanddeletemeal():
     v = Validator(mealschema)
     j = postmeal()
     assert v.validate(j) == True
-    assert j['PatientId'] == 11
+    assert j['PatientId'] == 17
     mealId = j['MealId']
     r = deletemeal(mealId)
     assert r == 200
