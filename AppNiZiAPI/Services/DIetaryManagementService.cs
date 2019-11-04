@@ -91,6 +91,9 @@ namespace AppNiZiAPI.Services
             {
                 List<DietaryManagementModel> dietaryManagement = await _dietaryManagmentRepository.GetDietaryManagementByPatientAsync(patientId);
                 List<DietaryRestriction> restrictions = await _dietaryManagmentRepository.GetDietaryRestrictions();
+                DietaryView view = new DietaryView();
+                view.DietaryManagements = dietaryManagement;
+                view.restrictions = restrictions;
 
                 if (dietaryManagement.Count <= 0)
                 {
@@ -106,11 +109,8 @@ namespace AppNiZiAPI.Services
                     return dictionary;
                 }
 
-                dynamic dietaryData = _messageSerializer.Serialize(dietaryManagement);
-                dictionary.Add(ServiceDictionaryKey.VALUE, dietaryData);
-
-                dynamic restrictionData = _messageSerializer.Serialize(restrictions);
-                dictionary.Add(ServiceDictionaryKey.VALUE, restrictionData);
+                dynamic data = _messageSerializer.Serialize(view);
+                dictionary.Add(ServiceDictionaryKey.VALUE, data);
             }
             catch (Exception ex)
             {
