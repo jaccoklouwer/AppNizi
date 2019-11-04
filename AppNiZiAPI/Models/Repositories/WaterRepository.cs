@@ -134,6 +134,7 @@ namespace AppNiZiAPI.Models.Repositories
                     sqlQuery =
                     $"UPDATE WaterConsumption " +
                     $"SET date = @DATE, amount = @AMOUNT, patient_id = @PATIENTID " +
+                    $"OUTPUT Instered.id " +
                     $"WHERE id = @ID";
                 }
                 else
