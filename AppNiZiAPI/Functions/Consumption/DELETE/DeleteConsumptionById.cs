@@ -20,7 +20,7 @@ namespace AppNiZiAPI
     {
         [FunctionName("DeleteConsumptionById")]
         #region Swagger
-        [OpenApiOperation(nameof(DeleteConsumptionById), "Consumption", Summary = "Deletes a consumption by id", Description = "Deletes a consumption of a patient by id", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiOperation(nameof(DeleteConsumptionById), "Consumption", Summary = "Deletes a consumption by id", Description = "Deletes a consumption of a patient by id. Only available for patient.", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter("consumptionId", Description = "the id of the consumption that is going to be deleted", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKDelete)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]

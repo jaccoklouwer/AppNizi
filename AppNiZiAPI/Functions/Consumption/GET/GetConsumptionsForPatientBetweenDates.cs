@@ -20,7 +20,7 @@ namespace AppNiZiAPI
     {
         [FunctionName("GetConsumptionsForPatientBetweenDates")]
         #region Swagger
-        [OpenApiOperation(nameof(GetConsumptionsForPatientBetweenDates), "Consumption", Summary = "Gets all consumptions for a patient between 2 dates", Description = "Gets all consumptions for a patientid between a startdate and enddate", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiOperation(nameof(GetConsumptionsForPatientBetweenDates), "Consumption", Summary = "Gets all consumptions for a patient between 2 dates", Description = "Gets all consumptions for a patientid between a startdate and enddate. Available for patient and doctor of patient.", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter("patientId", Description = "the id of the patient which adds a consumption", In = ParameterLocation.Query, Required = true, Type = typeof(int))]
         [OpenApiParameter("startDate", Description = "the start date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         [OpenApiParameter("endDate", Description = "the end date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]

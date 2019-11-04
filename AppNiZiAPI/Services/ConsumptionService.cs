@@ -23,7 +23,6 @@ namespace AppNiZiAPI.Services
             this.authorizationService = authorizationService;
         }
 
-
         public async Task<ActionResult> AddConsumption(HttpRequest req)
         {
             Consumption newConsumption = new Consumption();
@@ -33,7 +32,7 @@ namespace AppNiZiAPI.Services
             if (!CorrectConsumption(newConsumption)) return new BadRequestObjectResult(Messages.ErrorInvalidConsumptionObject);
 
             // Auth check
-            if (await Authorised(req, newConsumption.PatientId)) return new BadRequestObjectResult(Messages.AuthNoAcces);
+            if (await Authorised(req, newConsumption.PatientId, false)) return new BadRequestObjectResult(Messages.AuthNoAcces);
 
             if (consumptionRepository.AddConsumption(newConsumption)) return new OkObjectResult(Messages.OKPost);
             return new BadRequestObjectResult(Messages.ErrorPost);
@@ -45,7 +44,7 @@ namespace AppNiZiAPI.Services
 
             ConsumptionView targetConsumption = consumptionRepository.GetConsumptionByConsumptionId(id);
             // Auth check
-            if (await Authorised(req, targetConsumption.PatientId)) return new BadRequestObjectResult(Messages.AuthNoAcces);
+            if (await Authorised(req, targetConsumption.PatientId, true)) return new BadRequestObjectResult(Messages.AuthNoAcces);
 
             var consumptionJson = JsonConvert.SerializeObject(targetConsumption);
             return consumptionJson != null && targetConsumption.ConsumptionId != 0
@@ -76,7 +75,7 @@ namespace AppNiZiAPI.Services
             if (!int.TryParse(patientIdString, out int patientId)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
 
             // Auth check
-            if (await Authorised(req, patientId)) return new BadRequestObjectResult(Messages.AuthNoAcces);
+            if (await Authorised(req, patientId, true)) return new BadRequestObjectResult(Messages.AuthNoAcces);
 
             PatientConsumptionsView consumptions = new PatientConsumptionsView(consumptionRepository.GetConsumptionsForPatientBetweenDates(patientId, startDate, endDate));
 
@@ -88,12 +87,11 @@ namespace AppNiZiAPI.Services
 
         public async Task<ActionResult> RemoveConsumption(HttpRequest req, string consumptionId)
         {
-            // TODO: REFACTOR TO SINGLE METHOD
             if (!int.TryParse(consumptionId, out int Id) || Id <= 0) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
             int patientId = consumptionRepository.GetConsumptionByConsumptionId(Id).PatientId;
 
             // Auth check
-            if (await Authorised(req, patientId)) return new BadRequestObjectResult(Messages.AuthNoAcces);
+            if (await Authorised(req, patientId, false)) return new BadRequestObjectResult(Messages.AuthNoAcces);
 
             if (consumptionRepository.DeleteConsumption(Id, patientId)) return new OkObjectResult(Messages.OKDelete);
 
@@ -116,7 +114,7 @@ namespace AppNiZiAPI.Services
             if (updateConsumption.PatientId != targetPatientId) return new BadRequestObjectResult(Messages.ErrorPut);
 
             // Auth check
-            if (await Authorised(req, targetPatientId)) return new BadRequestObjectResult(Messages.AuthNoAcces);
+            if (await Authorised(req, targetPatientId, false)) return new BadRequestObjectResult(Messages.AuthNoAcces);
 
             if (consumptionRepository.UpdateConsumption(id, updateConsumption)) return new OkObjectResult(Messages.OKUpdate);
             return new BadRequestObjectResult(Messages.ErrorPut);
@@ -131,11 +129,20 @@ namespace AppNiZiAPI.Services
             return true;
         }
 
-        private async Task <bool> Authorised(HttpRequest req, int patientId)
+        private async Task <bool> Authorised(HttpRequest req, int patientId, bool availableForDoctor)
         {
-            AuthResultModel authResult = await authorizationService.CheckAuthorization(req, patientId);
+            AuthResultModel authResult;
+            if (availableForDoctor)
+            {
+                int userId= await authorizationService.GetUserId(req); 
+                authResult = await authorizationService.AuthForDoctorOrPatient(req, userId);
+            } else
+            {
+                authResult = await authorizationService.CheckAuthorization(req, patientId);
+            }
             if (authResult.Result) return true;
             return false;
         }
+
     }
 }

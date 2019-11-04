@@ -23,7 +23,7 @@ namespace AppNiZiAPI
     {
         [FunctionName("GetConsumptionById")]
         #region Swagger
-        [OpenApiOperation(nameof(GetConsumptionById), "Consumption", Summary = "Gets a consumption by id", Description = "Gets a consumption of a patient by id", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiOperation(nameof(GetConsumptionById), "Consumption", Summary = "Gets a consumption by id", Description = "Gets a consumption of a patient by id. Available for patient and doctor of patient.", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter("consumptionId", Description = "the id of the consumption that is targeted", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(ConsumptionView))]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
