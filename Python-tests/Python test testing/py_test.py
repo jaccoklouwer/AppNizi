@@ -353,7 +353,10 @@ def getdietarymanagement():
     j= r.json()
     return j
 def test_getdietarymanagement():
-    assert 1==2
+    r= requests.get(urlLocal+dietarymanagement+"/17" ,headers=header)
+    j= r.json()
+    return j
+    assert len(j["Restrictions"]) == 8
 
 
 

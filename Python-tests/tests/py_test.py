@@ -265,19 +265,20 @@ def getdoctorme():
     j= r.json()
     return j
 #dietarymanagement
-def putdietarymanagement():
+def test_putdietarymanagement():
     r= requests.put(urlLocal+dietarymanagement+"/4",data= json.dumps(dietarymanagementitem),headers = header)
-    return r.status_code
-def deletedietarymanagement():
+    assert r.status_code == 200;
+def test_deletedietarymanagement():
     r= requests.delete(urlLocal+dietarymanagement+"/4",headers = header)
-    return r.status_code
-def postdietarymanagement():
+    assert r.status_code == 200;
+def test_postdietarymanagement():
     r= requests.post(urlLocal+dietarymanagement,data = json.dumps(dietarymanagementitem) ,headers=header)
-    return r.status_code
-def getdietarymanagement():
+    assert r.status_code == 200;
+def test_getdietarymanagement():
     r= requests.get(urlLocal+dietarymanagement+"/11" ,headers=header)
     j= r.json()
-    return j
+    assert r.status_code == 200
+    assert len(j['Restrictions']) == 8
 
 
 
