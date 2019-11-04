@@ -18,6 +18,7 @@ namespace AppNiZiAPI.Models.Repositories
         bool Delete(int patientId);
         PatientLogin GetPatientInfo(string guid);
         PatientLogin RegisterPatient(PatientLogin newPatient);
+        bool Update(PatientUpdateModel patient);
     }
 
     public class PatientRepository : IPatientRepository
@@ -206,6 +207,71 @@ namespace AppNiZiAPI.Models.Repositories
             }
 
             return success;
+        }
+
+        public bool Update(PatientUpdateModel patient)
+        {
+            bool success = false;
+
+            string sqlQuery = BuildUpdateQuery(patient);
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                sqlConn.Open();
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+
+                sqlCmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patient.PatientId;
+
+                if (patient.DateOfBirth != null && patient.DateOfBirth != new DateTime())
+                    sqlCmd.Parameters.Add("@DOB", SqlDbType.Date).Value = patient.DateOfBirth;
+
+                if (patient.DoctorId > 0)
+                    sqlCmd.Parameters.Add("@DOCTORID", SqlDbType.Int).Value = patient.DoctorId;
+
+                if (patient.WeightInKilograms > 0)
+                    sqlCmd.Parameters.Add("@WEIGHT", SqlDbType.Float).Value = patient.WeightInKilograms;
+
+                int rows = sqlCmd.ExecuteNonQuery();
+                if (rows > 0)
+                    success = true;
+            }
+
+            return success;
+        }
+
+        private string BuildUpdateQuery(PatientUpdateModel patient)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("UPDATE patient ");
+            sb.Append("SET ");
+
+            bool isNotFirst = false;
+            if (patient.DateOfBirth != null && patient.DateOfBirth != new DateTime())
+            {
+                sb.Append("date_of_birth=@DOB");
+                isNotFirst = true;
+            }
+            if (patient.WeightInKilograms > 0)
+            {
+                if (isNotFirst)
+                    sb.Append(", ");
+
+                sb.Append("weight=@WEIGHT");
+                isNotFirst = true;
+            }
+            if (patient.DoctorId > 0)
+            {
+                if (isNotFirst)
+                    sb.Append(", ");
+
+                sb.Append("doctor_id=@DOCTORID");
+                isNotFirst = true;
+            }
+
+            sb.Append(" WHERE id=@PATIENTID");
+
+            return sb.ToString();
         }
 
         public PatientLogin GetPatientInfo(string guid)
