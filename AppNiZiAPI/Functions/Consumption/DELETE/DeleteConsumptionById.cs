@@ -1,19 +1,18 @@
-using System.Threading.Tasks;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
+using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Infrastructure;
+using AppNiZiAPI.Models;
+using AppNiZiAPI.Services;
+using AppNiZiAPI.Variables;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Azure.WebJobs.Extensions.Http;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using AppNiZiAPI.Variables;
-using AppNiZiAPI.Models.Repositories;
 using Microsoft.Extensions.DependencyInjection;
-using AppNiZiAPI.Infrastructure;
-using AppNiZiAPI.Security;
-using AppNiZiAPI.Models;
-using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
-using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
-using System.Net;
+using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using System.Net;
+using System.Threading.Tasks;
 
 namespace AppNiZiAPI
 {
@@ -33,21 +32,7 @@ namespace AppNiZiAPI
             ILogger log, string consumptionId)
         {
             log.LogDebug($"Triggered '" + nameof(DeleteConsumptionById) + "' with parameter: '"+ consumptionId +"'");
-            if (!int.TryParse(consumptionId, out int Id) || Id <= 0) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
-
-            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
-            int patientId = consumptionRepository.GetConsumptionByConsumptionId(Id).PatientId;
-
-            // Auth check
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
-            if (!authResult.Result)
-                return new StatusCodeResult((int)authResult.StatusCode);
-
-            bool deleted = consumptionRepository.DeleteConsumption(Id, patientId);
-
-            return deleted
-                ? (ActionResult)new OkObjectResult(Messages.OKDelete)
-                : new BadRequestObjectResult(Messages.ErrorDelete);
+            return await DIContainer.Instance.GetService<IConsumptionService>().RemoveConsumption(req, consumptionId);
         }
     }
 }

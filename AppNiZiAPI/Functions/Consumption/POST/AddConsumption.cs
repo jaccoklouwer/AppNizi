@@ -16,6 +16,8 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using System.Net;
 using Microsoft.OpenApi.Models;
+using AppNiZiAPI.Models.Handlers;
+using AppNiZiAPI.Services;
 
 namespace AppNiZiAPI
 {
@@ -35,24 +37,8 @@ namespace AppNiZiAPI
             ILogger log)
         {
             log.LogDebug($"Triggered '" + nameof(AddConsumption) + "'");
-
-            Consumption newConsumption = new Consumption();
-            string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();
-            JsonConvert.PopulateObject(consumptionJson, newConsumption);
-
-            int patientId = newConsumption.PatientId;
-            // Auth check
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
-            if (!authResult.Result)
-                return new StatusCodeResult((int)authResult.StatusCode);
-
-
-            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
-            if (consumptionRepository.AddConsumption(newConsumption))
-            {
-                return new OkObjectResult(Messages.OKPost);
-            }
-            return new BadRequestObjectResult(Messages.ErrorPost);
+            return await DIContainer.Instance.GetService<IConsumptionService>().AddConsumption(req);
         }
     }
+
 }

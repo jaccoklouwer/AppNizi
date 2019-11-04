@@ -26,8 +26,8 @@ namespace AppNiZiAPI.Variables
         public const string DoctorMe = "/doctor/me";
 
         // Consumption
-        public const string Consumption = "/consumption/{consumptionId}";
-        public const string Consumptions = "/consumptions";
+        public const string Consumption = "/consumption/{consumptionId}"; // DELETE, GET, PUT
+        public const string Consumptions = "/consumptions"; // GET, POST
 
         // Water Consumption
         public const string PostWaterConsumption = "/waterconsumption";

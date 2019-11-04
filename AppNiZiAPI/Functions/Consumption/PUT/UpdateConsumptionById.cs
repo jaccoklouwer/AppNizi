@@ -16,6 +16,8 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using System.Net;
 using Microsoft.OpenApi.Models;
+using AppNiZiAPI.Models.Handlers;
+using AppNiZiAPI.Services;
 
 namespace AppNiZiAPI
 {
@@ -37,30 +39,7 @@ namespace AppNiZiAPI
             ILogger log, string consumptionId)
         {
             log.LogDebug($"Triggered '" + typeof(UpdateConsumptionById).Name + "' with parameter: '" + consumptionId + "'");
-
-            if (!int.TryParse(consumptionId, out int id)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
-
-            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
-            int targetPatientId = consumptionRepository.GetConsumptionByConsumptionId(id).PatientId;
-
-            Consumption updateConsumption = new Consumption();
-            string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();
-            JsonConvert.PopulateObject(consumptionJson, updateConsumption);
-
-            // Check if updated consumption patientId equals target patientId
-            if (updateConsumption.PatientId != targetPatientId) return new BadRequestObjectResult(Messages.ErrorPut);
-
-            // Auth check
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, targetPatientId);
-            if (!authResult.Result)
-                return new StatusCodeResult((int)authResult.StatusCode);
-
-            
-            if (consumptionRepository.UpdateConsumption(id, updateConsumption))
-            {
-                return new OkObjectResult(Messages.OKUpdate);
-            }
-            return new BadRequestObjectResult(Messages.ErrorPut);
+            return await DIContainer.Instance.GetService<IConsumptionService>().UpdateConsumption(req, consumptionId);
         }
     }
 }
