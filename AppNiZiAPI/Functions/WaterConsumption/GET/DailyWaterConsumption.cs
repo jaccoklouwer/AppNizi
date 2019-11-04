@@ -49,8 +49,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
                 return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
 
-            string date = patientId.Substring(patientId.IndexOf('e'));
-            if (!DateTime.TryParse(req.Query[patientId.Substring(patientId.IndexOf('='), patientId.Length)], out var parsedDate))
+            if (!DateTime.TryParse(patientId.Substring(patientId.IndexOf('=') + 1), out var parsedDate))
                 return new StatusCodeResult(StatusCodes.Status400BadRequest);
 
             IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
