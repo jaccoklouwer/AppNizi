@@ -16,16 +16,20 @@ namespace AppNiZiAPI
                 $"(food_name, kcal, protein, fiber, calium, sodium, amount, weight_unit_id, date, patient_id)";
             var values = $" VALUES (@food_name, @kcal, @protein, @fiber, @calium, @sodium, @amount, @weight_unit_id, @date, @patient_id)";
             var insertQuery = insert + values;
-            conn.Open();
-            try
+
+            using (conn)
             {
-                added = ConsumptionCommand(insertQuery, consumption).ExecuteNonQuery() > 0;
+                conn.Open();
+                try
+                {
+                    added = ConsumptionCommand(insertQuery, consumption).ExecuteNonQuery() > 0;
+                }
+                catch (Exception)
+                {
+                    added = false;
+                }
+                conn.Close();
             }
-            catch (Exception)
-            {
-                added = false;
-            }
-            conn.Close();
             return added;
         }
 
@@ -35,17 +39,20 @@ namespace AppNiZiAPI
 
             bool affected;
             var query = $"DELETE FROM Consumption WHERE id = '{consumptionId}'";
-            conn.Open();
-            try
+            using (conn)
             {
-                SqlCommand command = new SqlCommand(query, conn);
-                affected = command.ExecuteNonQuery() > 0;
+                conn.Open();
+                try
+                {
+                    SqlCommand command = new SqlCommand(query, conn);
+                    affected = command.ExecuteNonQuery() > 0;
+                }
+                catch (Exception)
+                {
+                    affected = false;
+                }
+                conn.Close();
             }
-            catch (Exception)
-            {
-                affected = false;
-            }
-            conn.Close();
             return affected;
         }
 
@@ -56,41 +63,44 @@ namespace AppNiZiAPI
                 $"INNER JOIN WeightUnit ON Consumption.weight_unit_id = WeightUnit.id " +
                 $"WHERE Consumption.id = '{consumptionId}'";
 
-            conn.Open();
             ConsumptionView consumption = new ConsumptionView();
-            using (SqlCommand sqlCommand = new SqlCommand(query, conn))
+            using (conn)
             {
-                try
+                conn.Open();
+                using (SqlCommand sqlCommand = new SqlCommand(query, conn))
                 {
-                    SqlDataReader reader = sqlCommand.ExecuteReader();
-                    while (reader.Read())
+                    try
                     {
-                        consumption.ConsumptionId = (int)reader["id"];
-                        consumption.FoodName = reader["food_name"].ToString();
-                        consumption.KCal = (float)Convert.ToDouble(reader["kcal"]);
-                        consumption.Protein = (float)Convert.ToDouble(reader["protein"]);
-                        consumption.Fiber = (float)Convert.ToDouble(reader["fiber"]);
-                        consumption.Calium = (float)Convert.ToDouble(reader["calium"]);
-                        consumption.Sodium = (float)Convert.ToDouble(reader["sodium"]);
-                        consumption.Amount = (int)reader["amount"];
-                        consumption.Weight = new WeightUnitModel
+                        SqlDataReader reader = sqlCommand.ExecuteReader();
+                        while (reader.Read())
                         {
-                            Id = (int)reader["weight_unit_id"],
-                            Short = (string)reader["short"],
-                            Unit = (string)reader["unit"]
-                        };
-                        consumption.Date = Convert.ToDateTime(reader["date"]).Date;
-                        consumption.PatientId = (int)reader["patient_id"];
-                        consumption.Valid = true;
+                            consumption.ConsumptionId = (int)reader["id"];
+                            consumption.FoodName = reader["food_name"].ToString();
+                            consumption.KCal = (float)Convert.ToDouble(reader["kcal"]);
+                            consumption.Protein = (float)Convert.ToDouble(reader["protein"]);
+                            consumption.Fiber = (float)Convert.ToDouble(reader["fiber"]);
+                            consumption.Calium = (float)Convert.ToDouble(reader["calium"]);
+                            consumption.Sodium = (float)Convert.ToDouble(reader["sodium"]);
+                            consumption.Amount = (int)reader["amount"];
+                            consumption.Weight = new WeightUnitModel
+                            {
+                                Id = (int)reader["weight_unit_id"],
+                                Short = (string)reader["short"],
+                                Unit = (string)reader["unit"]
+                            };
+                            consumption.Date = Convert.ToDateTime(reader["date"]).Date;
+                            consumption.PatientId = (int)reader["patient_id"];
+                            consumption.Valid = true;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        consumption.Valid = false;
+                        return consumption;
                     }
                 }
-                catch (Exception)
-                {
-                    consumption.Valid = false;
-                    return consumption;
-                }
+                conn.Close();
             }
-            conn.Close();
             return consumption;
         }
 
@@ -166,16 +176,19 @@ namespace AppNiZiAPI
                 $"calium = @calium, sodium = @sodium, amount = @amount, weight_unit_id = @weight_unit_id, " +
                 $"date = @date, patient_id = @patient_id " +
                 $"Where Id = {consumptionId}";
-            conn.Open();
-            try
+            using (conn)
             {
-                updated = ConsumptionCommand(updateQuery, consumption).ExecuteNonQuery() > 0;
+                conn.Open();
+                try
+                {
+                    updated = ConsumptionCommand(updateQuery, consumption).ExecuteNonQuery() > 0;
+                }
+                catch (Exception)
+                {
+                    updated = false;
+                }
+                conn.Close();
             }
-            catch (Exception)
-            {
-                updated = false;
-            }
-            conn.Close();
             return updated;
         }
 
