@@ -61,7 +61,7 @@ namespace AppNiZiAPI.Models
         public float WeightInKilograms { get; set; }
     }
 
-    public struct PatientUpdateModel
+    public class PatientUpdateModel
     {
         public PatientUpdateModel(int patientId, DateTime dateOfBirth, float weightInKilograms, int doctorId)
         {

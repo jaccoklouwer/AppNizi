@@ -87,6 +87,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 sqlConn.Open();
                 accountModel.AccountId = (int)sqlCmd.ExecuteScalar();
+                accountModel.Role = role.ToString();
             }
 
             return accountModel;
@@ -95,7 +96,6 @@ namespace AppNiZiAPI.Models.Repositories
 
     public interface IAccountRepository
     {
-
         AccountModel RegisterAccount(Patient patient, Role role);
         bool CheckIfExists(string guid);
         int RegisterAccount(string firstName, string lastName, int role);

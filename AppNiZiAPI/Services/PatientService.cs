@@ -71,8 +71,17 @@ namespace AppNiZiAPI.Services
                 int id = Int32.Parse(idText);
 
                 // Auth
-                if (!await IsAuthorized(dictionary, req, id))
+                try
+                {
+                    if (!await IsAuthorized(dictionary, req, id))
+                        return dictionary;
+                }
+                catch
+                {
+                    dictionary.Add(ServiceDictionaryKey.ERROR, "Auth threw an error. Has the token lifetime expired?");
+                    dictionary.Add(ServiceDictionaryKey.HTTPSTATUSCODE, HttpStatusCode.Unauthorized);
                     return dictionary;
+                }
 
                 Patient patient = _patientRepository.Select(id);
 
@@ -141,6 +150,18 @@ namespace AppNiZiAPI.Services
                 if (patient.PatientId <= 0)
                 {
                     dictionary.Add(ServiceDictionaryKey.ERROR, "Please pass a valid patient ID to update.");
+                    return dictionary;
+                }
+
+                try
+                {
+                    if (!await IsAuthorized(dictionary, request, patient.PatientId))
+                        return dictionary;
+                }
+                catch
+                {
+                    dictionary.Add(ServiceDictionaryKey.ERROR, "Auth threw an error. Has the token lifetime expired?");
+                    dictionary.Add(ServiceDictionaryKey.HTTPSTATUSCODE, HttpStatusCode.Unauthorized);
                     return dictionary;
                 }
 
@@ -221,8 +242,17 @@ namespace AppNiZiAPI.Services
                 int patientId = Int32.Parse(idText);
 
                 // Auth
-                if (!await IsAuthorized(dictionary, req, patientId))
+                try
+                {
+                    if (!await IsAuthorized(dictionary, req, patientId))
+                        return dictionary;
+                }
+                catch
+                {
+                    dictionary.Add(ServiceDictionaryKey.ERROR, "Auth threw an error. Has the token lifetime expired?");
+                    dictionary.Add(ServiceDictionaryKey.HTTPSTATUSCODE, HttpStatusCode.Unauthorized);
                     return dictionary;
+                }
 
                 // Deleting
                 int accountId = _patientRepository.Select(patientId).AccountId;
@@ -283,6 +313,18 @@ namespace AppNiZiAPI.Services
         HTTPSTATUSCODE
     }
 }
+
+
+// REGISTER PATIENT
+//{
+//    "Patient": {
+//        "FirstName": "Jim",
+//        "LastName": "Pickem",
+//        "DateOfBirth": "2019-11-03T19:28:10.5222753+01:00",
+//        "WeightInKilograms": 88.3,
+//        "DoctorId": 2
+//    }
+//}
 
 /*/
  {

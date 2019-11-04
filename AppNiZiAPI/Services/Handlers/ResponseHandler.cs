@@ -46,7 +46,7 @@ namespace AppNiZiAPI.Services.Handlers
                         actionResult = new NotFoundObjectResult(dictionary[ServiceDictionaryKey.ERROR]);
                         break;
                     case HttpStatusCode.Forbidden:
-                        actionResult = new ForbidResult();
+                        actionResult = new BadRequestObjectResult("(403) Forbidden: " + dictionary[ServiceDictionaryKey.ERROR]);
                         break;
                     default:
                         actionResult = new BadRequestObjectResult(dictionary[ServiceDictionaryKey.ERROR]);
