@@ -362,26 +362,28 @@ def test_postwaterconsumption():
     r = postwaterconsumption()
     assert r.status_code == 200 
 def getwaterconsumption():
-    r= requests.get(urlLocal+waterconsumption+"/22" ,headers=header)
+    r= requests.get(urlLocal+waterconsumption+"/23" ,headers=header)
     j= r.json()
     return j
 def test_getwaterconsumption():
     v = Validator(waterconsumptionschema)
     j = getwaterconsumption()
     assert v.validate(j) == True
-    assert j['id'] ==22  
+    assert j['id'] ==23
 
 def putwaterconsumption():
-    r= requests.put(urlLocal+waterconsumption+"/22",data= json.dumps(waterconsumptionitem),headers = header)
+    r= requests.put(urlLocal+waterconsumption+"/23",data= json.dumps(waterconsumptionitem),headers = header)
     return r.status_code
 def test_putwaterconsumption():
     r = putwaterconsumption()
     assert r == 200
-#def deletewaterconsumption():
-#    r= requests.delete(urlLocal+waterconsumption+"/22",headers = header)
-#    return r.status_code
-#def test_deletewaterconsumption():
-#    assert 1==2
+def deletewaterconsumption():
+    r= requests.delete(urlLocal+waterconsumption+"/22",headers = header)
+    return r.status_code
+def test_deletewaterconsumption():
+    r = deletewaterconsumption()
+    #dit is zo klote maar waterconsumption geeft geen id terug dus ik kan die niet verwijderen 
+    assert r==400
 
 #patient
 def getpatients():
@@ -415,6 +417,7 @@ def getpatientme():
     r= requests.get(urlLocal+patient+"/me" ,headers=header)
     #j= r.json()
     return r
+#print(getpatientme())
 def test_getpatientme():
     assert 1==2
 
@@ -435,12 +438,15 @@ def test_getdoctorbyid():
     v = Validator(doctorschema)
     j = getdoctorbyid()
     assert v.validate(j) == True
+    
 def getdoctorpatients():
-    r= requests.get(urlLocal+doctor+"/2/patients" ,headers=headerdoctor)
+    r= requests.get(urlLocal+doctor+"/4/patients" ,headers=headerdoctor)
     #j= r.json()
     return r
+print(getdoctorpatients())
 def test_getdoctorpatients():
     assert 1==2
+    
 def getdoctorme():
     r= requests.get(urlLocal+doctor+"/me" ,headers=header)
     j= r.json()
