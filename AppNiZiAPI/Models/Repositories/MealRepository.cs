@@ -8,7 +8,6 @@ namespace AppNiZiAPI.Models.Repositories
 {
     class MealRepository :IMealRepository
     {
-        //TODO laat add en delete iets teruggeven
         public Meal AddMeal(Meal meal)
         {
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
@@ -142,6 +141,49 @@ namespace AppNiZiAPI.Models.Repositories
                 conn.Close();
             }
             return meals;
+        }
+
+        public Meal PutMeal(Meal meal)
+        {
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
+
+            string text = $"Select Id From Weightunit where unit = '{meal.WeightUnit}'";
+            int weightunitid = 1;
+            using (SqlCommand cmd = new SqlCommand(text, conn))
+            {
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                while (reader.Read())
+                {
+                    weightunitid = reader.GetInt32(0);
+                }
+                conn.Close();
+            }
+            StringBuilder sqlQuery = new StringBuilder();
+            sqlQuery.Append("Update Meal ");
+            sqlQuery.Append("set name = @NAME , kcal = @KCAL,protein= @PROTEIN,fiber = @FIBER,calcium =@CALCIUM,sodium =@SODIUM,portion_size = @PORTION_SIZE,weight_unit_id = @WEIGHT_UNIT_ID,picture = @PICTURE ");
+            sqlQuery.Append("WHERE id = @MEAL_ID");
+            using (conn)
+            {
+
+                conn.Open();
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery.ToString(), conn);
+                sqlCmd.Parameters.Add("@PATIENT_ID", SqlDbType.Int).Value = meal.PatientId;
+                sqlCmd.Parameters.Add("@MEAL_ID", SqlDbType.Int).Value = meal.MealId;
+                sqlCmd.Parameters.Add("@NAME", SqlDbType.NVarChar).Value = meal.Name;
+                sqlCmd.Parameters.Add("@KCAL", SqlDbType.Float).Value = meal.KCal;
+                sqlCmd.Parameters.Add("@PROTEIN", SqlDbType.Float).Value = meal.Protein;
+                sqlCmd.Parameters.Add("@FIBER", SqlDbType.Float).Value = meal.Fiber;
+                sqlCmd.Parameters.Add("@CALCIUM", SqlDbType.Float).Value = meal.Calcium;
+                sqlCmd.Parameters.Add("@SODIUM", SqlDbType.Float).Value = meal.Sodium;
+                sqlCmd.Parameters.Add("@PORTION_SIZE", SqlDbType.Int).Value = meal.PortionSize;
+                sqlCmd.Parameters.Add("@WEIGHT_UNIT_ID", SqlDbType.Int).Value = weightunitid;
+                sqlCmd.Parameters.Add("@PICTURE", SqlDbType.NVarChar).Value = meal.Picture;
+                int rows = sqlCmd.ExecuteNonQuery();
+
+            }
+            conn.Close();
+            return GetMealbyName(meal.Name);
         }
     }
 }

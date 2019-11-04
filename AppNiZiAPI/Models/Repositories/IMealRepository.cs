@@ -11,5 +11,6 @@ namespace AppNiZiAPI.Models.Repositories
         List<Meal> GetMyMeals(int patient_id);
 
         Meal GetMealbyName(string name);
+        Meal PutMeal(Meal meal);
     }
 }

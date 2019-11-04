@@ -22,6 +22,7 @@ namespace AppNiZiAPI.Services
         Task<Dictionary<ServiceDictionaryKey, object>> TryDeleteMeal(HttpRequest request);
         Task<Dictionary<ServiceDictionaryKey, object>> TryGetMeals(int patientId);
         Task<Dictionary<ServiceDictionaryKey, object>> TryAddMeal(int patientId, HttpRequest request);
+        Task<Dictionary<ServiceDictionaryKey, object>> TryPutMeal(int patientId, int mealId,HttpRequest request);
     }
     class MealService:IMealService
     {
@@ -123,6 +124,31 @@ namespace AppNiZiAPI.Services
             }
             
                 catch (Exception ex)
+            {
+                dictionary.AddErrorMessage(ServiceDictionaryKey.ERROR, ex, FeedbackHandler);
+            }
+            return dictionary;
+        }
+
+        public async Task<Dictionary<ServiceDictionaryKey, object>> TryPutMeal(int patientId, int mealId,HttpRequest request)
+        {
+            Dictionary<ServiceDictionaryKey, object> dictionary = new Dictionary<ServiceDictionaryKey, object>();
+
+            try
+            {
+                string requestBody = await new StreamReader(request.Body).ReadToEndAsync();
+
+                Meal meal = new Meal();
+                JsonConvert.PopulateObject(requestBody, meal);
+                meal.PatientId = patientId;
+                meal.MealId = mealId;
+                meal = _mealRepository.PutMeal(meal);
+                dynamic data = _messageSerializer.Serialize(meal);
+
+                dictionary.Add(ServiceDictionaryKey.VALUE, data);
+            }
+
+            catch (Exception ex)
             {
                 dictionary.AddErrorMessage(ServiceDictionaryKey.ERROR, ex, FeedbackHandler);
             }
