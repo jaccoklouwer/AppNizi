@@ -135,7 +135,14 @@ waterconsumptiondailyschema={
                                'date': {'type':'string'} , 
                                'patientId': {'type':'number'} }},
         }
-
+patientschema={
+        'Id':{'type':'number'},
+        'HandlingDoctorId':{'type':'number'},
+        'FirstName':{'type':'string'},
+        'LastName':{'type':'string'},
+        'DateOfBirth': {'type':'string'},
+        'WeightInKilograms': {'type':'number'}
+        }
 
 
 mealitem = {
@@ -170,12 +177,34 @@ waterconsumptionitem={
   "date": "2019-11-03T14:44:52.978Z",
   "PatientId": 11   
   }
-patientitem={
-  "firstName": "anus",
-  "lastName": "piraate",
-  "dateOfBirth": "11-11-2011",
-  "weight": 0,
-  "doctorId": 0
+patientregisteritem={
+  "Account": {
+    "AccountId": 0,
+    "Role": "string"
+  },
+  "Patient": {
+    "PatientId": 0,
+    "AccountId": 0,
+    "DoctorId": 0,
+    "FirstName": "string",
+    "LastName": "string",
+    "DateOfBirth": "2019-11-04T13:37:41.486Z",
+    "WeightInKilograms": 0,
+    "Guid": "string"
+  },
+  "Doctor": {
+    "DoctorId": 0,
+    "FirstName": "string",
+    "LastName": "string",
+    "Location": "string"
+  },
+  "AuthLogin": {
+    "Guid": "string",
+    "Token": {
+      "Scheme": "string",
+      "AccesCode": "string"
+    }
+  }
 }
 doctoritem={
   "firstName": "ho",
@@ -244,14 +273,14 @@ def test_getwaterconsumptionbydates():
 def postconsumption():
     r= requests.post(urlLocal+consumptions,data = json.dumps(consumptionitem) ,headers=header)
     return r.status_code
-print(postconsumption())
+#print(postconsumption())
 def test_postconsumption():
     assert 1==2
 def getconsumptionbyid():
     r= requests.get(urlLocal+consumption+"/21",headers = header)
     #j= r.json()
     return r
-print(getconsumptionbyid())
+#print(getconsumptionbyid())
 def test_getconsumptionbyid():
     v = Validator(consumptionschema)
     j = getconsumptionbyid()
@@ -261,6 +290,7 @@ def test_getconsumptionbyid():
 def deleteconsumption(consumptionId):
     r= requests.delete(urlLocal+consumption+"/"+str(consumptionId),headers = header)
     return r.status_code
+
 def test_deleteconsumption():
     assert 1==2
 
@@ -314,16 +344,19 @@ def test_deletewaterconsumption():
 def getpatients():
     r= requests.get(urlLocal+patients ,headers=header)
     j= r.json()
-    return j
+    return j[0]
 def test_getpatients():
-    assert 1==2
-    
+    v = Validator(patientschema)
+    j = getpatients()
+    assert v.validate(j) == True
 def getpatientbyid():
-    r= requests.get(urlLocal+patient+"/11" ,headers=header)
+    r= requests.get(urlLocal+patient+"/17" ,headers=header)
     j= r.json()
     return j
 def test_getpatientbyid():
-    assert 1==2
+    v = Validator(patientschema)
+    j = getpatients()
+    assert v.validate(j) == True
     
 def deletepatient():
     r= requests.delete(urlLocal+patient+"/11",headers = header)
@@ -332,15 +365,18 @@ def test_deletepatient():
     assert 1==2
     
 def registerpatient():
-    r= requests.post(urlLocal+patient,data = json.dumps(patientitem) ,headers=header)
+    r= requests.post(urlLocal+patient,data = json.dumps(patientregisteritem) ,headers=header)
+    #j = r.json()
     return r.status_code
 def test_registerpatient():
-    assert 1==2
+    r = registerpatient()
+    assert r == 200
     
 def getpatientme():
     r= requests.get(urlLocal+patient+"/me" ,headers=header)
-    j= r.json()
-    return j
+    #j= r.json()
+    return r
+print(getpatientme())
 def test_getpatientme():
     assert 1==2
 
