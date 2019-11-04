@@ -41,18 +41,11 @@ namespace AppNiZiAPI.Functions.Patients.DELETE
             string patientId,
             ILogger log)
         {
-            #region AuthCheck
-            //if (patientId != 0)
-            //{
-            //    AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
-            //    if (!authResult.Result)
-            //        return new StatusCodeResult((int)authResult.StatusCode);
-            //}
-            #endregion
+            log.LogInformation("C# HTTP trigger function processed a request.");
 
             // Logic
             Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IPatientService>()
-                .TryDeletePatient(patientId);
+                .TryDeletePatient(req, patientId);
 
             // Response
             return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);

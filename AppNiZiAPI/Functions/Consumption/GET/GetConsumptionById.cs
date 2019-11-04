@@ -15,6 +15,7 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Services;
 
 namespace AppNiZiAPI
 {
@@ -22,7 +23,7 @@ namespace AppNiZiAPI
     {
         [FunctionName("GetConsumptionById")]
         #region Swagger
-        [OpenApiOperation(nameof(GetConsumptionById), "Consumption", Summary = "Gets a consumption by id", Description = "Gets a consumption of a patient by id", Visibility = OpenApiVisibilityType.Important)]
+        [OpenApiOperation(nameof(GetConsumptionById), "Consumption", Summary = "Gets a consumption by id", Description = "Gets a consumption of a patient by id. Available for patient and doctor of patient.", Visibility = OpenApiVisibilityType.Important)]
         [OpenApiParameter("consumptionId", Description = "the id of the consumption that is targeted", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(ConsumptionView))]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
@@ -33,21 +34,7 @@ namespace AppNiZiAPI
             ILogger log, string consumptionId)
         {
             log.LogDebug($"Triggered '" + nameof(GetConsumptionById) + "' with parameter: '" + consumptionId + "'");
-
-            if (!int.TryParse(consumptionId, out int id)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
-
-            IConsumptionRepository consumptionRepository = DIContainer.Instance.GetService<IConsumptionRepository>();
-            ConsumptionView consumption = consumptionRepository.GetConsumptionByConsumptionId(id);
-
-            int patientId = consumption.PatientId;
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
-            if (!authResult.Result)
-                return new StatusCodeResult((int)authResult.StatusCode);
-            
-            var consumptionJson = JsonConvert.SerializeObject(consumption);
-            return consumptionJson != null && consumption.ConsumptionId != 0
-                ? (ActionResult)new OkObjectResult(consumptionJson)
-                : new BadRequestObjectResult(Messages.ErrorIncorrectId);
+            return await DIContainer.Instance.GetService<IConsumptionService>().GetConsumptionByConsumptionId(req, consumptionId);
         }
     }
 }

@@ -8,6 +8,7 @@ Created on Sat Oct 26 11:44:21 2019
 import requests
 import json
 import cerberus
+import http.client
 from cerberus import Validator
 
 ##urls
@@ -173,17 +174,26 @@ dietarymanagementitem ={
   "PatientId": 11
 }
 
+
+
+
 #problematisch
 def getwaterconsumptionbydate():
     r= requests.get(urlLocal+waterconsumptiondaily+"/11?date=20-10-1993" ,headers=header)
     print(r)
     j= r.json()
     return j
+
+def test_getwaterconsumptionbydate():
+    assert 1==2
+
 def getwaterconsumptionbydates():
     r= requests.get(urlLocal+waterconsumptionperiod+"/11&startDate=11-02-2019&endDate=11-04-2019" ,headers=header)
     print(r)
     j= r.json()
     return j
+def test_getwaterconsumptionbydates():
+    assert 1==2
 
     
 #consumption
@@ -191,110 +201,165 @@ def getconsumptionbyid():
     r= requests.get(urlLocal+consumption+"/9",headers = header)
     j= r.json()
     return j
+def test_getconsumptionbyid():
+    v = Validator(consumptionschema)
+    j = getconsumptionbyid()
+    assert v.validate(j) == True
+    assert j['ConsumptionId'] ==9
+
 def deleteconsumption(consumptionId):
     r= requests.delete(urlLocal+consumption+"/"+str(consumptionId),headers = header)
     return r.status_code
+def test_deleteconsumption():
+    assert 1==2
+
 def postconsumption():
     r= requests.post(urlLocal+consumptions,data = json.dumps(consumptionitem) ,headers=header)
     return r.status_code
+def test_postconsumption():
+    assert 1==2
+    
 def putconsumption():
     r= requests.put(urlLocal+consumption+"/1",data= json.dumps(consumptionitem),headers = header)
     return r.status_code
+def test_putconsumption():
+    assert 1==2
+    
 def getconsumptionbydate():
     r= requests.get(urlLocal+consumptions+"?patientId=11&startDate=11-02-2019&endDate=11-04-2019",headers = header)
     j= r.json()
     return j
-
-#wwater 
+def test_getconsumptionbydate():
+    v = Validator(consumptiondateschema)
+    j = getconsumptionbydate()
+    assert v.validate(j) == True
+    
+    
+    
+    #wwater 
 def postwaterconsumption():
     r= requests.post(urlLocal+waterconsumption,data = json.dumps(waterconsumptionitem) ,headers=header)
     return r.status_code
+def test_postwaterconsumption():
+    assert 1==2
 def getwaterconsumption():
     r= requests.get(urlLocal+waterconsumption+"/2" ,headers=header)
     j= r.json()
     return j
+def test_getwaterconsumption():
+    v = Validator(waterconsumptionschema)
+    j = getwaterconsumption()
+    assert v.validate(j) == True
+    assert j['id'] ==2  
 
 def putwaterconsumption():
     r= requests.put(urlLocal+waterconsumption+"/2",data= json.dumps(waterconsumptionitem),headers = header)
     return r.status_code
+def test_putwaterconsumption():
+    assert 1==2
 def deletewaterconsumption():
     r= requests.delete(urlLocal+waterconsumption+"/2",headers = header)
     return r.status_code
+def test_deletewaterconsumption():
+    assert 1==2
 
 #patient
 def getpatients():
     r= requests.get(urlLocal+patients ,headers=header)
     j= r.json()
     return j
+def test_getpatients():
+    assert 1==2
+    
 def getpatientbyid():
     r= requests.get(urlLocal+patient+"/11" ,headers=header)
     j= r.json()
     return j
+def test_getpatientbyid():
+    assert 1==2
+    
 def deletepatient():
     r= requests.delete(urlLocal+patient+"/11",headers = header)
     return r.status_code
+def test_deletepatient():
+    assert 1==2
+    
 def registerpatient():
     r= requests.post(urlLocal+patient,data = json.dumps(patientitem) ,headers=header)
     return r.status_code
+def test_registerpatient():
+    assert 1==2
+    
 def getpatientme():
     r= requests.get(urlLocal+patient+"/me" ,headers=header)
     j= r.json()
     return j
+def test_getpatientme():
+    assert 1==2
 
 #doctor
 def getdoctors():
     r= requests.get(urlLocal+doctor ,headers=header)
     j= r.json()
     return j
+def test_getdoctor():
+    assert 1==2
 def postdoctor():
     r= requests.post(urlLocal+doctor,data = json.dumps(doctoritem) ,headers=header)
     return r.status_code
+def test_postdoctor():
+    assert 1==2
 def getdoctorbyid():
     r= requests.get(urlLocal+doctor+"/1" ,headers=header)
     j= r.json()
     return j
+def test_getdoctorbyid():
+    assert 1==2
 def deletedoctor():
     r= requests.delete(urlLocal+doctor+"/2",headers = header)
     return r.status_code
+def test_deletedoctor():
+    assert 1==2
 def getdoctorpatients():
     r= requests.get(urlLocal+doctor+"/2/patients" ,headers=header)
     j= r.json()
     return j
+def test_getdoctorpatients():
+    assert 1==2
 def getdoctorme():
     r= requests.get(urlLocal+doctor+"/me" ,headers=header)
     j= r.json()
     return j
+def test_getdoctorme():
+    return 1==2
 #dietarymanagement
 def putdietarymanagement():
     r= requests.put(urlLocal+dietarymanagement+"/4",data= json.dumps(dietarymanagementitem),headers = header)
     return r.status_code
+def test_putdietarymanagement():
+    assert 1==2
 def deletedietarymanagement():
     r= requests.delete(urlLocal+dietarymanagement+"/4",headers = header)
     return r.status_code
+def test_deletedietarymanagement():
+    assert 1==2
 def postdietarymanagement():
     r= requests.post(urlLocal+dietarymanagement,data = json.dumps(dietarymanagementitem) ,headers=header)
     return r.status_code
+def test_postdietarymanagement():
+    assert 1==2
 def getdietarymanagement():
     r= requests.get(urlLocal+dietarymanagement+"/11" ,headers=header)
     j= r.json()
     return j
+def test_getdietarymanagement():
+    assert 1==2
 
 
 
-def test_getconsumptionbyid():
-    v = Validator(consumptionschema)
-    j = getconsumptionbyid()
-    assert v.validate(j) == True
-    assert j['ConsumptionId'] ==9
-def test_getwaterconsumption():
-    v = Validator(waterconsumptionschema)
-    j = getwaterconsumption()
-    assert v.validate(j) == True
-    assert j['id'] ==2  
-def test_getconsumptionbydate():
-    v = Validator(consumptiondateschema)
-    j = getconsumptionbydate()
-    assert v.validate(j) == True
+
+
+
     ##asser waarde nog te doen maar ik weet niet hoe ik iets terugkrijg hier wat niet leeg is
 
 
@@ -334,7 +399,12 @@ def postmeal():
 def deletemeal(mealId):
     r= requests.delete(urlLocal+meal+"?patientId=11&mealId="+str(mealId),headers=header)
     return r.status_code
+def putmeal():
+    r= requests.put(urlLocal+meal+"/17/9",data = json.dumps(mealitem),headers=header)
+    return r.status_code
 #tests
+def test_putmeal():
+    assert 1==2
 def test_foodsearch():
     v = Validator(foodschema)
     j = getfoodbysearch()

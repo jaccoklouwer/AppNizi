@@ -10,17 +10,20 @@ namespace AppNiZiAPI.Models.Repositories
 {
     public interface IDietaryManagementRepository
     {
-        Task<DietaryManagementModel> AddDietaryManagement(DietaryManagementModel dietary);
+        Task<bool> AddDietaryManagement(DietaryManagementModel dietary);
         Task<bool> DeleteDietaryManagement(int id);
-        Task<List<DietaryManagementModel>> GetDietaryManagementByPatient(int patientId);
+
+        Task<bool> DeleteByPatientId(int patientId);
+
+        Task<List<DietaryManagementModel>> GetDietaryManagementByPatientAsync(int patientId);
         Task<List<DietaryRestriction>> GetDietaryRestrictions();
-        Task<DietaryManagementModel> UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement);
+        Task<bool> UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement);
     }
 
     public class DietaryManagementRepository : Repository, IDietaryManagementRepository
     {
 
-        public async Task<List<DietaryManagementModel>> GetDietaryManagementByPatient(int patientId)
+        public async Task<List<DietaryManagementModel>> GetDietaryManagementByPatientAsync(int patientId)
         {
 
             List<DietaryManagementModel> dietaryManagementModels = new List<DietaryManagementModel>();
@@ -88,7 +91,8 @@ namespace AppNiZiAPI.Models.Repositories
             return await Task.FromResult(dietaryRestrictions);
         }
 
-        public async Task<DietaryManagementModel> UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement)
+
+        public async Task<bool> UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement)
         {
 
             conn.Open();
@@ -107,13 +111,8 @@ namespace AppNiZiAPI.Models.Repositories
             command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietaryManagement.PatientId;
             command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietaryManagement.IsActive;
             command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
-
-            if (command.ExecuteNonQuery() > 0)
-                return null;
             conn.Close();
-
-            return await Task.FromResult(dietaryManagement);
-
+            return await Task.FromResult(command.ExecuteNonQuery() > 0);
         }
 
         public async Task<bool> DeleteDietaryManagement(int id)
@@ -138,7 +137,7 @@ namespace AppNiZiAPI.Models.Repositories
 
         }
 
-        public async Task<DietaryManagementModel> AddDietaryManagement(DietaryManagementModel dietary)
+        public async Task<bool> AddDietaryManagement(DietaryManagementModel dietary)
         {
             conn.Open();
             var query = @"INSERT INTO DietaryManagement
@@ -165,12 +164,8 @@ namespace AppNiZiAPI.Models.Repositories
                 command.Parameters.Add("@AMOUNT", SqlDbType.Int).Value = dietary.Amount;
                 command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietary.PatientId;
                 command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietary.IsActive;
-
-
-                command.ExecuteNonQuery();
                 conn.Close();
-
-                return await Task.FromResult(dietary);
+                return await Task.FromResult(command.ExecuteNonQuery() > 0);
             }
             catch (Exception e)
             {
@@ -178,6 +173,27 @@ namespace AppNiZiAPI.Models.Repositories
                 throw e;
             }
 
+        }
+
+        public async Task<bool> DeleteByPatientId(int patientId)
+        {
+            bool success = false;
+
+            string sqlQuery = "DELETE FROM DietaryManagement WHERE patient_id = @ID";
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                sqlConn.Open();
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+                sqlCmd.Parameters.Add("@ID", SqlDbType.Int).Value = patientId;
+
+                int rows = sqlCmd.ExecuteNonQuery();
+                if (rows > 0)
+                    success = true;
+            }
+
+            return success;
         }
     }
 }
