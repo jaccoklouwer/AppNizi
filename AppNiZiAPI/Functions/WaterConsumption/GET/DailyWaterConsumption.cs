@@ -37,19 +37,24 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
         #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetDailyWaterConsumption))] HttpRequest req,
-            ILogger log, int patientId)
+            ILogger log, string patientId)
         {
+            string substringPatient = patientId.Substring(0, patientId.IndexOf('&'));
+            if (!Int32.TryParse(substringPatient, out int patientIdParsed))
+                return new BadRequestResult();
+
             #region AuthCheck
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientIdParsed);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
 
-            if (!DateTime.TryParse(req.Query["date"], out var parsedDate))
+            string date = patientId.Substring(patientId.IndexOf('e'));
+            if (!DateTime.TryParse(req.Query[patientId.Substring(patientId.IndexOf('='), patientId.Length)], out var parsedDate))
                 return new StatusCodeResult(StatusCodes.Status400BadRequest);
 
             IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
-            WaterConsumptionDaily model = waterRep.GetDailyWaterConsumption(patientId, parsedDate);
+            WaterConsumptionDaily model = waterRep.GetDailyWaterConsumption(patientIdParsed, parsedDate);
 
             return model != null || model.WaterConsumptions.Count != 0
                 ? (ActionResult)new OkObjectResult(model)
