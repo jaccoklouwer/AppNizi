@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net;
 using AppNiZiAPI.Variables;
-using AppNiZiAPI.Models.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Models.Dietarymanagement;
 using AppNiZiAPI.Infrastructure;

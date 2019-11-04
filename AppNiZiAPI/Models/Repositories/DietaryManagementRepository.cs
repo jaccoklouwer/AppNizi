@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Text;
 using System.Threading.Tasks;
 using AppNiZiAPI.Models.Dietarymanagement;
 
@@ -194,6 +193,7 @@ namespace AppNiZiAPI.Models.Repositories
                 int rows = sqlCmd.ExecuteNonQuery();
                 if (rows > 0)
                     success = true;
+                sqlConn.Close();
             }
 
             return await Task.FromResult(success);

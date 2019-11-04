@@ -11,6 +11,8 @@
     <OutputPath>.</OutputPath>
     <Name>Python-tests</Name>
     <RootNamespace>Python-tests</RootNamespace>
+    <TestFramework>Pytest</TestFramework>
+    <SuppressEnvironmentCreationPrompt>True</SuppressEnvironmentCreationPrompt>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugSymbols>true</DebugSymbols>
