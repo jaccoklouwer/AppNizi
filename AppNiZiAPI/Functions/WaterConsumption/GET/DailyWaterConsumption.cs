@@ -33,31 +33,37 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
         [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
         [OpenApiParameter("patientId", Description = "Inserting the patientId", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
-        [OpenApiParameter("date", Description = "Inserting the date", In = ParameterLocation.Query, Required = true, Type = typeof(string))] 
+        [OpenApiParameter("date", Description = "Inserting the date", In = ParameterLocation.Query, Required = true, Type = typeof(string))]
         #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.GetDailyWaterConsumption))] HttpRequest req,
             ILogger log, string patientId)
         {
-            string substringPatient = patientId.Substring(0, patientId.IndexOf('&'));
-            if (!Int32.TryParse(substringPatient, out int patientIdParsed))
+            try
+            {
+                string substringPatient = patientId.Substring(0, patientId.IndexOf('&'));
+                if (!Int32.TryParse(substringPatient, out int patientIdParsed))
+                    return new BadRequestResult();
+                if (!DateTime.TryParse(patientId.Substring(patientId.IndexOf('=') + 1), out var parsedDate))
+                    return new StatusCodeResult(StatusCodes.Status400BadRequest);
+
+                #region AuthCheck
+                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientIdParsed);
+                if (!authResult.Result)
+                    return new StatusCodeResult((int)authResult.StatusCode);
+                #endregion
+
+                IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
+                WaterConsumptionDaily model = waterRep.GetDailyWaterConsumption(patientIdParsed, parsedDate);
+
+                return model != null || model.WaterConsumptions.Count != 0
+                        ? (ActionResult)new OkObjectResult(model)
+                        : new StatusCodeResult(StatusCodes.Status204NoContent);
+            }
+            catch
+            {
                 return new BadRequestResult();
-
-            #region AuthCheck
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientIdParsed);
-            if (!authResult.Result)
-                return new StatusCodeResult((int)authResult.StatusCode);
-            #endregion
-
-            if (!DateTime.TryParse(patientId.Substring(patientId.IndexOf('=') + 1), out var parsedDate))
-                return new StatusCodeResult(StatusCodes.Status400BadRequest);
-
-            IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
-            WaterConsumptionDaily model = waterRep.GetDailyWaterConsumption(patientIdParsed, parsedDate);
-
-            return model != null || model.WaterConsumptions.Count != 0
-                ? (ActionResult)new OkObjectResult(model)
-                : new StatusCodeResult(StatusCodes.Status204NoContent);
+            }
         }
     }
 }
