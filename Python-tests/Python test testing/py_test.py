@@ -415,31 +415,29 @@ def getdoctorme():
     return j
 def test_getdoctorme():
     return 1==2
+
 #dietarymanagement
-def putdietarymanagement():
-    r= requests.put(urlLocal+dietarymanagement+"/4",data= json.dumps(dietarymanagementitem),headers = header)
-    return r.status_code
 def test_putdietarymanagement():
-    assert 1==2
-def deletedietarymanagement():
-    r= requests.delete(urlLocal+dietarymanagement+"/4",headers = header)
-    return r.status_code
+    r= requests.put(urlLocal+dietarymanagement+"/8",data= json.dumps(dietarymanagementitem),headers = header)
+    assert r.status_code == 200
+    print(r.json())
+
 def test_deletedietarymanagement():
-    assert 1==2
-def postdietarymanagement():
-    r= requests.post(urlLocal+dietarymanagement,data = json.dumps(dietarymanagementitem) ,headers=header)
-    return r.status_code
+    r= requests.delete(urlLocal+dietarymanagement+"/8",headers = header)
+    assert r.status_code == 200
+    print(r.json())
+
 def test_postdietarymanagement():
-    assert 1==2
-def getdietarymanagement():
+    r= requests.post(urlLocal+dietarymanagement,data = json.dumps(dietarymanagementitem) ,headers=header)
+    assert r.status_code == 200
+    print(r.json())
+
+def test_getdietarymanagement():
     r= requests.get(urlLocal+dietarymanagement+"/11" ,headers=header)
     j= r.json()
-    return j
-def test_getdietarymanagement():
-    r= requests.get(urlLocal+dietarymanagement+"/17" ,headers=header)
-    j= r.json()
-    return j
-    assert len(j["Restrictions"]) == 8
+    assert r.status_code == 200
+    assert len(j['Restrictions']) == 8
+    print(r.json())
 
 
 

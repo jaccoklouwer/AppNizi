@@ -119,7 +119,7 @@ waterconsumptionschema ={
         'patientId': {'type':'number'} 
         }
 
-header = {"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik5ERkdPRFUxTnpJNFJEZ3lNakkxUmtFMU5EZ3dRMEUxTkVJM05UTTBSRGRFUTBFNE5FWkdNZyJ9.eyJpc3MiOiJodHRwczovL2FwcG5pemkuZXUuYXV0aDAuY29tLyIsInN1YiI6ImRWWXRtU3c1bTgxOW1YMm5TMnJhTVp3bzVsWGN3RGc2QGNsaWVudHMiLCJhdWQiOiJhcHBuaXppLm5sL2FwaSIsImlhdCI6MTU3Mjc3OTM4OSwiZXhwIjoxNTcyODY1Nzg5LCJhenAiOiJkVll0bVN3NW04MTltWDJuUzJyYU1ad281bFhjd0RnNiIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.s2k8FrRkaTuoVx_uFBOhKTAS6avfBZJ1GSY8gfFG-FTD0krv_mzlnKhjNsrFUtPKeM9XTSYq1uvZYmFRmQvU_xEffji_Is_fnn0sjmGCgOG8WRntaF4zeipNn9Q276UCSgxnsTss5dO6ihAiXNZeDAWm6j7y5MHvoDzwwAnp_nxKrhQEwIar37faTRQduVoWlzXmudOJ2qv3j259nUqRNkB1MzK1XcPzt7k6V85ZOqrsUUg-oU2eSdlaMcDfyEo3w_rey8mcDFo4YmjhSSGSlp4TNHayNBCyeehzQWDAdIrq3Z7275PtDoIYTJDqrLYJcH5wyFUmezZ8GlpQMGmDRA"}
+header = {"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik5ERkdPRFUxTnpJNFJEZ3lNakkxUmtFMU5EZ3dRMEUxTkVJM05UTTBSRGRFUTBFNE5FWkdNZyJ9.eyJpc3MiOiJodHRwczovL2FwcG5pemkuZXUuYXV0aDAuY29tLyIsInN1YiI6ImRWWXRtU3c1bTgxOW1YMm5TMnJhTVp3bzVsWGN3RGc2QGNsaWVudHMiLCJhdWQiOiJhcHBuaXppLm5sL2FwaSIsImlhdCI6MTU3Mjg2Nzg0MiwiZXhwIjoxNTcyOTU0MjQyLCJhenAiOiJkVll0bVN3NW04MTltWDJuUzJyYU1ad281bFhjd0RnNiIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.UBh4Sruso9KcD4sFU80VnRMfUKXlb3uXyucTfxEXZTfTvYGSx1cseqvbp2-kksASXYXiNCbv34iOTLWeHYddCemZT5w6BdgMducBt4Wf_BP_krbU0FiGxb71L88BLxVUU8QGtyBCfqyTBfgmjYDUNPDmJKWRB2CblGyLH481HkAHzymNkfw9xBHJTAvMLnNGo_msvWC_O0akJgAr3N9eTjGxlV1CNHtHzPEYOJasHe1WzTpfFEgEezSMo7eSkPIaLzP35HVpcBijesc5CR6pwo3mhElMN2lfIsduUQtS0PdCLbRlcv2f3m1xFqL3dI-qIlFvjxP0jxqfFeBbs3xyBA.eyJpc3MiOiJodHRwczovL2FwcG5pemkuZXUuYXV0aDAuY29tLyIsInN1YiI6ImRWWXRtU3c1bTgxOW1YMm5TMnJhTVp3bzVsWGN3RGc2QGNsaWVudHMiLCJhdWQiOiJhcHBuaXppLm5sL2FwaSIsImlhdCI6MTU3Mjc3OTM4OSwiZXhwIjoxNTcyODY1Nzg5LCJhenAiOiJkVll0bVN3NW04MTltWDJuUzJyYU1ad281bFhjd0RnNiIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.s2k8FrRkaTuoVx_uFBOhKTAS6avfBZJ1GSY8gfFG-FTD0krv_mzlnKhjNsrFUtPKeM9XTSYq1uvZYmFRmQvU_xEffji_Is_fnn0sjmGCgOG8WRntaF4zeipNn9Q276UCSgxnsTss5dO6ihAiXNZeDAWm6j7y5MHvoDzwwAnp_nxKrhQEwIar37faTRQduVoWlzXmudOJ2qv3j259nUqRNkB1MzK1XcPzt7k6V85ZOqrsUUg-oU2eSdlaMcDfyEo3w_rey8mcDFo4YmjhSSGSlp4TNHayNBCyeehzQWDAdIrq3Z7275PtDoIYTJDqrLYJcH5wyFUmezZ8GlpQMGmDRA"}
 
 mealitem = {
   "mealId": 0,
@@ -266,14 +266,14 @@ def getdoctorme():
     return j
 #dietarymanagement
 def test_putdietarymanagement():
-    r= requests.put(urlLocal+dietarymanagement+"/4",data= json.dumps(dietarymanagementitem),headers = header)
-    assert r.status_code == 200;
+    r= requests.put(urlLocal+dietarymanagement+"/8",data= json.dumps(dietarymanagementitem),headers = header)
+    assert r.status_code == 200
 def test_deletedietarymanagement():
-    r= requests.delete(urlLocal+dietarymanagement+"/4",headers = header)
-    assert r.status_code == 200;
+    r= requests.delete(urlLocal+dietarymanagement+"/8",headers = header)
+    assert r.status_code == 200
 def test_postdietarymanagement():
     r= requests.post(urlLocal+dietarymanagement,data = json.dumps(dietarymanagementitem) ,headers=header)
-    assert r.status_code == 200;
+    assert r.status_code == 200
 def test_getdietarymanagement():
     r= requests.get(urlLocal+dietarymanagement+"/11" ,headers=header)
     j= r.json()
