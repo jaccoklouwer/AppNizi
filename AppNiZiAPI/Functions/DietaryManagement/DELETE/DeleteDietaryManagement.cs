@@ -17,6 +17,10 @@ using AppNiZiAPI.Models;
 using AppNiZiAPI.Security;
 using System.IO;
 using Newtonsoft.Json;
+using AppNiZiAPI.Services;
+using System.Collections.Generic;
+using AppNiZiAPI.Services.Handlers;
+using AppNiZiAPI.Models.Dietarymanagement;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
 {
@@ -44,39 +48,16 @@ namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
             if (!int.TryParse(dietId, out id))
                 return new UnprocessableEntityObjectResult(Messages.ErrorIncorrectId);
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            int patientId;
-            if (string.IsNullOrEmpty(requestBody))
-                return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues);
-            try
-            {
-                patientId = JsonConvert.DeserializeObject<int>(requestBody);
-            }
-            catch (Exception)
-            {
-                return new UnprocessableEntityObjectResult(Messages.ErrorIncorrectId);
-            }
-
             #region AuthCheck
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
             #endregion
 
-            IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
-            bool success;
-            try
-            {
-                success = await repository.DeleteDietaryManagement(id);
-            }
-            catch (Exception)
-            {
-                return new NotFoundObjectResult(Messages.ErrorMissingValues);
-            }
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IDietaryManagementService>().TryDeleteDietaryManagement(id);
 
-            return success
-                ? (ActionResult)new BadRequestObjectResult(Messages.ErrorMissingValues)
-                : new OkObjectResult(Messages.OKDelete);
+
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

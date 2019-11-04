@@ -45,6 +45,7 @@ namespace AppNiZiAPI.Infrastructure
             services.AddSingleton<IPatientService, PatientService>();
             services.AddSingleton<IFoodService, FoodService>();
             services.AddSingleton<IMealService, MealService>();
+            services.AddSingleton<IDietaryManagementService, DIetaryManagementService>();
 
             return services;
         }

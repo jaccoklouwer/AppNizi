@@ -18,6 +18,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Services;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.GET
 {
@@ -46,34 +48,13 @@ namespace AppNiZiAPI.Functions.DietaryManagement.GET
             AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, id);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
-                #endregion
+            #endregion
 
-            List<DietaryManagementModel> dietaryManagementModels;
-            List<DietaryRestriction> dietaryRestrictions;
-            DietaryView view;
-            try
-            {
-                IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
-                dietaryManagementModels = await repository.GetDietaryManagementByPatientAsync(id);
-                dietaryRestrictions = await repository.GetDietaryRestrictions();
-                view = new DietaryView();
-                view.DietaryManagements = dietaryManagementModels;
-                view.restrictions = dietaryRestrictions;
-            }
-            catch (Exception e)
-            {
-                log.LogInformation(e.Message);
-                return new NotFoundObjectResult(Messages.ErrorMissingValues + e.Message);
-            }
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IDietaryManagementService>().TryGetDietaryManagementByPatient(id);
 
-            if (dietaryManagementModels == null)
-                return new BadRequestObjectResult("No Dietarymanagement was found!");
 
-            string json = JsonConvert.SerializeObject(view);
 
-            return json != null
-                ? (ActionResult)new OkObjectResult(json)
-                : new BadRequestObjectResult(Messages.ErrorMissingValues);
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

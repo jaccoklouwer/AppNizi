@@ -10,17 +10,17 @@ namespace AppNiZiAPI.Models.Repositories
 {
     public interface IDietaryManagementRepository
     {
-        Task<bool> AddDietaryManagement(DietaryManagementModel dietary);
+        Task<DietaryManagementModel> AddDietaryManagement(DietaryManagementModel dietary);
         Task<bool> DeleteDietaryManagement(int id);
-        Task<List<DietaryManagementModel>> GetDietaryManagementByPatientAsync(int patientId);
+        Task<List<DietaryManagementModel>> GetDietaryManagementByPatient(int patientId);
         Task<List<DietaryRestriction>> GetDietaryRestrictions();
-        Task<bool> UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement);
+        Task<DietaryManagementModel> UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement);
     }
 
     public class DietaryManagementRepository : Repository, IDietaryManagementRepository
     {
 
-        public async Task<List<DietaryManagementModel>> GetDietaryManagementByPatientAsync(int patientId)
+        public async Task<List<DietaryManagementModel>> GetDietaryManagementByPatient(int patientId)
         {
 
             List<DietaryManagementModel> dietaryManagementModels = new List<DietaryManagementModel>();
@@ -88,8 +88,7 @@ namespace AppNiZiAPI.Models.Repositories
             return await Task.FromResult(dietaryRestrictions);
         }
 
-
-        public async Task<bool> UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement)
+        public async Task<DietaryManagementModel> UpdateDietaryManagement(int id, DietaryManagementModel dietaryManagement)
         {
 
             conn.Open();
@@ -109,7 +108,11 @@ namespace AppNiZiAPI.Models.Repositories
             command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietaryManagement.IsActive;
             command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
 
-            return await Task.FromResult(command.ExecuteNonQuery() > 0);
+            if (command.ExecuteNonQuery() > 0)
+                return null;
+            conn.Close();
+
+            return await Task.FromResult(dietaryManagement);
 
         }
 
@@ -124,17 +127,18 @@ namespace AppNiZiAPI.Models.Repositories
             {
                 SqlCommand command = new SqlCommand(query, conn);
                 command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
+                conn.Close();
                 return await Task.FromResult(command.ExecuteNonQuery() > 0);
             }
             catch (Exception)
             {
-
+                conn.Close();
                 return false;
             }
 
         }
 
-        public async Task<bool> AddDietaryManagement(DietaryManagementModel dietary)
+        public async Task<DietaryManagementModel> AddDietaryManagement(DietaryManagementModel dietary)
         {
             conn.Open();
             var query = @"INSERT INTO DietaryManagement
@@ -161,10 +165,16 @@ namespace AppNiZiAPI.Models.Repositories
                 command.Parameters.Add("@AMOUNT", SqlDbType.Int).Value = dietary.Amount;
                 command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietary.PatientId;
                 command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietary.IsActive;
-                return await Task.FromResult(command.ExecuteNonQuery() > 0);
+
+
+                command.ExecuteNonQuery();
+                conn.Close();
+
+                return await Task.FromResult(dietary);
             }
             catch (Exception e)
             {
+                conn.Close();
                 throw e;
             }
 
