@@ -194,6 +194,7 @@ namespace AppNiZiAPI.Models.Repositories
                 int rows = sqlCmd.ExecuteNonQuery();
                 if (rows > 0)
                     success = true;
+                sqlConn.Close();
             }
 
             return await Task.FromResult(success);
