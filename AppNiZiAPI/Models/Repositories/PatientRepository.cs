@@ -162,7 +162,7 @@ namespace AppNiZiAPI.Models.Repositories
                 sqlCmd.Parameters.Add("@WEIGHT", SqlDbType.Float).Value = newPatient.Patient.WeightInKilograms;
 
                 sqlConn.Open();
-                newPatient.Patient.PatientId = sqlCmd.ExecuteNonQuery();
+                newPatient.Patient.PatientId = (int)sqlCmd.ExecuteScalar();
             }
 
             return newPatient;
