@@ -119,8 +119,24 @@ waterconsumptionschema ={
         'date': {'type':'string'} , 
         'patientId': {'type':'number'} 
         }
+waterconsumptiondailyschema={
+        'total':{'type':'number'},
+        'minimumRestriction':{'type':'number'},
+        'waterConsumptions': {'type':'list',
+                              'schema':{
+                               'weightUnit': {'type':'dict',
+                                              'schema':{
+                                                      'id': {'type':'number'}, 
+                                                      'unit': {'type':'string'}, 
+                                                      'short': {'type':'string'}}},
+                               'error': {'type':'boolean'} , 
+                               'id': {'type':'number'} , 
+                               'amount': {'type':'number'} , 
+                               'date': {'type':'string'} , 
+                               'patientId': {'type':'number'} }},
+        }
 
-header = {"Authorization": "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImtpZCI6Ik5ERkdPRFUxTnpJNFJEZ3lNakkxUmtFMU5EZ3dRMEUxTkVJM05UTTBSRGRFUTBFNE5FWkdNZyJ9.eyJpc3MiOiJodHRwczovL2FwcG5pemkuZXUuYXV0aDAuY29tLyIsInN1YiI6ImRWWXRtU3c1bTgxOW1YMm5TMnJhTVp3bzVsWGN3RGc2QGNsaWVudHMiLCJhdWQiOiJhcHBuaXppLm5sL2FwaSIsImlhdCI6MTU3Mjc3OTM4OSwiZXhwIjoxNTcyODY1Nzg5LCJhenAiOiJkVll0bVN3NW04MTltWDJuUzJyYU1ad281bFhjd0RnNiIsImd0eSI6ImNsaWVudC1jcmVkZW50aWFscyJ9.s2k8FrRkaTuoVx_uFBOhKTAS6avfBZJ1GSY8gfFG-FTD0krv_mzlnKhjNsrFUtPKeM9XTSYq1uvZYmFRmQvU_xEffji_Is_fnn0sjmGCgOG8WRntaF4zeipNn9Q276UCSgxnsTss5dO6ihAiXNZeDAWm6j7y5MHvoDzwwAnp_nxKrhQEwIar37faTRQduVoWlzXmudOJ2qv3j259nUqRNkB1MzK1XcPzt7k6V85ZOqrsUUg-oU2eSdlaMcDfyEo3w_rey8mcDFo4YmjhSSGSlp4TNHayNBCyeehzQWDAdIrq3Z7275PtDoIYTJDqrLYJcH5wyFUmezZ8GlpQMGmDRA"}
+
 
 mealitem = {
   "mealId": 0,
@@ -137,15 +153,15 @@ mealitem = {
 }
 consumptionitem ={
   "FoodName": "teveel stront",
-  "KCal": 0,
-  "Protein": 0,
-  "Fiber": 0,
-  "Calium": 0,
-  "Sodium": 0,
-  "Amount": 20,
-  "WeightUnitId": 0,
+  "KCal": 3.0,
+  "Protein": 4.0,
+  "Fiber": 1.0,
+  "Calium": 3.0,
+  "Sodium": 2.0,
+  "Amount": 100,
+  "WeightUnitId": 1,
   "Date": "2019-11-03T14:16:29.305Z",
-  "PatientId": 11,
+  "PatientId": 17,
   "Id": 0
   }
 waterconsumptionitem={
@@ -167,40 +183,75 @@ doctoritem={
   "location": "aarslaan"
 }
 dietarymanagementitem ={
-  "Id": 2,
+  
   "Description": "streng dieet",
   "Amount": 50,
   "IsActive": True,
   "PatientId": 11
 }
 
+patientitembody ={
+  "patientId": 17,
+        }
 
+#variablen
+patientid = "/17"
+
+def accestoken():
+    conn = http.client.HTTPSConnection("appnizi.eu.auth0.com")
+
+    payload = "{\"client_id\":\"dVYtmSw5m819mX2nS2raMZwo5lXcwDg6\",\"client_secret\":\"vN6N5HNG25MP-gjBPsVhf01dzuIPqAixFFImtGUU4vy4RuJwFEYcPnJg4r6EOOdr\",\"audience\":\"appnizi.nl/api\",\"grant_type\":\"client_credentials\"}"
+        
+    headers = { 'content-type': "application/json" }
+
+    conn.request("POST", "/oauth/token", payload, headers)
+
+    res = conn.getresponse()
+    data = res.read()
+    datadecoded = data.decode("utf-8")
+    splitdata = datadecoded.split('"')
+
+    return(splitdata[3])
+
+header = {
+        "Authorization": "Bearer "+accestoken(),
+        'content-type' : "application/json"
+        }
 
 
 #problematisch
 def getwaterconsumptionbydate():
-    r= requests.get(urlLocal+waterconsumptiondaily+"/11?date=20-10-1993" ,headers=header)
-    print(r)
+    r= requests.get(urlLocal+waterconsumptiondaily+patientid+"?date=2019-09-24" ,headers=header)
     j= r.json()
     return j
-
 def test_getwaterconsumptionbydate():
-    assert 1==2
+    v = Validator(waterconsumptiondailyschema)
+    j = getwaterconsumptionbydate()
+    assert v.validate(j) == True
+    #assert j['ConsumptionId'] ==9
 
 def getwaterconsumptionbydates():
-    r= requests.get(urlLocal+waterconsumptionperiod+"/11&startDate=11-02-2019&endDate=11-04-2019" ,headers=header)
+    r= requests.get(urlLocal+waterconsumptionperiod+"/17&startDate=2019-02-11&endDate=2019-04-11",headers=header)
     print(r)
-    j= r.json()
-    return j
+    #j= r.json()
+    return r
+#print(getwaterconsumptionbydates())
 def test_getwaterconsumptionbydates():
     assert 1==2
 
-    
+
 #consumption
+def postconsumption():
+    r= requests.post(urlLocal+consumptions,data = json.dumps(consumptionitem) ,headers=header)
+    return r.status_code
+print(postconsumption())
+def test_postconsumption():
+    assert 1==2
 def getconsumptionbyid():
-    r= requests.get(urlLocal+consumption+"/9",headers = header)
-    j= r.json()
-    return j
+    r= requests.get(urlLocal+consumption+"/21",headers = header)
+    #j= r.json()
+    return r
+print(getconsumptionbyid())
 def test_getconsumptionbyid():
     v = Validator(consumptionschema)
     j = getconsumptionbyid()
@@ -213,11 +264,7 @@ def deleteconsumption(consumptionId):
 def test_deleteconsumption():
     assert 1==2
 
-def postconsumption():
-    r= requests.post(urlLocal+consumptions,data = json.dumps(consumptionitem) ,headers=header)
-    return r.status_code
-def test_postconsumption():
-    assert 1==2
+
     
 def putconsumption():
     r= requests.put(urlLocal+consumption+"/1",data= json.dumps(consumptionitem),headers = header)
