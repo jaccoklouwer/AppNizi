@@ -1,4 +1,3 @@
-using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.WebJobs;
@@ -6,7 +5,6 @@ using Microsoft.Azure.WebJobs.Extensions.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using AppNiZiAPI.Variables;
-using AppNiZiAPI.Models.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
@@ -15,12 +13,9 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using Microsoft.OpenApi.Models;
 using AppNiZiAPI.Models;
 using AppNiZiAPI.Security;
-using System.IO;
-using Newtonsoft.Json;
 using AppNiZiAPI.Services;
 using System.Collections.Generic;
 using AppNiZiAPI.Services.Handlers;
-using AppNiZiAPI.Models.Dietarymanagement;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.DELETE
 {
