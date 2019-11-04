@@ -37,7 +37,7 @@ namespace AppNiZiAPI.Functions.Food
             ILogger log, int patientId)
         {
             // Auth check
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, patientId);
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
             if (!authResult.Result)
                 return new StatusCodeResult((int)authResult.StatusCode);
 
