@@ -232,11 +232,11 @@ doctoritem={
   "location": "aarslaan"
 }
 dietarymanagementitem ={
-  
-  "Description": "streng dieet",
-  "Amount": 50,
-  "IsActive": True,
-  "PatientId": 11
+    "Id": 0,
+    "Description": "Caloriebeperking",
+    "amount" : 1492,
+    "Patient": 17,
+    "isActive" : 1
 }
 
 patientitembody ={
@@ -349,11 +349,7 @@ def putconsumption():
     return r.status_code
 def test_putconsumption():
     assert 1==2
-    
 
-    
-    
-    
     #wwater 
 def postwaterconsumption():
     r= requests.post(urlLocal+waterconsumption,data = json.dumps(waterconsumptionitem) ,headers=header)
@@ -460,7 +456,11 @@ def test_putdietarymanagement():
     assert r.status_code == 200
 
 def test_deletedietarymanagement():
-    r = requests.delete(urlLocal+dietarymanagement+"/8", headers = header)
+    r = requests.get(urlLocal+dietarymanagement+patientid ,headers=header)
+    j = r.json()
+    managements = j["Dietarymanagement"]
+    management = managements[len(managements) -1]
+    r = requests.delete(urlLocal+dietarymanagement+"/"+str(management["id"]), headers = header)
     assert r.status_code == 200
 
 def test_postdietarymanagement():
@@ -468,18 +468,8 @@ def test_postdietarymanagement():
     assert r.status_code == 200
 
 def test_getdietarymanagement():
-    r = requests.get(urlLocal+dietarymanagement+"/17" ,headers=header)
-    j = r.json()
+    r = requests.get(urlLocal+dietarymanagement+patientid ,headers=header)
     assert r.status_code == 200
-    assert len(j['Restrictions']) == 8
-def getdietarymanagement():
-    r = requests.get(urlLocal+dietarymanagement+"/17" ,headers=header)
-    #j = r.json()
-    return(r)
-
-
-
-
 
     ##asser waarde nog te doen maar ik weet niet hoe ik iets terugkrijg hier wat niet leeg is
 
