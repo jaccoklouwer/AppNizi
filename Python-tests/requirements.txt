@@ -1,5 +1,4 @@
 requests
 pytest
-pytest-azurepipelines
 cerberus
-azure
+datetime
