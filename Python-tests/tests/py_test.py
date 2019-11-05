@@ -9,6 +9,7 @@ import requests
 import json
 import cerberus
 import http.client
+import datetime
 from cerberus import Validator
 
 ##urls
@@ -82,10 +83,29 @@ consumptionschema = {
     'Date': {'type':'string'},
     'Valid': {'type':'boolean'}
 }
+
+patientconsumptionschema = {
+    'ConsumptionId': {'type':'number'}, 
+    'FoodName': {'type':'string'}, 
+    'KCal': {'type':'number'}, 
+    'Protein': {'type':'number'}, 
+    'Fiber': {'type':'number'}, 
+    'Calium': {'type':'number'}, 
+    'Sodium': {'type':'number'}, 
+    'Amount': {'type':'number'}, 
+    'Weight': {'type':'dict',
+               'schema':{
+                    'Id': {'type':'number'}, 
+                    'Unit': {'type':'string'}, 
+                    'Short': {'type':'string'}
+                        }},
+    'Date': {'type':'string'},
+    'Valid': {'type':'boolean'}
+}
+
 consumptiondateschema ={
     'Consumptions': {'type':'list',
                      'schema':{
-                             'PatientId': {'type':'number'}, 
                              'ConsumptionId': {'type':'number'}, 
                              'FoodName': {'type':'string'}, 
                              'KCal': {'type':'number'}, 
@@ -191,7 +211,7 @@ mealitem = {
   "picture":"www.poep.nl"
 }
 consumptionitem ={
-  "FoodName": "teveel stront",
+  "FoodName": "Pittige pytest",
   "KCal": 3.0,
   "Protein": 4.0,
   "Fiber": 1.0,
@@ -200,8 +220,7 @@ consumptionitem ={
   "Amount": 100,
   "WeightUnitId": 1,
   "Date": "2019-11-03T14:16:29.305Z",
-  "PatientId": 17,
-  "Id": 0
+  "PatientId": 17
   }
 waterconsumptionitem={
   "Id": 23,
@@ -320,47 +339,66 @@ def test_getwaterconsumptionbydates():
     assert v.validate(j[0]) == True
 
 
-#consumption
-def postconsumption():
-    r= requests.post(urlLocal+consumptions,data = json.dumps(consumptionitem) ,headers=header)
-    j = r.json
+#Consumption
+# Methods
+
+def post_consumption(consumption_date):
+    consumptionitem["Date"] = consumption_date
+    r = requests.post(urlLocal+consumptions,data = json.dumps(consumptionitem) ,headers=header)
+    return r.status_code
+
+def get_consumptions_by_date(start_date):
+    end_date = str(datetime.datetime.now().strftime('%Y-%m-%d'))  
+    r= requests.get(urlLocal+consumptions+"?patientId=17&startDate=" + start_date + "&endDate=" + end_date ,headers = header)
+    print(r)
+    j= r.json()
     return j
-def deleteconsumption(consumptionId):
+
+def get_consumption_by_id(consumption_id):
+    r= requests.get(urlLocal+consumption+"/"+str(consumption_id), headers = header)
+    j= r.json()
+    return j
+
+def put_consumption(consumption_id):
+    consumptionitem['FoodName'] = "EDITED Pittige pytest"
+    r= requests.put(urlLocal+consumption+ "/" + str(consumption_id) ,data= json.dumps(consumptionitem),headers = header)
+    return r.status_code
+
+def delete_consumption(consumptionId):
     r= requests.delete(urlLocal+consumption+"/"+str(consumptionId),headers = header)
     return r.status_code
-#print(postconsumption())
-#def test_postanddeleteconsumption():
-    #j = postconsumption()
-    #j = r.json()
-    
-    #r2 = deleteconsumption(j['id'])
-    #assert r2 == 200
 
-def getconsumptionbyid():
-    r= requests.get(urlLocal+consumption+"/21",headers = header)
-    j= r.json()
-    return j
-def test_getconsumptionbyid():
+
+# Tests
+def test_consumption():
+    current_time = str(datetime.datetime.now().strftime('%Y-%m-%d'))  
+    # Create new consumption
+    r = post_consumption(current_time)
+    assert r == 200
+
+    # Get Consumptions (from new consumption date to now)
+    v = Validator(patientconsumptionschema)
+    j = get_consumptions_by_date(current_time)
+    assert len(j['Consumptions']) > 0
+    
+    # Get the new consumption
+    latest_consumption = j['Consumptions'][-1]
+    new_consumption_id = latest_consumption['ConsumptionId']
+    assert v.validate(latest_consumption) == True
+
+    # Use the consumptionId of the new consumption to get the consumption with get_consumption_by_id
     v = Validator(consumptionschema)
-    j = getconsumptionbyid()
+    j = get_consumption_by_id(new_consumption_id)
     assert v.validate(j) == True
-    assert j['ConsumptionId'] ==21
+    assert j['ConsumptionId'] == new_consumption_id
 
-def getconsumptionbydate():
-    r= requests.get(urlLocal+consumptions+"?patientId=11&startDate=11-02-2019&endDate=11-04-2019",headers = header)
-    j= r.json()
-    return j
-#def test_getconsumptionbydate():
-#    v = Validator(consumptiondateschema)
-#    j = getconsumptionbydate()
-#    assert v.validate(j) == True
+    # Change the consumption name with put_consumption
+    r = put_consumption(new_consumption_id)
+    assert r == 200
 
-    
-def putconsumption():
-    r= requests.put(urlLocal+consumption+"/1",data= json.dumps(consumptionitem),headers = header)
-    return r.status_code
-#def test_putconsumption():
-    #assert 1==2
+    # Delete the new consumption
+    r = delete_consumption(new_consumption_id)
+    assert r == 200
 
     #wwater 
 def postwaterconsumption():

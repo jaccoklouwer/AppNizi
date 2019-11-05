@@ -6,11 +6,11 @@ using System.Data.SqlClient;
 
 namespace AppNiZiAPI
 {
-    public class ConsumptionRespository : Repository, IConsumptionRepository
+    public class ConsumptionRespository : IConsumptionRepository
     {
-
         public bool AddConsumption(Consumption consumption)
         {
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             bool added;
             var insert = $"INSERT INTO Consumption " +
                 $"(food_name, kcal, protein, fiber, calium, sodium, amount, weight_unit_id, date, patient_id)";
@@ -22,7 +22,7 @@ namespace AppNiZiAPI
                 conn.Open();
                 try
                 {
-                    added = ConsumptionCommand(insertQuery, consumption).ExecuteNonQuery() > 0;
+                    added = ConsumptionCommand(insertQuery, consumption,conn).ExecuteNonQuery() > 0;
                 }
                 catch (Exception)
                 {
@@ -35,6 +35,7 @@ namespace AppNiZiAPI
 
         public bool DeleteConsumption(int consumptionId, int patientId)
         {
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             if (patientId == 0) return false;
 
             bool affected;
@@ -58,6 +59,7 @@ namespace AppNiZiAPI
 
         public ConsumptionView GetConsumptionByConsumptionId(int consumptionId)
         {
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             var query = $"SELECT Consumption.*, WeightUnit.short, WeightUnit.unit " +
                 $"FROM Consumption " +
                 $"INNER JOIN WeightUnit ON Consumption.weight_unit_id = WeightUnit.id " +
@@ -106,6 +108,7 @@ namespace AppNiZiAPI
 
         public List<PatientConsumptionView> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate)
         {
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             string sqlStartDate = startDate.Date.ToString("yyyy-MM-dd").Replace("/", "-");
             string sqlEndDate = endDate.Date.ToString("yyyy-MM-dd").Replace("/", "-");
             
@@ -170,6 +173,7 @@ namespace AppNiZiAPI
 
         public bool UpdateConsumption(int consumptionId, Consumption consumption)
         {
+            SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             bool updated;
             var updateQuery = $"UPDATE Consumption SET " +
                 $"food_name = @food_name, kcal = @kcal, protein = @protein, fiber = @fiber, " +
@@ -181,7 +185,7 @@ namespace AppNiZiAPI
                 conn.Open();
                 try
                 {
-                    updated = ConsumptionCommand(updateQuery, consumption).ExecuteNonQuery() > 0;
+                    updated = ConsumptionCommand(updateQuery, consumption,conn).ExecuteNonQuery() > 0;
                 }
                 catch (Exception)
                 {
@@ -192,7 +196,7 @@ namespace AppNiZiAPI
             return updated;
         }
 
-        private SqlCommand ConsumptionCommand(string query, Consumption consumption)
+        private SqlCommand ConsumptionCommand(string query, Consumption consumption,SqlConnection conn)
         {
             SqlCommand command = new SqlCommand(query, conn);
             command.Parameters.AddWithValue("@food_name", consumption.FoodName);
