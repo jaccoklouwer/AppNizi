@@ -55,7 +55,7 @@ steps:
 
 - task: CopyFiles@2
   inputs:
-    SourceFolder: 'Python-tests\Python test testing'
+    SourceFolder: 'Python-tests'
     Contents: '**'
     TargetFolder: $(build.artifactStagingDirectory)/tests
 
