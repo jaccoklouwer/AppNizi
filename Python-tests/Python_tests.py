@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 """
 Created on Sat Oct 26 11:44:21 2019
@@ -11,11 +10,21 @@ import json
 import cerberus
 import http.client
 import datetime
+import os
 from cerberus import Validator
 
 ##urls
-urlLocal = "http://localhost:7071/api/v1"
+def defineurl():
+    try:
+        os.environ["AppURL"]
+    except:
+        return "http://localhost:7071/api/v1"
+    return os.environ["AppURL"]
+urlLocal = defineurl()
 
+
+    
+defineurl()
 food="/food"
 foodPartial="/food/partial"
 foodFavorites="/food/favorite"
