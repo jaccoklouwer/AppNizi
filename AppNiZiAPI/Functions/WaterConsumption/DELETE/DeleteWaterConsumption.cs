@@ -16,6 +16,9 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Services;
+using System.Collections.Generic;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.WaterConsumption.PUT_DELETE
 {
@@ -38,10 +41,9 @@ namespace AppNiZiAPI.Functions.WaterConsumption.PUT_DELETE
             if (patientId == 0)
                 return new StatusCodeResult(StatusCodes.Status401Unauthorized);
 
-            IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
-            return waterRep.RemoveWaterConsumptions(patientId, waterId)
-                ? (ActionResult)new OkResult()
-                : new BadRequestResult();
+            Dictionary<ServiceDictionaryKey, object> dictionary = DIContainer.Instance.GetService<IWaterService>().TryDeleteWaterConsumption(waterId, patientId);
+
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

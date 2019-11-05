@@ -114,6 +114,8 @@ namespace AppNiZiAPI.Security
             return authLogin;
         }
 
+        // Helpers
+
         private async Task<AuthGUID> GetGUIDAsync(HttpRequest req)
         {
             AuthGUID authGUID = new AuthGUID();
@@ -139,6 +141,7 @@ namespace AppNiZiAPI.Security
         }
     }
 
+    // Interface
     public interface IAuthorization
     {
         Task<AuthLogin> LoginAuthAsync(HttpRequest req);

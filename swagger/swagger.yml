@@ -19,7 +19,7 @@ paths:
       tags:
         - Consumption
       summary: Deletes a consumption by id
-      description: Deletes a consumption of a patient by id
+      description: Deletes a consumption of a patient by id. Only available for patient.
       operationId: DeleteConsumptionById
       parameters:
         - name: consumptionId
@@ -56,7 +56,7 @@ paths:
       tags:
         - Consumption
       summary: Gets a consumption by id
-      description: Gets a consumption of a patient by id
+      description: Gets a consumption of a patient by id. Available for patient and doctor of patient.
       operationId: GetConsumptionById
       parameters:
         - name: consumptionId
@@ -92,7 +92,7 @@ paths:
       tags:
         - Consumption
       summary: Updates a consumption
-      description: Updates a consumption of a patient by using the consumption id located in the url path and the consumption data from the requestbody
+      description: Updates a consumption of a patient by using the consumption id located in the url path and the consumption data from the requestbody. Only available for patient.
       operationId: UpdateConsumptionById
       parameters:
         - name: consumptionId
@@ -135,7 +135,7 @@ paths:
       tags:
         - Consumption
       summary: Gets all consumptions for a patient between 2 dates
-      description: Gets all consumptions for a patientid between a startdate and enddate
+      description: Gets all consumptions for a patientid between a startdate and enddate. Available for patient and doctor of patient.
       operationId: GetConsumptionsForPatientBetweenDates
       parameters:
         - name: patientId
@@ -183,7 +183,7 @@ paths:
       tags:
         - Consumption
       summary: Adds a consumption
-      description: Adds a consumption for a patient by using the consumption data from the requestbody
+      description: Adds a consumption for a patient by using the consumption data from the requestbody. Only available for patient.
       operationId: AddConsumption
       requestBody:
         content:
@@ -213,7 +213,7 @@ paths:
                 $ref: '#/components/schemas/Error'
           x-ms-summary: 'Authorization Error: No acces'
       x-ms-visibility: important
-  '/v1/food/{patientId}/{foodId}':
+  '/v1/food/{foodId}':
     get:
       tags:
         - Food
@@ -221,13 +221,6 @@ paths:
       description: updates the dietary management of a patient
       operationId: GetFoodById
       parameters:
-        - name: patientId
-          in: path
-          description: the id of the patient thats going to get the item
-          required: true
-          schema:
-            type: integer
-            format: int32
         - name: foodId
           in: path
           description: the id of food item to be retrieved
@@ -237,25 +230,25 @@ paths:
             format: int32
       responses:
         '200':
-          description: Payload of String
+          description: Payload of Food
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Food'
           x-ms-summary: Updating Data Successfully
         '400':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: Missing values
         '401':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: 'Authorization Error: No acces'
       x-ms-visibility: important
   /v1/waterconsumption:
@@ -493,8 +486,8 @@ paths:
     get:
       tags:
         - WaterConsumption
-      summary: Get waterconsumption from a period
-      description: Get waterconsumption from a period
+      summary: Get waterconsumption from a date date
+      description: Get waterconsumption from a date date
       operationId: WaterConsumptionPeriod
       parameters:
         - name: patientId
@@ -546,7 +539,7 @@ paths:
                 $ref: '#/components/schemas/String'
           x-ms-summary: 'Authorization Error: No acces'
       x-ms-visibility: important
-  /v1/patient:
+  /v1/patients:
     get:
       tags:
         - Patient
@@ -561,13 +554,17 @@ paths:
           schema:
             type: integer
             format: int32
+        - name: code
+          in: query
+          schema:
+            type: string
       responses:
         '200':
-          description: 'Payload of PatientObject[]'
+          description: 'Payload of Patient[]'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PatientObject'
+                $ref: '#/components/schemas/PatientArray'
           x-ms-summary: Updating Data Successfully
         '400':
           description: Payload of String
@@ -591,6 +588,7 @@ paths:
                 $ref: '#/components/schemas/String'
           x-ms-summary: 'Authorization Error: No acces'
       x-ms-visibility: important
+  /v1/patient:
     post:
       tags:
         - Patient
@@ -649,11 +647,11 @@ paths:
             format: int32
       responses:
         '200':
-          description: Payload of PatientObject
+          description: Payload of Patient
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PatientObject'
+                $ref: '#/components/schemas/Patient'
           x-ms-summary: Updating Data Successfully
         '400':
           description: Payload of String
@@ -721,6 +719,60 @@ paths:
                 $ref: '#/components/schemas/String'
           x-ms-summary: 'Authorization Error: No acces'
       x-ms-visibility: important
+  '/v1/meal/{patientId}/{mealId}':
+    put:
+      tags:
+        - Meal
+      summary: Adds a meal
+      description: Updates the specified meal
+      operationId: PutMeal
+      parameters:
+        - name: patientId
+          in: path
+          description: The patient who is adding the meal
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: mealId
+          in: path
+          description: The id who is adding the meal
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: code
+          in: query
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Meal'
+      responses:
+        '200':
+          description: Payload of Meal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Meal'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Missing values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
   '/v1/meal/{patientId}':
     post:
       tags:
@@ -743,25 +795,25 @@ paths:
               $ref: '#/components/schemas/Meal'
       responses:
         '200':
-          description: Payload of String
+          description: Payload of Meal
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Meal'
           x-ms-summary: Updating Data Successfully
         '400':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: Missing values
         '401':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: 'Authorization Error: No acces'
       x-ms-visibility: important
     get:
@@ -780,28 +832,28 @@ paths:
             format: int32
       responses:
         '200':
-          description: Payload of String
+          description: 'Payload of Meal[]'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/MealArray'
           x-ms-summary: Updating Data Successfully
         '400':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: Missing values
         '401':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: 'Authorization Error: No acces'
       x-ms-visibility: important
-  '/v1/meal/{patientId}/{mealId}':
+  /v1/meal:
     delete:
       tags:
         - Meal
@@ -810,14 +862,14 @@ paths:
       operationId: DeleteMeal
       parameters:
         - name: patientId
-          in: path
+          in: query
           description: the id of the patient thats going to delete his meal
           required: true
           schema:
             type: integer
             format: int32
         - name: mealId
-          in: path
+          in: query
           description: The meal to delete
           required: true
           schema:
@@ -832,21 +884,21 @@ paths:
                 $ref: '#/components/schemas/String'
           x-ms-summary: Updating Data Successfully
         '400':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: Missing values
         '401':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: 'Authorization Error: No acces'
       x-ms-visibility: important
-  '/v1/food/partial/{patientId}/{foodName}':
+  '/v1/food/partial/{foodName}/{count}':
     get:
       tags:
         - Food
@@ -854,40 +906,40 @@ paths:
       description: Allows you to search the food Database and gets items that start with the supplied letters
       operationId: SearchFood
       parameters:
-        - name: patientId
-          in: path
-          description: the id of the patient thats going to get the item
-          required: true
-          schema:
-            type: integer
-            format: int32
         - name: foodName
           in: path
           description: The letters to use in the search
           required: true
           schema:
             type: string
+        - name: count
+          in: path
+          description: amount of items to retrieve
+          required: true
+          schema:
+            type: integer
+            format: int32
       responses:
         '200':
-          description: Payload of String
+          description: 'Payload of Food[]'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/FoodArray'
           x-ms-summary: Updating Data Successfully
         '400':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: Missing values
         '401':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: 'Authorization Error: No acces'
       x-ms-visibility: important
   '/v1/food/favorite/{patientId}':
@@ -900,32 +952,32 @@ paths:
       parameters:
         - name: patientId
           in: path
-          description: the id of the patient thats going to get the item
+          description: the id of the patient which items should be got
           required: true
           schema:
             type: integer
             format: int32
       responses:
         '200':
-          description: Payload of String
+          description: 'Payload of Food[]'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/FoodArray'
           x-ms-summary: Updating Data Successfully
         '400':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: Missing values
         '401':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: 'Authorization Error: No acces'
       x-ms-visibility: important
   /v1/food/favorite:
@@ -959,18 +1011,66 @@ paths:
                 $ref: '#/components/schemas/String'
           x-ms-summary: Updating Data Successfully
         '400':
-          description: Payload of String
+          description: Payload of Error
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/String'
+                $ref: '#/components/schemas/Error'
           x-ms-summary: Missing values
         '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: 'Authorization Error: No acces'
+      x-ms-visibility: important
+    delete:
+      tags:
+        - Food
+      summary: Unfavorites the fooditem
+      description: Deletes the connection between the patient and this fooditem in essence unfavoriting it
+      operationId: Delete Favorite Food
+      parameters:
+        - name: patientId
+          in: query
+          description: the id of the patient thats unfavoriting the food
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: foodId
+          in: query
+          description: the fooditem to be unfavorited
+          required: true
+          schema:
+            type: integer
+            format: int32
+        - name: code
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
           description: Payload of String
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/String'
+          x-ms-summary: Updating Data Successfully
+        '400':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+          x-ms-summary: Missing values
+        '401':
+          description: Payload of Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
           x-ms-summary: 'Authorization Error: No acces'
       x-ms-visibility: important
   /v1/doctor:
@@ -1112,11 +1212,11 @@ paths:
             format: int32
       responses:
         '200':
-          description: 'SuccesFull'
+          description: 'Payload of Patient[]'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PatientObject'
+                $ref: '#/components/schemas/PatientArray'
           x-ms-summary: Updating Data Successfully
         '400':
           description: Payload of String
@@ -1164,11 +1264,11 @@ paths:
             format: int32
       responses:
         '200':
-          description: 'Updating Data Successfully'
+          description: 'Payload of Patient[]'
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PatientObject'
+                $ref: '#/components/schemas/PatientArray'
           x-ms-summary: Updating Data Successfully
         '400':
           description: Payload of String
@@ -1254,8 +1354,7 @@ paths:
           description: the id of the diet that is going to be updated
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
       responses:
         '200':
           description: Payload of String
@@ -1341,8 +1440,7 @@ paths:
           description: the id of the diet that is going to be updated
           required: true
           schema:
-            type: integer
-            format: int32
+            type: string
       responses:
         '200':
           description: Payload of DietaryView
@@ -1373,7 +1471,7 @@ paths:
                 $ref: '#/components/schemas/Error'
           x-ms-summary: Incorrect values
       x-ms-visibility: important
-  /v1/doctor/me:
+  /v1/login/doctor:
     get:
       tags:
         - Doctor
@@ -1410,7 +1508,7 @@ paths:
                 $ref: '#/components/schemas/Error'
           x-ms-summary: Incorrect values
       x-ms-visibility: important
-  /v1/patient/me:
+  /v1/login/patient:
     get:
       tags:
         - Patient
@@ -1512,25 +1610,26 @@ components:
           format: int32
         KCal:
           type: number
-          format: float
+          format: double
         Protein:
           type: number
-          format: float
+          format: double
         Fiber:
           type: number
-          format: float
+          format: double
         Calcium:
           type: number
-          format: float
+          format: double
         Sodium:
           type: number
-          format: float
+          format: double
         PortionSize:
           type: number
-          format: float
-        WeightUnitId:
-          type: number
-          format: float
+          format: double
+        WeightUnit:
+          type: string
+        Picture:
+          type: string
     SwaggerRegisterDoctor:
       type: object
       properties:
@@ -1685,6 +1784,36 @@ components:
         SodiumTotal:
           type: number
           format: float
+    Food:
+      type: object
+      properties:
+        FoodId:
+          type: integer
+          format: int32
+        Name:
+          type: string
+        KCal:
+          type: number
+          format: double
+        Protein:
+          type: number
+          format: double
+        Fiber:
+          type: number
+          format: double
+        Calcium:
+          type: number
+          format: double
+        Sodium:
+          type: number
+          format: double
+        PortionSize:
+          type: number
+          format: double
+        WeightUnit:
+          type: string
+        Picture:
+          type: string
     WaterConsumptionDaily:
       type: object
       properties:
@@ -1752,12 +1881,18 @@ components:
           PatientId:
             type: integer
             format: int32
-    'PatientObject':
+    'PatientArray':
       type: array
       items:
         type: object
         properties:
           PatientId:
+            type: integer
+            format: int32
+          AccountId:
+            type: integer
+            format: int32
+          DoctorId:
             type: integer
             format: int32
           FirstName:
@@ -1772,7 +1907,98 @@ components:
             format: float
           Guid:
             type: string
-    'DoctorModel':
+    Patient:
+      type: object
+      properties:
+        PatientId:
+          type: integer
+          format: int32
+        AccountId:
+          type: integer
+          format: int32
+        DoctorId:
+          type: integer
+          format: int32
+        FirstName:
+          type: string
+        LastName:
+          type: string
+        DateOfBirth:
+          type: string
+          format: date-time
+        WeightInKilograms:
+          type: number
+          format: float
+        Guid:
+          type: string
+    'MealArray':
+      type: array
+      items:
+        type: object
+        properties:
+          MealId:
+            type: integer
+            format: int32
+          Name:
+            type: string
+          PatientId:
+            type: integer
+            format: int32
+          KCal:
+            type: number
+            format: double
+          Protein:
+            type: number
+            format: double
+          Fiber:
+            type: number
+            format: double
+          Calcium:
+            type: number
+            format: double
+          Sodium:
+            type: number
+            format: double
+          PortionSize:
+            type: number
+            format: double
+          WeightUnit:
+            type: string
+          Picture:
+            type: string
+    'FoodArray':
+      type: array
+      items:
+        type: object
+        properties:
+          FoodId:
+            type: integer
+            format: int32
+          Name:
+            type: string
+          KCal:
+            type: number
+            format: double
+          Protein:
+            type: number
+            format: double
+          Fiber:
+            type: number
+            format: double
+          Calcium:
+            type: number
+            format: double
+          Sodium:
+            type: number
+            format: double
+          PortionSize:
+            type: number
+            format: double
+          WeightUnit:
+            type: string
+          Picture:
+            type: string
+    'DoctorModelArray':
       type: array
       items:
         type: object
@@ -1821,8 +2047,8 @@ components:
                   type: string
                 AccesCode:
                   type: string
-    DoctorModelArray:
-      type: array
+    DoctorModel:
+      type: object
       properties:
         DoctorId:
           type: integer
@@ -1879,6 +2105,12 @@ components:
           type: object
           properties:
             PatientId:
+              type: integer
+              format: int32
+            AccountId:
+              type: integer
+              format: int32
+            DoctorId:
               type: integer
               format: int32
             FirstName:
