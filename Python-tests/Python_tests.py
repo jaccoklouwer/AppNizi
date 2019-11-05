@@ -18,7 +18,7 @@ def defineurl():
     try:
         os.environ["AppURL"]
     except:
-        return "http://localhost:7071/api/v1"
+        return "https://appnizi-api.azurewebsites.net/api/v1"
     return os.environ["AppURL"]
 urlLocal = defineurl()
 
