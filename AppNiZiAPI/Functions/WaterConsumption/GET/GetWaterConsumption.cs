@@ -16,6 +16,7 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using AppNiZiAPI.Services;
 
 namespace AppNiZiAPI.Functions.WaterConsumption.PUT
 {
@@ -34,16 +35,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.PUT
             [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = (Routes.APIVersion + Routes.SingleWaterConsumption))] HttpRequest req,
             ILogger log, int waterId)
         {
-            int patientId = await DIContainer.Instance.GetService<IAuthorization>().GetUserId(req);
-            if (patientId == 0)
-                return new StatusCodeResult(StatusCodes.Status401Unauthorized);
-
-            IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
-
-            WaterConsumptionModel waterConsumptionModel = waterRep.GetSingleWaterConsumption(patientId, waterId);
-            return waterConsumptionModel != null
-                ? (ActionResult)new OkObjectResult(waterConsumptionModel)
-                : new StatusCodeResult(StatusCodes.Status204NoContent);
+            return await DIContainer.Instance.GetService<IWaterService>().GetWaterById(req, waterId);
         }
     }
 }

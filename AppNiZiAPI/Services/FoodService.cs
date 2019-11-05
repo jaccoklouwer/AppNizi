@@ -19,7 +19,7 @@ namespace AppNiZiAPI.Services
         IMessageHandler FeedbackHandler { get; }
 
         Task<Dictionary<ServiceDictionaryKey, object>> TryGetFoodById(int id);
-        Task<Dictionary<ServiceDictionaryKey, object>> TryGetFoodBySearch(string searchQuery,int count);
+        Task<Dictionary<ServiceDictionaryKey, object>> TryGetFoodBySearch(string searchQuery, int count);
         Task<Dictionary<ServiceDictionaryKey, object>> TryGetFavoriteFood(int patientId);
         Task<Dictionary<ServiceDictionaryKey, object>> TryPostFavoriteFood(HttpRequest request);
         Task<Dictionary<ServiceDictionaryKey, object>> TryDeleteFavoriteFood(HttpRequest request);
@@ -45,8 +45,8 @@ namespace AppNiZiAPI.Services
         public async Task<Dictionary<ServiceDictionaryKey, object>> TryDeleteFavoriteFood(HttpRequest request)
         {
             Dictionary<ServiceDictionaryKey, object> dictionary = new Dictionary<ServiceDictionaryKey, object>();
-            int foodId=0;
-            int patientId=0;
+            int foodId = 0;
+            int patientId = 0;
             try
             {
                 //TODO haal patient id op een coole manier op
@@ -142,7 +142,7 @@ namespace AppNiZiAPI.Services
             }
             try
             {
-                List<Food> foods = _foodRepository.Search(searchQuery,count);
+                List<Food> foods = _foodRepository.Search(searchQuery, count);
 
                 if (foods.Count <= 0)
                 {
@@ -166,8 +166,8 @@ namespace AppNiZiAPI.Services
         {
             Dictionary<ServiceDictionaryKey, object> dictionary = new Dictionary<ServiceDictionaryKey, object>();
 
-            int foodId=0;
-            int patientId=0;
+            int foodId = 0;
+            int patientId = 0;
 
             try
             {
@@ -181,7 +181,7 @@ namespace AppNiZiAPI.Services
             }
             try
             {
-                bool succes = _foodRepository.Favorite(patientId,foodId);
+                bool succes = _foodRepository.Favorite(patientId, foodId);
 
                 if (!succes)
                 {

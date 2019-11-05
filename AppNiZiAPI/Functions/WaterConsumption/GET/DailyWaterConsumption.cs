@@ -53,6 +53,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
                     return new StatusCodeResult((int)authResult.StatusCode);
                 #endregion
 
+
                 IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
                 WaterConsumptionDaily model = waterRep.GetDailyWaterConsumption(patientIdParsed, parsedDate);
 
