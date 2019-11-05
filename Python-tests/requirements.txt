@@ -2,6 +2,4 @@ requests
 datetime
 http.client
 pytest
-pytest-azurepipelines
 cerberus
-azure
