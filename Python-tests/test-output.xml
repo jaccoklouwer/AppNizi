@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite errors="2" failures="0" hostname="LAPTOP-F3U3PBBP" name="pytest" skipped="0" tests="2" time="0.686" timestamp="2019-11-04T14:43:30.247226"><testcase classname="" file="tests/py_test.py" name="tests.py_test" time="0.000"><error message="collection failure">import file mismatch:
+imported module &apos;py_test&apos; has this __file__ attribute:
+  D:\documenten\cloud\AppNizi\Python-tests\Python test testing\py_test.py
+which is not the same as the test file we want to collect:
+  D:\documenten\cloud\AppNizi\Python-tests\tests\py_test.py
+HINT: remove __pycache__ / .pyc files and/or use a unique basename for your test file modules</error></testcase><testcase classname="" file="tests/run_test.py" name="tests.run_test" time="0.000"><error message="collection failure">import file mismatch:
+imported module &apos;run_test&apos; has this __file__ attribute:
+  D:\documenten\cloud\AppNizi\Python-tests\Python test testing\run_test.py
+which is not the same as the test file we want to collect:
+  D:\documenten\cloud\AppNizi\Python-tests\tests\run_test.py
+HINT: remove __pycache__ / .pyc files and/or use a unique basename for your test file modules</error></testcase></testsuite></testsuites>

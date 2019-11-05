@@ -14,9 +14,11 @@ namespace AppNiZiAPI.Variables
         public const string SwaggerJson = "swagger/json";
 
         // Patients
-        public const string Patients = "/patient";
+        public const string Patient = "/patient";
+        public const string Patients = "/patients";
         public const string Me = "/me";
         public const string SpecificPatient = "/patient/{patientId}";
+        public const string All = "/all";
 
         // Doctors
         public const string GetDoctorPatients = "/doctor/{doctorId}/patients";
@@ -25,8 +27,8 @@ namespace AppNiZiAPI.Variables
         public const string DoctorMe = "/doctor/me";
 
         // Consumption
-        public const string Consumption = "/consumption/{consumptionId}";
-        public const string Consumptions = "/consumptions";
+        public const string Consumption = "/consumption/{consumptionId}"; // DELETE, GET, PUT
+        public const string Consumptions = "/consumptions"; // GET, POST
 
         // Water Consumption
         public const string PostWaterConsumption = "/waterconsumption";
@@ -41,21 +43,24 @@ namespace AppNiZiAPI.Variables
         public const string DietaryManagementById = "/dietaryManagement/{dietId}";
 
         //Food
-        public const string FoodById = "/food/{patientId}/{foodId}";
-        public const string FoodByPartialname = "/food/partial/{patientId}/{foodName}";
-        //TODO verbeter deze fantastische naamgeving 
-
-        public const string GetFavoriteFood = "/food/favorite/{patientId:int}";
+        public const string FoodById = "/food/{foodId}";
+        public const string FoodByPartialname = "/food/partial/{foodName}/{count}";
+        //food
+        public const string GetFavoriteFood = "/food/favorite/{patientId}";
         public const string PostFavoriteFood = "/food/favorite";
+        public const string UnFavoriteFood = "/food/favorite";
 
         //Meal
         public const string AddMeal = "/meal/{patientId}";
-        public const string DeleteMeal = "/meal/{patientId}/{mealId}";
+        public const string DeleteMeal = "/meal";
         public const string GetMeals = "/meal/{patientId}";
+        public const string PutMeal = "/meal/{patientId}/{mealId}";
 
         //Account
         public const string RegisterPatient = "/patients/register";
         public const string Account = "/account";
+        public const string LoginDoctor = "/login/doctor";
+        public const string LoginPatient = "/login/patient";
 
 
     }

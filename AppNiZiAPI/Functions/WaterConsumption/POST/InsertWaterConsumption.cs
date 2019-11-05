@@ -33,7 +33,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.POST
         [OpenApiRequestBody("application/json", typeof(WaterConsumptionModel), Description = "Updated model for water consumption")] 
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.PostWaterConsumption))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.PostWaterConsumption))] HttpRequest req,
             ILogger log)
         {
             int patientId = await DIContainer.Instance.GetService<IAuthorization>().GetUserId(req);
@@ -60,11 +60,11 @@ namespace AppNiZiAPI.Functions.WaterConsumption.POST
                 return new BadRequestObjectResult(Messages.ErrorPost);
             }
 
-            Result result = waterRep.InsertWaterConsumption(model, false);
+            model = waterRep.InsertWaterConsumption(model, false);
 
-            return result.Succesfull
-                ? (ActionResult)new OkObjectResult(result)
-                : new BadRequestObjectResult(result);
+            return model != null
+                ? (ActionResult)new OkObjectResult(model)
+                : new BadRequestResult();
         }
     }
 }

@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite errors="0" failures="13" hostname="LAPTOP-F3U3PBBP" name="pytest" skipped="0" tests="32" time="127.173" timestamp="2019-11-04T18:56:07.226440"><testcase classname="py_test" file="py_test.py" line="282" name="test_getwaterconsumptionbydate" time="2.055"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_getwaterconsumptionbydate():
+        v = Validator(waterconsumptiondailyschema)
+&gt;       j = getwaterconsumptionbydate()
+
+py_test.py:285: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+py_test.py:281: in getwaterconsumptionbydate
+    j= r.json()
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;json.decoder.JSONDecoder object at 0x000002905F6B6B08&gt;, s = &apos;&apos;, idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="296" name="test_getwaterconsumptionbydates" time="0.001"><failure message="assert 1 == 2">def test_getwaterconsumptionbydates():
+&gt;       assert 1==2
+E       assert 1 == 2
+
+py_test.py:298: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="309" name="test_postanddeleteconsumption" time="2.092"><failure message="TypeError: &apos;method&apos; object is not subscriptable">def test_postanddeleteconsumption():
+        j = postconsumption()
+        #j = r.json()
+    
+&gt;       r2 = deleteconsumption(j[&apos;id&apos;])
+E       TypeError: &apos;method&apos; object is not subscriptable
+
+py_test.py:314: TypeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="320" name="test_getconsumptionbyid" time="2.094"></testcase><testcase classname="py_test" file="py_test.py" line="330" name="test_getconsumptionbydate" time="2.038"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_getconsumptionbydate():
+        v = Validator(consumptiondateschema)
+&gt;       j = getconsumptionbydate()
+
+py_test.py:333: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+py_test.py:329: in getconsumptionbydate
+    j= r.json()
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;json.decoder.JSONDecoder object at 0x000002905F6B6B08&gt;, s = &apos;Invalid date value(s). Date format: yyyy-MM-dd&apos;
+idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="339" name="test_putconsumption" time="0.000"><failure message="assert 1 == 2">def test_putconsumption():
+&gt;       assert 1==2
+E       assert 1 == 2
+
+py_test.py:341: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="346" name="test_postwaterconsumption" time="2.106"></testcase><testcase classname="py_test" file="py_test.py" line="353" name="test_getwaterconsumption" time="2.150"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_getwaterconsumption():
+        v = Validator(waterconsumptionschema)
+&gt;       j = getwaterconsumption()
+
+py_test.py:356: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+py_test.py:352: in getwaterconsumption
+    j= r.json()
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = &lt;json.decoder.JSONDecoder object at 0x000002905F6B6B08&gt;, s = &apos;&apos;, idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="362" name="test_putwaterconsumption" time="0.000"><failure message="assert 1 == 2">def test_putwaterconsumption():
+&gt;       assert 1==2
+E       assert 1 == 2
+
+py_test.py:364: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="367" name="test_deletewaterconsumption" time="0.000"><failure message="assert 1 == 2">def test_deletewaterconsumption():
+&gt;       assert 1==2
+E       assert 1 == 2
+
+py_test.py:369: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="375" name="test_getpatients" time="5.061"></testcase><testcase classname="py_test" file="py_test.py" line="383" name="test_getpatientbyid" time="2.052"></testcase><testcase classname="py_test" file="py_test.py" line="391" name="test_deletepatient" time="0.001"><failure message="assert 1 == 2">def test_deletepatient():
+&gt;       assert 1==2
+E       assert 1 == 2
+
+py_test.py:393: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="406" name="test_getpatientme" time="0.001"><failure message="assert 1 == 2">def test_getpatientme():
+&gt;       assert 1==2
+E       assert 1 == 2
+
+py_test.py:408: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="414" name="test_getdoctors" time="2.082"></testcase><testcase classname="py_test" file="py_test.py" line="421" name="test_postdoctor" time="0.002"><failure message="assert 1 == 2">def test_postdoctor():
+&gt;       assert 1==2
+E       assert 1 == 2
+
+py_test.py:423: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="427" name="test_getdoctorbyid" time="2.068"></testcase><testcase classname="py_test" file="py_test.py" line="434" name="test_deletedoctor" time="0.002"><failure message="assert 1 == 2">def test_deletedoctor():
+&gt;       assert 1==2
+E       assert 1 == 2
+
+py_test.py:436: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="440" name="test_getdoctorpatients" time="0.001"><failure message="assert 1 == 2">def test_getdoctorpatients():
+&gt;       assert 1==2
+E       assert 1 == 2
+
+py_test.py:442: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="446" name="test_getdoctorme" time="0.002"></testcase><testcase classname="py_test" file="py_test.py" line="450" name="test_putdietarymanagement" time="2.094"></testcase><testcase classname="py_test" file="py_test.py" line="454" name="test_deletedietarymanagement" time="7.073"></testcase><testcase classname="py_test" file="py_test.py" line="462" name="test_postdietarymanagement" time="4.917"></testcase><testcase classname="py_test" file="py_test.py" line="466" name="test_getdietarymanagement" time="3.744"></testcase><testcase classname="py_test" file="py_test.py" line="513" name="test_putmeal" time="3.317"></testcase><testcase classname="py_test" file="py_test.py" line="516" name="test_foodsearch" time="2.106"></testcase><testcase classname="py_test" file="py_test.py" line="521" name="test_getfoodbyid" time="2.095"></testcase><testcase classname="py_test" file="py_test.py" line="526" name="test_postfoodfavorite" time="2.093"></testcase><testcase classname="py_test" file="py_test.py" line="529" name="test_getfoodfavorites" time="3.761"></testcase><testcase classname="py_test" file="py_test.py" line="533" name="test_deletefoodfavorite" time="3.748"></testcase><testcase classname="py_test" file="py_test.py" line="536" name="test_getmeal" time="2.065"></testcase><testcase classname="py_test" file="py_test.py" line="541" name="test_postanddeletemeal" time="5.998"></testcase></testsuite></testsuites>

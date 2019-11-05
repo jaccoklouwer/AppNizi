@@ -1,0 +1,329 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite errors="0" failures="14" hostname="LAPTOP-F3U3PBBP" name="pytest" skipped="0" tests="14" time="59.461" timestamp="2019-11-04T15:00:24.471959"><testcase classname="py_test" file="py_test.py" line="267" name="test_putdietarymanagement" time="2.072"><failure message="assert 401 == 200
+ +  where 401 = &lt;Response [401]&gt;.status_code">def test_putdietarymanagement():
+        r= requests.put(urlLocal+dietarymanagement+&quot;/8&quot;,data= json.dumps(dietarymanagementitem),headers = header)
+&gt;       assert r.status_code == 200;
+E       assert 401 == 200
+E        +  where 401 = &lt;Response [401]&gt;.status_code
+
+py_test.py:270: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="270" name="test_deletedietarymanagement" time="2.066"><failure message="assert 401 == 200
+ +  where 401 = &lt;Response [401]&gt;.status_code">def test_deletedietarymanagement():
+        r= requests.delete(urlLocal+dietarymanagement+&quot;/8&quot;,headers = header)
+&gt;       assert r.status_code == 200;
+E       assert 401 == 200
+E        +  where 401 = &lt;Response [401]&gt;.status_code
+
+py_test.py:273: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="273" name="test_postdietarymanagement" time="2.076"><failure message="assert 401 == 200
+ +  where 401 = &lt;Response [401]&gt;.status_code">def test_postdietarymanagement():
+        r= requests.post(urlLocal+dietarymanagement,data = json.dumps(dietarymanagementitem) ,headers=header)
+&gt;       assert r.status_code == 200;
+E       assert 401 == 200
+E        +  where 401 = &lt;Response [401]&gt;.status_code
+
+py_test.py:276: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="276" name="test_getdietarymanagement" time="2.120"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_getdietarymanagement():
+        r= requests.get(urlLocal+dietarymanagement+&quot;/11&quot; ,headers=header)
+&gt;       j= r.json()
+
+py_test.py:279: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;json.decoder.JSONDecoder object at 0x0000020DB4BC9988&gt;, s = &apos;&apos;, idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="284" name="test_getconsumptionbyid" time="2.090"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_getconsumptionbyid():
+        v = Validator(consumptionschema)
+&gt;       j = getconsumptionbyid()
+
+py_test.py:287: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+py_test.py:192: in getconsumptionbyid
+    j= r.json()
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;json.decoder.JSONDecoder object at 0x0000020DB4BC9988&gt;
+s = &apos;Authorization Error: No acces&apos;, idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="289" name="test_getwaterconsumption" time="2.067"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_getwaterconsumption():
+        v = Validator(waterconsumptionschema)
+&gt;       j = getwaterconsumption()
+
+py_test.py:292: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+py_test.py:214: in getwaterconsumption
+    j= r.json()
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;json.decoder.JSONDecoder object at 0x0000020DB4BC9988&gt;, s = &apos;&apos;, idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="294" name="test_getconsumptionbydate" time="2.038"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_getconsumptionbydate():
+        v = Validator(consumptiondateschema)
+&gt;       j = getconsumptionbydate()
+
+py_test.py:297: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+py_test.py:205: in getconsumptionbydate
+    j= r.json()
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;json.decoder.JSONDecoder object at 0x0000020DB4BC9988&gt;
+s = &apos;Invalid date value(s). Date format: yyyy-MM-dd&apos;, idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="338" name="test_foodsearch" time="2.077"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_foodsearch():
+        v = Validator(foodschema)
+&gt;       j = getfoodbysearch()
+
+py_test.py:341: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+py_test.py:311: in getfoodbysearch
+    j= r.json()
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;json.decoder.JSONDecoder object at 0x0000020DB4BC9988&gt;, s = &apos;&apos;, idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="343" name="test_getfoodbyid" time="2.086"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_getfoodbyid():
+        v = Validator(foodschema)
+&gt;       j = getfoodbysearch()
+
+py_test.py:346: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+py_test.py:311: in getfoodbysearch
+    j= r.json()
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;json.decoder.JSONDecoder object at 0x0000020DB4BC9988&gt;, s = &apos;&apos;, idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="348" name="test_postfoodfavorite" time="2.144"><failure message="assert 401 == 200">def test_postfoodfavorite():
+        r = postfoodfavorite()
+&gt;       assert r == 200
+E       assert 401 == 200
+
+py_test.py:351: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="351" name="test_getfoodfavorites" time="2.063"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_getfoodfavorites():
+        v = Validator(foodschema)
+&gt;       j = getfoodfavorites()
+
+py_test.py:354: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+py_test.py:319: in getfoodfavorites
+    j= r.json()
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;json.decoder.JSONDecoder object at 0x0000020DB4BC9988&gt;, s = &apos;&apos;, idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="355" name="test_deletefoodfavorite" time="2.076"><failure message="assert 401 == 200">def test_deletefoodfavorite():
+        r= deletefoodfavorite()
+&gt;       assert r == 200
+E       assert 401 == 200
+
+py_test.py:358: AssertionError</failure></testcase><testcase classname="py_test" file="py_test.py" line="358" name="test_getmeal" time="2.060"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_getmeal():
+        v = Validator(mealschema)
+&gt;       j = getmeal()
+
+py_test.py:361: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+py_test.py:329: in getmeal
+    j= r.json()
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;json.decoder.JSONDecoder object at 0x0000020DB4BC9988&gt;, s = &apos;&apos;, idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase><testcase classname="py_test" file="py_test.py" line="363" name="test_postanddeletemeal" time="2.054"><failure message="json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)">def test_postanddeletemeal():
+        v = Validator(mealschema)
+&gt;       j = postmeal()
+
+py_test.py:366: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+py_test.py:333: in postmeal
+    j= r.json()
+C:\Users\jacco\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.7_qbz5n2kfra8p0\LocalCache\local-packages\Python37\site-packages\requests\models.py:897: in json
+    return complexjson.loads(self.text, **kwargs)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\__init__.py:348: in loads
+    return _default_decoder.decode(s)
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:337: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;json.decoder.JSONDecoder object at 0x0000020DB4BC9988&gt;, s = &apos;&apos;, idx = 0
+
+    def raw_decode(self, s, idx=0):
+        &quot;&quot;&quot;Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        &quot;&quot;&quot;
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+&gt;           raise JSONDecodeError(&quot;Expecting value&quot;, s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Program Files\WindowsApps\PythonSoftwareFoundation.Python.3.7_3.7.1520.0_x64__qbz5n2kfra8p0\lib\json\decoder.py:355: JSONDecodeError</failure></testcase></testsuite></testsuites>

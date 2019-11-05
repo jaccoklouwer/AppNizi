@@ -19,6 +19,9 @@ using AppNiZiAPI.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using Microsoft.OpenApi.Models;
+using AppNiZiAPI.Services;
+using System.Collections.Generic;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Patients.DELETE
 {
@@ -34,31 +37,18 @@ namespace AppNiZiAPI.Functions.Patients.DELETE
         [OpenApiParameter("patientId", Description = "Inserting the patient id", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.SpecificPatient))] HttpRequest req, int patientId,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = (Routes.APIVersion + Routes.SpecificPatient))] HttpRequest req,
+            string patientId,
             ILogger log)
         {
-            if (patientId == 0)
-                return new BadRequestObjectResult("No patientId parameter passed.");
+            log.LogInformation("C# HTTP trigger function processed a request.");
 
-            #region AuthCheck
-            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, patientId);
-            if (!authResult.Result)
-                return new StatusCodeResult((int)authResult.StatusCode);
-            #endregion
+            // Logic
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IPatientService>()
+                .TryDeletePatient(req, patientId);
 
-            try
-            {
-                IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
-
-                return patientRepository.Delete(patientId)
-                    ? (ActionResult)new OkObjectResult("Deleted.")
-                    : new NotFoundObjectResult("Deletion failed, invalid patientId?");
-            }
-            catch (Exception ex)
-            {
-                // Build error message and return it.
-                return new BadRequestObjectResult(new MessageHandler().BuildErrorMessage(ex));
-            }
+            // Response
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

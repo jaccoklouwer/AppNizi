@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +7,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using AppNiZiAPI.Variables;
-using AppNiZiAPI.Models.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Infrastructure;
 using AppNiZiAPI.Models.Dietarymanagement;
@@ -18,6 +16,9 @@ using System.Net;
 using Microsoft.OpenApi.Models;
 using AppNiZiAPI.Security;
 using AppNiZiAPI.Models;
+using AppNiZiAPI.Services;
+using System.Collections.Generic;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.PUT
 {
@@ -33,7 +34,7 @@ namespace AppNiZiAPI.Functions.DietaryManagement.PUT
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPostBody)]
         [OpenApiResponseBody(HttpStatusCode.UnprocessableEntity, "application/json", typeof(Error), Summary = Messages.ErrorMissingValues)]
         [OpenApiRequestBody("application/json", typeof(DietaryManagementModel), Description = "the new values of the dietaryManagement")]
-        [OpenApiParameter("dietId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))] 
+        [OpenApiParameter("dietId", Description = "the id of the diet that is going to be updated", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         #endregion
         public static async Task<IActionResult> UpdateDietaryManagement(
             [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = (Routes.APIVersion + Routes.DietaryManagementById))]
@@ -45,36 +46,16 @@ namespace AppNiZiAPI.Functions.DietaryManagement.PUT
             log.LogInformation("C# HTTP trigger function processed a request.");
 
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-            if (string.IsNullOrEmpty(requestBody))
-                return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues);
 
-            IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
-            try
-            {
-                DietaryManagementModel dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
+            DietaryManagementModel dietary = new DietaryManagementModel();
+            JsonConvert.PopulateObject(requestBody, dietary);
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, dietary.PatientId);
+            if (!authResult.Result)
+                return new StatusCodeResult((int)authResult.StatusCode);
 
-                #region AuthCheck
-                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, dietary.PatientId);
-                if (!authResult.Result)
-                    return new StatusCodeResult((int)authResult.StatusCode);
-                #endregion
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IDietaryManagementService>().TryUpdateDietaryManagement(dietId, dietary);
 
-                bool success = repository.UpdateDietaryManagement(dietId, dietary);
-
-                if (success)
-                {
-                    return new OkObjectResult(Messages.OKUpdate);
-                }
-                else
-                {
-                    return new BadRequestObjectResult(Messages.ErrorPostBody);
-                }
-            }
-            catch (Exception e)
-            {
-
-                return new NotFoundObjectResult(Messages.ErrorMissingValues + e.Message);
-            }
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

@@ -27,7 +27,7 @@ namespace AppNiZiAPI.Functions.Doctor.DELETE
         [FunctionName("DeleteDoctor")]
         #region Swagger
         [OpenApiOperation("DeleteDoctor", "Doctor", Summary = "Delete specific doctor", Description = "Delete specific doctor", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(PatientObject[]), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Patient[]), Summary = Messages.OKUpdate)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
@@ -35,7 +35,7 @@ namespace AppNiZiAPI.Functions.Doctor.DELETE
         [OpenApiParameter("doctorId", Description = "Inserting the doctor id", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "delete", Route = (Routes.APIVersion + Routes.SpecificDoctor))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = (Routes.APIVersion + Routes.SpecificDoctor))] HttpRequest req,
             ILogger log, int doctorId)
         {
             #region AuthCheck

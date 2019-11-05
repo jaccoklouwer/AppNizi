@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +8,6 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Net;
 using AppNiZiAPI.Variables;
-using AppNiZiAPI.Models.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 using AppNiZiAPI.Models.Dietarymanagement;
 using AppNiZiAPI.Infrastructure;
@@ -18,6 +16,9 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using Microsoft.OpenApi.Models;
 using AppNiZiAPI.Security;
 using AppNiZiAPI.Models;
+using AppNiZiAPI.Services;
+using System.Collections.Generic;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.DietaryManagement.POST
 {
@@ -42,33 +43,18 @@ namespace AppNiZiAPI.Functions.DietaryManagement.POST
             string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
             if (string.IsNullOrEmpty(requestBody))
                 return new UnprocessableEntityObjectResult(Messages.ErrorMissingValues);
-            IDietaryManagementRepository repository = DIContainer.Instance.GetService<IDietaryManagementRepository>();
 
-            try
-            {
-                DietaryManagementModel dietary = JsonConvert.DeserializeObject<DietaryManagementModel>(requestBody);
+            DietaryManagementModel dietary = new DietaryManagementModel();
+            JsonConvert.PopulateObject(requestBody, dietary);
+            #region AuthCheck
+            AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().CheckAuthorization(req, dietary.PatientId);
+            if (!authResult.Result)
+                return new StatusCodeResult((int)authResult.StatusCode);
+            #endregion
 
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IDietaryManagementService>().TryAddDietaryManagement(dietary);
 
-                #region AuthCheck
-                AuthResultModel authResult = await DIContainer.Instance.GetService<IAuthorization>().AuthForDoctorOrPatient(req, dietary.PatientId);
-                if (!authResult.Result)
-                    return new StatusCodeResult((int)authResult.StatusCode);
-                #endregion
-                
-                bool success = repository.AddDietaryManagement(dietary);
-                if (success)
-                {
-                    return new OkObjectResult(Messages.OKPost);
-                }
-                else
-                {
-                    return new BadRequestObjectResult(Messages.ErrorPostBody);
-                }
-            }
-            catch (Exception e)
-            {
-                return new NotFoundObjectResult(Messages.ErrorMissingValues + e.Message);
-            }
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

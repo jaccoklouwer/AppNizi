@@ -19,6 +19,9 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using System.Net;
 using AppNiZiAPI.Models.SwaggerModels;
+using AppNiZiAPI.Services;
+using System.Collections.Generic;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Account.POST
 {
@@ -34,52 +37,17 @@ namespace AppNiZiAPI.Functions.Account.POST
         [OpenApiRequestBody("application/json", typeof(SwaggerRegisterPatient), Description = "New patient")]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "post", Route = (Routes.APIVersion + Routes.Patients))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.Patient))] HttpRequest req,
             ILogger log)
         {
-            // Auth check
-            AuthLogin authLogin = await DIContainer.Instance.GetService<IAuthorization>().LoginAuthAsync(req);
-            if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
-            PatientLogin newPatient;
+            log.LogInformation("C# HTTP trigger function processed a request.");
 
-            try
-            {
-                StreamReader streamReader = new StreamReader(req.Body);
-                var content = await streamReader.ReadToEndAsync();
-                streamReader.Dispose();
+            // Logic
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IPatientService>()
+                .TryRegisterPatient(req);
 
-                // Parse Patient Info
-                JObject jsonParsed = JObject.Parse(content);
-
-                newPatient = new PatientLogin
-                {
-                    Patient = new PatientObject
-                    {
-                        FirstName = jsonParsed["firstName"].ToString(),
-                        LastName = jsonParsed["lastName"].ToString(),
-                        DateOfBirth = (DateTime)jsonParsed["dateOfBirth"],
-                        WeightInKilograms = (float)jsonParsed["weight"],
-                        Guid = authLogin.Guid
-                    },
-                    Doctor = new DoctorModel
-                    {
-                        DoctorId = (int)jsonParsed["doctorId"]
-                    }
-                };
-            }
-            catch (Exception e)
-            {
-                log.LogInformation(e.Message);
-                return new BadRequestResult();
-            }
-            
-            IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
-            newPatient = patientRepository.RegisterPatient(newPatient);
-            newPatient.AuthLogin = authLogin;
-
-            return newPatient != null
-                ? (ActionResult)new OkObjectResult(newPatient)
-                : new BadRequestResult();
+            // Response
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

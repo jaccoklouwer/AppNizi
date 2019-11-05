@@ -9,13 +9,13 @@ namespace AppNiZiAPI.Models
         public int MealId { get; set; }
         public string Name { get; set; }
         public int PatientId { get; set; }
-        public float KCal { get; set; }
-        public float Protein { get; set; }
-        public float Fiber { get; set; }
-        public float Calcium { get; set; }
-        public float Sodium { get; set; }
-        public float PortionSize { get; set; }
-        public float WeightUnitId { get; set; }
-
+        public double KCal { get; set; }
+        public double Protein { get; set; }
+        public double Fiber { get; set; }
+        public double Calcium { get; set; }
+        public double Sodium { get; set; }
+        public double PortionSize { get; set; }
+        public string WeightUnit { get; set; }
+        public string Picture { get; set; }
     }
 }

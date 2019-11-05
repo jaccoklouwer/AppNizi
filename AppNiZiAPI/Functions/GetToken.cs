@@ -15,7 +15,7 @@ namespace AppNiZiAPI.Functions
     {
         [FunctionName("GetToken")]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
             ILogger log)
         {
             //var client = new RestClient("https://appnizi.eu.auth0.com/oauth/token");

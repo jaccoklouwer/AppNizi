@@ -12,12 +12,13 @@ namespace AppNiZiAPI.Models.Repositories
 {
     public interface IPatientRepository
     {
-        PatientObject Select(int id);
-        PatientObject Select(string guid);
-        List<PatientView> List(int count);
+        Patient Select(int id);
+        Patient Select(string guid);
+        List<Patient> List(int count);
         bool Delete(int patientId);
         PatientLogin GetPatientInfo(string guid);
         PatientLogin RegisterPatient(PatientLogin newPatient);
+        bool Update(PatientUpdateModel patient);
     }
 
     public class PatientRepository : IPatientRepository
@@ -25,12 +26,12 @@ namespace AppNiZiAPI.Models.Repositories
         /// <summary>
         /// Select patient by ID.
         /// </summary>
-        public PatientObject Select(int id)
+        public Patient Select(int id)
         {
             if (id == 0)
-                return null;
+                return new Patient();
 
-            PatientObject patient = null;
+            Patient patient = new Patient();
 
             using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -46,28 +47,26 @@ namespace AppNiZiAPI.Models.Repositories
 
                 while (reader.Read())
                 {
-                    patient = new PatientObject()
-                    {
-                        PatientId = (int)reader["id"],
-                        Guid = reader["guid"].ToString(),
-                        DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
-                        WeightInKilograms = Convert.ToInt32(reader["weight"]),
-                        FirstName = reader["first_name"].ToString(),
-                        LastName = reader["last_name"].ToString()
-                        
-                    };
+                    patient.PatientId = (int)reader["id"];
+                    patient.DoctorId = (int)reader["doctor_id"];
+                    patient.AccountId = (int)reader["account_id"];
+                    patient.Guid = reader["guid"].ToString();
+                    patient.DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]);
+                    patient.WeightInKilograms = Convert.ToInt32(reader["weight"]);
+                    patient.FirstName = reader["first_name"].ToString();
+                    patient.LastName = reader["last_name"].ToString();
                 }
             }
 
             return patient;
         }
 
-        public PatientObject Select(string guid)
+        public Patient Select(string guid)
         {
             if (string.IsNullOrEmpty(guid))
-                return null;
+                return new Patient();
 
-            PatientObject patient = null;
+            Patient patient = new Patient();
 
             using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -80,7 +79,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 while (reader.Read())
                 {
-                    patient = new PatientObject()
+                    patient = new Patient()
                     {
                         Guid = reader["guid"].ToString(),
                         DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
@@ -88,23 +87,26 @@ namespace AppNiZiAPI.Models.Repositories
                     };
                 }
             }
+
             return patient;
         }
 
         /// <summary>
         /// Select all patients, up to count amount.
         /// </summary>
-        public List<PatientView> List(int count)
+        public List<Patient> List(int count)
         {
             if (count == 0)
                 count = 999999;
 
-            List<PatientView> patients = new List<PatientView>();
+            List<Patient> patients = new List<Patient>();
 
             using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
                 sqlConn.Open();
-                string sqlQuery = $"SELECT TOP(@COUNT) * FROM patient";
+                string sqlQuery = $"SELECT TOP(@COUNT) p.*, a.* " +
+                    $"FROM Patient AS p " +
+                    $"INNER JOIN Account AS A ON p.account_id = a.id";
 
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@COUNT", SqlDbType.Int).Value = count;
@@ -112,29 +114,32 @@ namespace AppNiZiAPI.Models.Repositories
 
                 while (reader.Read())
                 {
-                    PatientView patient = new PatientView
+                    Patient patient = new Patient
                     {
-                        GUID = reader["guid"].ToString(),
-                        dateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
-                        weight = Convert.ToInt32(reader["weight"]),
-                        id = Convert.ToInt32(reader["weight"])
+                        PatientId = (int)reader["id"],
+                        Guid = reader["guid"].ToString(),
+                        DateOfBirth = Convert.ToDateTime(reader["date_of_birth"]),
+                        WeightInKilograms = Convert.ToInt32(reader["weight"]),
+                        FirstName = reader["first_name"].ToString(),
+                        LastName = reader["last_name"].ToString()
                     };
 
                     patients.Add(patient);
                 }
+
                 sqlConn.Close();
             }
+
             return patients;
         }
 
         public PatientLogin RegisterPatient(PatientLogin newPatient)
         {
             // Return null when GUID already exists in DB
-            if (CheckIfExists(newPatient.Patient.Guid))
-                return null;
+            if (newPatient.Patient.Guid != null)
+                if (CheckIfExists(newPatient.Patient.Guid))
+                    return null;
 
-            // Register First a new account, if there is an error the AccountId will be 0
-            newPatient.Account.AccountId = RegisterAccount(newPatient.Patient);
             if (newPatient.Account.AccountId == 0)
                 return null;
 
@@ -147,38 +152,20 @@ namespace AppNiZiAPI.Models.Repositories
             {
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@ACCOUNTID", SqlDbType.Int).Value = newPatient.Account.AccountId;
+                newPatient.Patient.AccountId = newPatient.Account.AccountId;
+
                 sqlCmd.Parameters.Add("@DATE", SqlDbType.Date).Value = newPatient.Patient.DateOfBirth;
-                sqlCmd.Parameters.Add("@DOCTORID", SqlDbType.Int).Value = newPatient.Doctor.DoctorId;
-                sqlCmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = newPatient.Patient.Guid;
+
+                sqlCmd.Parameters.Add("@DOCTORID", SqlDbType.Int).Value = newPatient.Patient.DoctorId;
+
+                sqlCmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = Guid.NewGuid().ToString();
                 sqlCmd.Parameters.Add("@WEIGHT", SqlDbType.Float).Value = newPatient.Patient.WeightInKilograms;
 
                 sqlConn.Open();
-                int result = sqlCmd.ExecuteNonQuery();
-                if (result < 0)
-                    return null;
+                newPatient.Patient.PatientId = (int)sqlCmd.ExecuteScalar();
             }
 
-            // Get all patient info, included the doctor
-            return GetPatientInfo(newPatient.Patient.Guid);
-        }
-
-        private int RegisterAccount(PatientObject patient)
-        {
-            string sqlQuery =
-                "INSERT INTO Account(first_name, last_name, role) " +
-                "OUTPUT Inserted.id " +
-                "VALUES(@FIRSTNAME, @LASTNAME, @ROLE)";
-
-            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
-            {
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
-                sqlCmd.Parameters.Add("@FIRSTNAME", SqlDbType.NVarChar).Value = patient.FirstName;
-                sqlCmd.Parameters.Add("@LASTNAME", SqlDbType.NVarChar).Value = patient.LastName;
-                sqlCmd.Parameters.Add("@ROLE", SqlDbType.Int).Value = Role.Patient;
-
-                sqlConn.Open();
-                return (int)sqlCmd.ExecuteScalar();
-            }
+            return newPatient;
         }
 
         private bool CheckIfExists(string guid)
@@ -203,32 +190,9 @@ namespace AppNiZiAPI.Models.Repositories
         public bool Delete(int patientId)
         {
             bool success = false;
-            int accountId = 0;
 
-            string sqlQuery = "SELECT account_id FROM Patient WHERE id=@PATIENTID";
-            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
-            {
-                sqlConn.Open();
 
-                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
-                sqlCmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
-
-                try
-                {
-                    accountId = (int)sqlCmd.ExecuteScalar();
-                    sqlConn.Close();
-                }
-                catch
-                {
-                    return false;
-                }
-                if (accountId == 0)
-                    return false;
-            }
-
-            sqlQuery = 
-                "DELETE FROM patient WHERE id=@PATIENTID;" +
-                "DELETE FROM Account WHERE id=@ACCOUNTID";
+            string sqlQuery = "DELETE FROM patient WHERE id=@PATIENTID";
 
             using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -236,13 +200,78 @@ namespace AppNiZiAPI.Models.Repositories
 
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
-                sqlCmd.Parameters.Add("@ACCOUNTID", SqlDbType.Int).Value = accountId;
 
                 int rows = sqlCmd.ExecuteNonQuery();
                 if (rows > 0)
                     success = true;
             }
+
             return success;
+        }
+
+        public bool Update(PatientUpdateModel patient)
+        {
+            bool success = false;
+
+            string sqlQuery = BuildUpdateQuery(patient);
+
+            using (SqlConnection sqlConn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            {
+                sqlConn.Open();
+
+                SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
+
+                sqlCmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patient.PatientId;
+
+                if (patient.DateOfBirth != null && patient.DateOfBirth != new DateTime())
+                    sqlCmd.Parameters.Add("@DOB", SqlDbType.Date).Value = patient.DateOfBirth;
+
+                if (patient.DoctorId > 0)
+                    sqlCmd.Parameters.Add("@DOCTORID", SqlDbType.Int).Value = patient.DoctorId;
+
+                if (patient.WeightInKilograms > 0)
+                    sqlCmd.Parameters.Add("@WEIGHT", SqlDbType.Float).Value = patient.WeightInKilograms;
+
+                int rows = sqlCmd.ExecuteNonQuery();
+                if (rows > 0)
+                    success = true;
+            }
+
+            return success;
+        }
+
+        private string BuildUpdateQuery(PatientUpdateModel patient)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("UPDATE patient ");
+            sb.Append("SET ");
+
+            bool isNotFirst = false;
+            if (patient.DateOfBirth != null && patient.DateOfBirth != new DateTime())
+            {
+                sb.Append("date_of_birth=@DOB");
+                isNotFirst = true;
+            }
+            if (patient.WeightInKilograms > 0)
+            {
+                if (isNotFirst)
+                    sb.Append(", ");
+
+                sb.Append("weight=@WEIGHT");
+                isNotFirst = true;
+            }
+            if (patient.DoctorId > 0)
+            {
+                if (isNotFirst)
+                    sb.Append(", ");
+
+                sb.Append("doctor_id=@DOCTORID");
+                isNotFirst = true;
+            }
+
+            sb.Append(" WHERE id=@PATIENTID");
+
+            return sb.ToString();
         }
 
         public PatientLogin GetPatientInfo(string guid)
@@ -273,14 +302,14 @@ namespace AppNiZiAPI.Models.Repositories
                         Role = (string)reader["role_name"]
                     };
 
-                    PatientObject patient = new PatientObject
+                    Patient patient = new Patient
                     {
                         DateOfBirth = (DateTime)reader["date_of_birth"],
                         FirstName = (string)reader["first_name"],
                         LastName = (string)reader["last_name"],
                         Guid = (string)reader["guid"],
                         PatientId = (int)reader["patient_id"],
-                        WeightInKilograms =  float.Parse(reader["weight"].ToString())
+                        WeightInKilograms = float.Parse(reader["weight"].ToString())
                     };
 
                     DoctorModel doctor = new DoctorModel
@@ -300,6 +329,6 @@ namespace AppNiZiAPI.Models.Repositories
                 conn.Close();
             }
             return patientLogin;
-        } 
+        }
     }
 }

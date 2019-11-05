@@ -36,6 +36,8 @@ namespace AppNiZiAPI.Infrastructure
 
             // Here we're adding the different services, such as API's, queue, blob library and repositories. Register them in the registry.
             services.AddRepositoryServices();
+            services.AddAPIServices();
+            services.AddHelperServices();
 
             return services.BuildServiceProvider();
         }

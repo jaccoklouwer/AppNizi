@@ -24,6 +24,9 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
 using System.Net;
 using Microsoft.OpenApi.Models;
+using AppNiZiAPI.Services;
+using static AppNiZiAPI.Services.PatientService;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Patients
 {
@@ -35,7 +38,7 @@ namespace AppNiZiAPI.Functions.Patients
         [FunctionName("GetPatients")]
         #region Swagger
         [OpenApiOperation("GetPatients", "Patient", Summary = "Get all patients", Description = "Get all patients", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(PatientObject[]), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Patient[]), Summary = Messages.OKUpdate)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.Forbidden, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
         [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorPostBody)]
@@ -45,21 +48,14 @@ namespace AppNiZiAPI.Functions.Patients
             [HttpTrigger(AuthorizationLevel.Admin, "get", Route = (Routes.APIVersion + Routes.Patients))] HttpRequest req,
             ILogger log)
         {
-            // Authorization
-            //if (!await Authorization.CheckAuthorization(req.Headers)){ return new BadRequestObjectResult(Messages.AuthNoAcces);}
-
             log.LogInformation("C# HTTP trigger function processed a request.");
 
-            int count = new QueryHandler().ExtractIntegerFromRequestQuery("count", req);
+            // Logic
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IPatientService>()
+                .TryListPatients(req);
 
-            IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
-            List<PatientView> patients = patientRepository.List(count);
-
-            dynamic data = JsonConvert.SerializeObject(patients);
-            
-            return patients != null
-                ? (ActionResult)new OkObjectResult(data)
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            // Response
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }

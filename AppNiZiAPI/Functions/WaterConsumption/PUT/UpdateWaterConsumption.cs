@@ -33,7 +33,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.PUT
         [OpenApiRequestBody("application/json", typeof(WaterConsumptionModel), Description = "Id can be null or zero")]
         #endregion
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function, "put", Route = (Routes.APIVersion + Routes.SingleWaterConsumption))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous, "put", Route = (Routes.APIVersion + Routes.SingleWaterConsumption))] HttpRequest req,
             ILogger log, int waterId)
         {
             int patientId = await DIContainer.Instance.GetService<IAuthorization>().GetUserId(req);
@@ -52,20 +52,22 @@ namespace AppNiZiAPI.Functions.WaterConsumption.PUT
                 {
                     PatientId = patientId,
                     Amount = (int)jsonParsed["amount"],
-                    Date = Convert.ToDateTime(jsonParsed["date"].ToString()),
                     Id = waterId
                 };
+                DateTime.TryParse(jsonParsed["date"].ToString(), out var date);
+                if (date != null)
+                    model.Date = date;
             }
             catch
             {
                 return new BadRequestObjectResult(Messages.ErrorPost);
             }
 
-            Result result = waterRep.InsertWaterConsumption(model, true);
+            model = waterRep.InsertWaterConsumption(model, true);
 
-            return result.Succesfull
-                ? (ActionResult)new OkObjectResult(result)
-                : new BadRequestObjectResult(result);
+            return model != null
+                ? (ActionResult)new OkObjectResult(model)
+                : new BadRequestResult();
         }
     }
 }

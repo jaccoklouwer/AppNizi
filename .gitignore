@@ -264,3 +264,13 @@ __pycache__/
 *.pyc
 /AppNiZiAPI/Properties/launchSettings.json
 AppNiZiAPI/.vs/AppNiZiAPI/v16/Server/sqlite3/db.lock
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+Python-tests/.vscode/settings.json

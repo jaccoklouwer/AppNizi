@@ -17,6 +17,9 @@ using Aliencube.AzureFunctions.Extensions.OpenApi.Attributes;
 using System.Net;
 using Microsoft.OpenApi.Models;
 using Aliencube.AzureFunctions.Extensions.OpenApi.Enums;
+using System.Collections.Generic;
+using AppNiZiAPI.Services;
+using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI.Functions.Meal.POST
 {
@@ -24,13 +27,13 @@ namespace AppNiZiAPI.Functions.Meal.POST
     {
         [FunctionName("AddMeal")]
         [OpenApiOperation("AddMeal", "Meal", Summary = "Adds a meal", Description = "Adds a meal to the specified patient", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKUpdate)]
-        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(string), Summary = Messages.AuthNoAcces)]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(string), Summary = Messages.ErrorMissingValues)]
+        [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(Models.Meal), Summary = Messages.OKUpdate)]
+        [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorMissingValues)]
         [OpenApiRequestBody("application/json", typeof(Models.Meal), Description = "The meal object to be added")]
         [OpenApiParameter("patientId", Description = "The patient who is adding the meal", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         public static async Task<IActionResult> Run(
-            [HttpTrigger(AuthorizationLevel.Function,  "post", Route = (Routes.APIVersion+Routes.AddMeal))] HttpRequest req,
+            [HttpTrigger(AuthorizationLevel.Anonymous,  "post", Route = (Routes.APIVersion+Routes.AddMeal))] HttpRequest req,
             ILogger log,int patientId)
         {
             #region AuthCheck
@@ -40,17 +43,10 @@ namespace AppNiZiAPI.Functions.Meal.POST
             #endregion
 
 
-            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            Dictionary<ServiceDictionaryKey, object> dictionary = await DIContainer.Instance.GetService<IMealService>().TryAddMeal(patientId, req);
 
-            Models.Meal meal = new Models.Meal();
-            JsonConvert.PopulateObject(requestBody, meal);
-            meal.PatientId = patientId;
-            IMealRepository mealRepository = DIContainer.Instance.GetService<IMealRepository>();
-            bool succes = mealRepository.AddMeal(meal);
 
-            return succes != false
-                ? (ActionResult)new OkObjectResult(succes)
-                : new BadRequestObjectResult("Please pass a name on the query string or in the request body");
+            return DIContainer.Instance.GetService<IResponseHandler>().ForgeResponse(dictionary);
         }
     }
 }
