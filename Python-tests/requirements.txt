@@ -1,5 +1,4 @@
 requests
-datetime
-http.client
 pytest
 cerberus
+datetime
