@@ -1,7 +1,4 @@
 requests
-http.client
-datetime
-os
 pytest
 pytest-azurepipelines
 cerberus
