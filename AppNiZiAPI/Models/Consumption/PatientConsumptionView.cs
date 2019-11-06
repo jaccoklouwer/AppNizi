@@ -17,11 +17,6 @@ namespace AppNiZiAPI
         public int Amount { get; set; }
         public WeightUnitModel Weight { get; set; }
         public DateTime Date { get; set; }
-        public bool Valid { get; set; }
 
-        public PatientConsumptionView()
-        {
-            this.Valid = false;
-        }
     }
 }
