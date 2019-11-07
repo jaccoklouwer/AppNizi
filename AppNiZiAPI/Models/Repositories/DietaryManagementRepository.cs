@@ -38,10 +38,10 @@ namespace AppNiZiAPI.Models.Repositories
                     try
                     {
                         SqlDataReader reader = cmd.ExecuteReader();
-                        DietaryManagementModel dietaryManagementModel = new DietaryManagementModel();
+
                         while (reader.Read())
                         {
-
+                            DietaryManagementModel dietaryManagementModel = new DietaryManagementModel();
                             // Uit lezen bijv
                             dietaryManagementModel.Id = Int32.Parse(reader["id"].ToString());
                             dietaryManagementModel.Description = reader["description"].ToString();

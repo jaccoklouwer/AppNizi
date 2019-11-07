@@ -8,7 +8,7 @@ namespace AppNiZiAPI
 {
     public class ConsumptionRespository : IConsumptionRepository
     {
-        public bool AddConsumption(Consumption consumption)
+        public bool AddConsumption(ConsumptionInput consumption)
         {
             bool added;
             var insert = $"INSERT INTO Consumption " +
@@ -89,13 +89,11 @@ namespace AppNiZiAPI
                             };
                             consumption.Date = Convert.ToDateTime(reader["date"]).Date;
                             consumption.PatientId = (int)reader["patient_id"];
-                            consumption.Valid = true;
                         }
                     }
                     catch (Exception)
                     {
-                        consumption.Valid = false;
-                        return consumption;
+                        consumption = null;
                     }
                 }
                 conn.Close();
@@ -129,8 +127,7 @@ namespace AppNiZiAPI
                         {
                             consumption = new PatientConsumptionView();
 
-                            try
-                            {
+                            
                                 consumption.ConsumptionId = (int)reader["id"];
                                 consumption.FoodName = reader["food_name"].ToString();
                                 consumption.KCal = (float)Convert.ToDouble(reader["kcal"]);
@@ -146,17 +143,7 @@ namespace AppNiZiAPI
                                     Unit = (string)reader["unit"]
                                 };
                                 consumption.Date = Convert.ToDateTime(reader["date"]).Date;
-                                consumption.Valid = true;
-                            }
-                            catch (Exception ex)
-                            {
-                                if (consumption.ConsumptionId == 0)
-                                {
-                                    throw ex;
-                                }
-                            }
-
-                            // Adds incomplete consumption to consumptions. Consumption is Invalid by default
+                     
                             consumptions.Add(consumption);
                         }
                     }
@@ -171,7 +158,7 @@ namespace AppNiZiAPI
             return consumptions;
         }
 
-        public bool UpdateConsumption(int consumptionId, Consumption consumption)
+        public bool UpdateConsumption(int consumptionId, ConsumptionInput consumption)
         {
             bool updated;
             var updateQuery = $"UPDATE Consumption SET " +
@@ -195,7 +182,7 @@ namespace AppNiZiAPI
             return updated;
         }
 
-        private SqlCommand ConsumptionCommand(string query, Consumption consumption,SqlConnection conn)
+        private SqlCommand ConsumptionCommand(string query, ConsumptionInput consumption,SqlConnection conn)
         {
             SqlCommand command = new SqlCommand(query, conn);
             command.Parameters.AddWithValue("@food_name", consumption.FoodName);

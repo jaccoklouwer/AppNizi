@@ -26,11 +26,10 @@ namespace AppNiZiAPI
         [FunctionName("AddConsumption")]
         #region Swagger
         [OpenApiOperation(nameof(AddConsumption), "Consumption", Summary = "Adds a consumption", Description = "Adds a consumption for a patient by using the consumption data from the requestbody. Only available for patient.", Visibility = OpenApiVisibilityType.Important)]
-        [OpenApiRequestBody("application/json", typeof(Consumption))]
+        [OpenApiRequestBody("application/json", typeof(ConsumptionInput))]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKPost)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorIncorrectId)]
-        /*[OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPost)]*/
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorPost)]
         #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = (Routes.APIVersion + Routes.Consumptions))] HttpRequest req,
