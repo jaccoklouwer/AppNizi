@@ -73,10 +73,10 @@ namespace AppNiZiAPI.Models.Repositories
                 {
                     try
                     {
-                        DietaryRestriction restriction = new DietaryRestriction();
                         SqlDataReader reader = await cmd.ExecuteReaderAsync();
                         while (reader.Read())
                         {
+                            DietaryRestriction restriction = new DietaryRestriction();
                             restriction.Id = Int32.Parse(reader["id"].ToString());
                             restriction.Description = reader["description"].ToString();
                             dietaryRestrictions.Add(restriction);
