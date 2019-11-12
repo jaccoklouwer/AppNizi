@@ -8,11 +8,11 @@ namespace AppNiZiAPI.Models.Repositories
         ConsumptionView GetConsumptionByConsumptionId(int consumptionId);
         List<PatientConsumptionView> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate);
 
-        bool AddConsumption(Consumption consumption);
+        bool AddConsumption(ConsumptionInput consumption);
 
         bool DeleteConsumption(int consumptionId, int patientId);
 
-        bool UpdateConsumption(int consumptionId, Consumption consumption);
+        bool UpdateConsumption(int consumptionId, ConsumptionInput consumption);
 
     }
 }

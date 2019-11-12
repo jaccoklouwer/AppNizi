@@ -24,8 +24,7 @@ namespace AppNiZiAPI
         [OpenApiParameter("consumptionId", Description = "the id of the consumption that is going to be deleted", In = ParameterLocation.Path, Required = true, Type = typeof(int))]
         [OpenApiResponseBody(HttpStatusCode.OK, "application/json", typeof(string), Summary = Messages.OKDelete)]
         [OpenApiResponseBody(HttpStatusCode.Unauthorized, "application/json", typeof(Error), Summary = Messages.AuthNoAcces)]
-        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorIncorrectId)]
-        /*[OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorDelete)]*/
+        [OpenApiResponseBody(HttpStatusCode.BadRequest, "application/json", typeof(Error), Summary = Messages.ErrorDelete)]
         #endregion
         public static async Task<IActionResult> Run(
             [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = (Routes.APIVersion + Routes.Consumption))] HttpRequest req,

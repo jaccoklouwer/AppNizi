@@ -25,7 +25,7 @@ namespace AppNiZiAPI.Services
 
         public async Task<ActionResult> AddConsumption(HttpRequest req)
         {
-            Consumption newConsumption = new Consumption();
+            ConsumptionInput newConsumption = new ConsumptionInput();
             string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();
             JsonConvert.PopulateObject(consumptionJson, newConsumption);
 
@@ -104,7 +104,7 @@ namespace AppNiZiAPI.Services
            
             int targetPatientId = consumptionRepository.GetConsumptionByConsumptionId(id).PatientId;
 
-            Consumption updateConsumption = new Consumption();
+            ConsumptionInput updateConsumption = new ConsumptionInput();
             string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();
             JsonConvert.PopulateObject(consumptionJson, updateConsumption);
 
@@ -120,7 +120,7 @@ namespace AppNiZiAPI.Services
             return new BadRequestObjectResult(Messages.ErrorPut);
         }
 
-        private bool CorrectConsumption(Consumption consumption)
+        private bool CorrectConsumption(ConsumptionInput consumption)
         {
             if (consumption.Amount <= 0) return false;
             if (consumption.FoodName.Trim().Length <= 1) return false;

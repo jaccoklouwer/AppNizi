@@ -37,11 +37,11 @@ namespace AppNiZiAPI.Models.Repositories
                 {
                     try
                     {
-                        SqlDataReader reader = cmd.ExecuteReader();
-                        DietaryManagementModel dietaryManagementModel = new DietaryManagementModel();
+                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
+
                         while (reader.Read())
                         {
-
+                            DietaryManagementModel dietaryManagementModel = new DietaryManagementModel();
                             // Uit lezen bijv
                             dietaryManagementModel.Id = Int32.Parse(reader["id"].ToString());
                             dietaryManagementModel.Description = reader["description"].ToString();
@@ -58,7 +58,7 @@ namespace AppNiZiAPI.Models.Repositories
                     }
                 }
             }
-            return await Task.FromResult(dietaryManagementModels);
+            return dietaryManagementModels;
         }
 
         public async Task<List<DietaryRestriction>> GetDietaryRestrictions()
@@ -74,7 +74,7 @@ namespace AppNiZiAPI.Models.Repositories
                     try
                     {
                         DietaryRestriction restriction = new DietaryRestriction();
-                        SqlDataReader reader = cmd.ExecuteReader();
+                        SqlDataReader reader = await cmd.ExecuteReaderAsync();
                         while (reader.Read())
                         {
                             restriction.Id = Int32.Parse(reader["id"].ToString());
@@ -90,7 +90,7 @@ namespace AppNiZiAPI.Models.Repositories
                 }
 
             }
-            return await Task.FromResult(dietaryRestrictions);
+            return dietaryRestrictions;
         }
 
 
@@ -115,9 +115,9 @@ namespace AppNiZiAPI.Models.Repositories
                 command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietaryManagement.PatientId;
                 command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietaryManagement.IsActive;
                 command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
-                succes = (command.ExecuteNonQuery() > 0);
+                succes = await command.ExecuteNonQueryAsync() > 0;
             }
-            return await Task.FromResult(succes);
+            return succes;
         }
 
         public async Task<bool> DeleteDietaryManagement(int id)
@@ -128,19 +128,18 @@ namespace AppNiZiAPI.Models.Repositories
                 conn.Open();
                 var query = @"DELETE FROM DietaryManagement
                                 WHERE id = @ID";
-
+                bool succes;
                 try
                 {
                     SqlCommand command = new SqlCommand(query, conn);
                     command.Parameters.Add("@ID", SqlDbType.Int).Value = id;
-                    bool succes = (command.ExecuteNonQuery() > 0);
-
-                    return await Task.FromResult(succes);
+                    succes = await command.ExecuteNonQueryAsync() > 0;
                 }
                 catch (Exception)
                 {
-                    return false;
+                    succes = false;
                 }
+                return succes;
             }
         }
 
@@ -166,6 +165,7 @@ namespace AppNiZiAPI.Models.Repositories
                                     @ISACTIVE
                                 )";
 
+                bool succes;
                 try
                 {
                     SqlCommand command = new SqlCommand(query, conn);
@@ -173,14 +173,13 @@ namespace AppNiZiAPI.Models.Repositories
                     command.Parameters.Add("@AMOUNT", SqlDbType.Int).Value = dietary.Amount;
                     command.Parameters.Add("@PATIENT", SqlDbType.Int).Value = dietary.PatientId;
                     command.Parameters.Add("@ISACTIVE", SqlDbType.Bit).Value = dietary.IsActive;
-                    bool succes = (command.ExecuteNonQuery() > 0);
-
-                    return await Task.FromResult(succes);
+                    succes = await command.ExecuteNonQueryAsync() > 0;
                 }
                 catch (Exception e)
                 {
                     throw e;
                 }
+                return succes;
             }
         }
 
@@ -197,13 +196,13 @@ namespace AppNiZiAPI.Models.Repositories
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@ID", SqlDbType.Int).Value = patientId;
 
-                int rows = sqlCmd.ExecuteNonQuery();
+                int rows = await sqlCmd.ExecuteNonQueryAsync();
                 if (rows > 0)
                     success = true;
                 sqlConn.Close();
             }
 
-            return await Task.FromResult(success);
+            return success;
         }
     }
 }

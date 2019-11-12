@@ -300,6 +300,7 @@ def accestoken():
     splitdata = datadecoded.split('"')
 
     return(splitdata[3])
+print(accestoken())
 
 def accestokendoctor():
     conn = http.client.HTTPSConnection("appnizi.eu.auth0.com")
