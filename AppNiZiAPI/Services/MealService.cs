@@ -59,7 +59,7 @@ namespace AppNiZiAPI.Services
             }
             try
             {
-                bool succes = _mealRepository.DeleteMeal(patientId, mealId);
+                bool succes = await _mealRepository.DeleteMeal(patientId, mealId);
                 if (!succes)
                 {
                     dictionary.Add(ServiceDictionaryKey.ERROR, "No rows affected. Does the meal exist?");
@@ -85,7 +85,7 @@ namespace AppNiZiAPI.Services
             
             try
             {
-                List<Meal> meals = _mealRepository.GetMyMeals(patientId);
+                List<Meal> meals = await _mealRepository.GetMyMeals(patientId);
 
                 if (meals.Count <= 0)
                 {
@@ -117,7 +117,7 @@ namespace AppNiZiAPI.Services
                 Meal meal = new Meal();
                 JsonConvert.PopulateObject(requestBody, meal);
                 meal.PatientId = patientId;
-                meal = _mealRepository.AddMeal(meal);
+                meal = await _mealRepository.AddMeal(meal);
                 dynamic data = _messageSerializer.Serialize(meal);
 
                 dictionary.Add(ServiceDictionaryKey.VALUE, data);
@@ -142,7 +142,7 @@ namespace AppNiZiAPI.Services
                 JsonConvert.PopulateObject(requestBody, meal);
                 meal.PatientId = patientId;
                 meal.MealId = mealId;
-                meal = _mealRepository.PutMeal(meal);
+                meal = await _mealRepository.PutMeal(meal);
                 dynamic data = _messageSerializer.Serialize(meal);
 
                 dictionary.Add(ServiceDictionaryKey.VALUE, data);

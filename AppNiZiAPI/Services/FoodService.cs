@@ -59,7 +59,7 @@ namespace AppNiZiAPI.Services
             }
             try
             {
-                bool succes = _foodRepository.UnFavorite(patientId, foodId);
+                bool succes = await _foodRepository.UnFavorite(patientId, foodId);
                 if (!succes)
                 {
                     dictionary.Add(ServiceDictionaryKey.ERROR, "No rows affected. Does the favorite exist?");
@@ -85,7 +85,7 @@ namespace AppNiZiAPI.Services
 
             try
             {
-                List<Food> foods = _foodRepository.Favorites(patientId);
+                List<Food> foods = await _foodRepository.Favorites(patientId);
 
                 if (foods.Count <= 0)
                 {
@@ -111,7 +111,7 @@ namespace AppNiZiAPI.Services
 
             try
             {
-                Food food = _foodRepository.Select(id);
+                Food food = await _foodRepository.SelectAsync(id);
 
                 if (food.FoodId <= 0)
                 {
@@ -142,7 +142,7 @@ namespace AppNiZiAPI.Services
             }
             try
             {
-                List<Food> foods = _foodRepository.Search(searchQuery, count);
+                List<Food> foods = await _foodRepository.Search(searchQuery, count);
 
                 if (foods.Count <= 0)
                 {
@@ -181,7 +181,7 @@ namespace AppNiZiAPI.Services
             }
             try
             {
-                bool succes = _foodRepository.Favorite(patientId, foodId);
+                bool succes = await _foodRepository.Favorite(patientId, foodId);
 
                 if (!succes)
                 {

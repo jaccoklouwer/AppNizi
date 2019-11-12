@@ -5,13 +5,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AppNiZiAPI.Models.Repositories
 {
    public class FoodRepository: IFoodRepository
     {
         //change to Id
-        public Food Select(int foodId)
+        public async Task<Food> SelectAsync(int foodId)
         {
             Food food = new Food();
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
@@ -23,7 +24,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
                     while (reader.Read())
                     {
                         // TODO OOOH doe dit anders indexes zo gevaarlijk
@@ -44,7 +45,7 @@ namespace AppNiZiAPI.Models.Repositories
             }
             return food;
         }
-        public List<Food> Search(string foodname,int count)
+        public async Task<List<Food>> Search(string foodname,int count)
         {
             
             List<Food> foods = new List<Food>();
@@ -60,7 +61,7 @@ namespace AppNiZiAPI.Models.Repositories
                 {
                     //Todo limit dit met een count parameter anders gaan we straks 200 ap*** ophalen)
                     //Done
-                    SqlDataReader reader = sqlCmd.ExecuteReader();
+                    SqlDataReader reader = await sqlCmd.ExecuteReaderAsync();
                     while (reader.Read())
                     {
                         Food food = new Food
@@ -84,7 +85,7 @@ namespace AppNiZiAPI.Models.Repositories
             }
             return foods;
         }
-        public List<Food> Favorites(int patientId)
+        public async Task<List<Food>> Favorites(int patientId)
         {
             List<Food> foods = new List<Food>();
 
@@ -97,7 +98,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
                     while (reader.Read())
                     {
                         Food food = new Food
@@ -121,7 +122,7 @@ namespace AppNiZiAPI.Models.Repositories
 
             return foods;
         }
-        public bool Favorite(int patient_id,int food_id)
+        public async Task<bool> Favorite(int patient_id,int food_id)
         {
             bool succes = true;
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
@@ -149,7 +150,7 @@ namespace AppNiZiAPI.Models.Repositories
                     sqlCmd.Parameters.Add(param1);
                     sqlCmd.Parameters.Add(param2);
                     //TODO TEST DIT
-                    rows = sqlCmd.ExecuteNonQuery();
+                    rows = await sqlCmd.ExecuteNonQueryAsync();
                 }
                 conn.Close();
             }
@@ -164,7 +165,7 @@ namespace AppNiZiAPI.Models.Repositories
             return succes;
         }
 
-        public bool UnFavorite(int patient_id, int food_id)
+        public async Task<bool> UnFavorite(int patient_id, int food_id)
         {
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             bool success = false;
@@ -177,7 +178,7 @@ namespace AppNiZiAPI.Models.Repositories
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, conn);
                 sqlCmd.Parameters.Add("@PATIENT_ID", SqlDbType.Int).Value = patient_id;
                 sqlCmd.Parameters.Add("@FOOD_ID", SqlDbType.Int).Value = food_id;
-                int rows = sqlCmd.ExecuteNonQuery();
+                int rows = await sqlCmd.ExecuteNonQueryAsync();
 
                 if (rows != 0)
                     success = true;
@@ -185,7 +186,7 @@ namespace AppNiZiAPI.Models.Repositories
             return success;
         }
 
-        public bool Delete(int patientId)
+        public async Task<bool> Delete(int patientId)
         {
             bool success = false;
 
@@ -198,7 +199,7 @@ namespace AppNiZiAPI.Models.Repositories
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@ID", SqlDbType.Int).Value = patientId;
 
-                int rows = sqlCmd.ExecuteNonQuery();
+                int rows = await sqlCmd.ExecuteNonQueryAsync();
                 if (rows > 0)
                     success = true;
             }
