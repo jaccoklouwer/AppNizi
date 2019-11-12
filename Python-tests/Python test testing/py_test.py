@@ -10,7 +10,7 @@ import json
 import cerberus
 import http.client
 import datetime
-import os
+
 from cerberus import Validator
 
 ##urls
@@ -23,8 +23,6 @@ def defineurl():
 urlLocal = defineurl()
 
 
-    
-defineurl()
 food="/food"
 foodPartial="/food/partial"
 foodFavorites="/food/favorite"
