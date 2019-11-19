@@ -83,7 +83,7 @@ namespace AppNiZiAPI.Services
                     return dictionary;
                 }
 
-                Patient patient = _patientRepository.Select(id);
+                Patient patient = await _patientRepository.Select(id);
 
                 if (patient.PatientId <= 0)
                 {
@@ -120,7 +120,7 @@ namespace AppNiZiAPI.Services
             {
                 int amountRequested = _queryHelper.ExtractIntegerFromRequestQuery("count", request);
 
-                List<Patient> patients = _patientRepository.List(amountRequested);
+                List<Patient> patients = await _patientRepository.List(amountRequested);
                 PatientReturnModel[] returnModels = new PatientReturnModel[patients.Count];
 
                 for (int i = 0; i < patients.Count; i++)
@@ -165,7 +165,7 @@ namespace AppNiZiAPI.Services
                     return dictionary;
                 }
 
-                bool success = _patientRepository.Update(patient);
+                bool success = await _patientRepository.Update(patient);
 
                 if (!success)
                 {
@@ -213,8 +213,8 @@ namespace AppNiZiAPI.Services
                 PatientLogin newPatient = await _messageSerializer.Deserialize<PatientLogin>(request.Body);
                 newPatient.Account = _accountRepository.RegisterAccount(newPatient.Patient, Role.Patient);
 
-                newPatient = _patientRepository.RegisterPatient(newPatient);
-                newPatient.Patient = _patientRepository.Select(newPatient.Patient.PatientId);
+                newPatient = await _patientRepository.RegisterPatient(newPatient);
+                newPatient.Patient = await _patientRepository.Select(newPatient.Patient.PatientId);
 
                 newPatient.AuthLogin = authLogin;
 
@@ -255,7 +255,9 @@ namespace AppNiZiAPI.Services
                 }
 
                 // Deleting
-                int accountId = _patientRepository.Select(patientId).AccountId;
+                Patient patient = await _patientRepository.Select(patientId);
+                int accountId = patient.AccountId;
+
                 if (!await TryPerformDelete(patientId, accountId))
                 {
                     dictionary.Add(ServiceDictionaryKey.ERROR, $"Deletion failed for given ID: {patientId}. Does patient exist?");
@@ -276,8 +278,8 @@ namespace AppNiZiAPI.Services
         private async Task<bool> TryPerformDelete(int patientId, int accountId)
         {
             await _dietaryManagementRepository.DeleteByPatientId(patientId);
-            _foodRepository.Delete(patientId);
-            bool success = _patientRepository.Delete(patientId);
+            await _foodRepository.Delete(patientId);
+            bool success = await _patientRepository.Delete(patientId);
 
             if (accountId > 0)
                 _accountRepository.Delete(accountId);

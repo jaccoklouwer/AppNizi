@@ -7,18 +7,19 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Globalization;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AppNiZiAPI.Models.Repositories
 {
     public interface IPatientRepository
     {
-        Patient Select(int id);
-        Patient Select(string guid);
-        List<Patient> List(int count);
-        bool Delete(int patientId);
-        PatientLogin GetPatientInfo(string guid);
-        PatientLogin RegisterPatient(PatientLogin newPatient);
-        bool Update(PatientUpdateModel patient);
+        Task<Patient> Select(int id);
+        Task<Patient> Select(string guid);
+        Task<List<Patient>> List(int count);
+        Task<bool> Delete(int patientId);
+        Task<PatientLogin> GetPatientInfo(string guid);
+        Task<PatientLogin> RegisterPatient(PatientLogin newPatient);
+        Task<bool> Update(PatientUpdateModel patient);
     }
 
     public class PatientRepository : IPatientRepository
@@ -26,7 +27,7 @@ namespace AppNiZiAPI.Models.Repositories
         /// <summary>
         /// Select patient by ID.
         /// </summary>
-        public Patient Select(int id)
+        public async Task<Patient> Select(int id)
         {
             if (id == 0)
                 return new Patient();
@@ -43,7 +44,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@ID", SqlDbType.Int).Value = id;
-                SqlDataReader reader = sqlCmd.ExecuteReader();
+                SqlDataReader reader = await sqlCmd.ExecuteReaderAsync();
 
                 while (reader.Read())
                 {
@@ -61,7 +62,7 @@ namespace AppNiZiAPI.Models.Repositories
             return patient;
         }
 
-        public Patient Select(string guid)
+        public async Task<Patient> Select(string guid)
         {
             if (string.IsNullOrEmpty(guid))
                 return new Patient();
@@ -75,7 +76,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@GUID", SqlDbType.NVarChar).Value = guid;
-                SqlDataReader reader = sqlCmd.ExecuteReader();
+                SqlDataReader reader = await sqlCmd.ExecuteReaderAsync();
 
                 while (reader.Read())
                 {
@@ -94,7 +95,7 @@ namespace AppNiZiAPI.Models.Repositories
         /// <summary>
         /// Select all patients, up to count amount.
         /// </summary>
-        public List<Patient> List(int count)
+        public async Task<List<Patient>> List(int count)
         {
             if (count == 0)
                 count = 999999;
@@ -110,7 +111,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@COUNT", SqlDbType.Int).Value = count;
-                SqlDataReader reader = sqlCmd.ExecuteReader();
+                SqlDataReader reader = await sqlCmd.ExecuteReaderAsync();
 
                 while (reader.Read())
                 {
@@ -133,11 +134,11 @@ namespace AppNiZiAPI.Models.Repositories
             return patients;
         }
 
-        public PatientLogin RegisterPatient(PatientLogin newPatient)
+        public async Task<PatientLogin> RegisterPatient(PatientLogin newPatient)
         {
             // Return null when GUID already exists in DB
             if (newPatient.Patient.Guid != null)
-                if (CheckIfExists(newPatient.Patient.Guid))
+                if (await CheckIfExists(newPatient.Patient.Guid))
                     return null;
 
             if (newPatient.Account.AccountId == 0)
@@ -162,13 +163,13 @@ namespace AppNiZiAPI.Models.Repositories
                 sqlCmd.Parameters.Add("@WEIGHT", SqlDbType.Float).Value = newPatient.Patient.WeightInKilograms;
 
                 sqlConn.Open();
-                newPatient.Patient.PatientId = (int)sqlCmd.ExecuteScalar();
+                newPatient.Patient.PatientId = (int) await sqlCmd.ExecuteScalarAsync();
             }
 
             return newPatient;
         }
 
-        private bool CheckIfExists(string guid)
+        private async Task<bool> CheckIfExists(string guid)
         {
             string sqlQuery =
                 "SELECT CASE WHEN EXISTS ( " +
@@ -183,11 +184,11 @@ namespace AppNiZiAPI.Models.Repositories
                 //sqlCmd.Parameters.Add("@DOCTERGUID", SqlDbType.NVarChar).Value = guid;
 
                 sqlConn.Open();
-                return (bool)sqlCmd.ExecuteScalar();
+                return (bool) await sqlCmd.ExecuteScalarAsync();
             }
         }
 
-        public bool Delete(int patientId)
+        public async Task<bool> Delete(int patientId)
         {
             bool success = false;
 
@@ -201,7 +202,7 @@ namespace AppNiZiAPI.Models.Repositories
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, sqlConn);
                 sqlCmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
 
-                int rows = sqlCmd.ExecuteNonQuery();
+                int rows = await sqlCmd.ExecuteNonQueryAsync();
                 if (rows > 0)
                     success = true;
             }
@@ -209,7 +210,7 @@ namespace AppNiZiAPI.Models.Repositories
             return success;
         }
 
-        public bool Update(PatientUpdateModel patient)
+        public async Task<bool> Update(PatientUpdateModel patient)
         {
             bool success = false;
 
@@ -232,7 +233,7 @@ namespace AppNiZiAPI.Models.Repositories
                 if (patient.WeightInKilograms > 0)
                     sqlCmd.Parameters.Add("@WEIGHT", SqlDbType.Float).Value = patient.WeightInKilograms;
 
-                int rows = sqlCmd.ExecuteNonQuery();
+                int rows = await sqlCmd.ExecuteNonQueryAsync();
                 if (rows > 0)
                     success = true;
             }
@@ -274,7 +275,7 @@ namespace AppNiZiAPI.Models.Repositories
             return sb.ToString();
         }
 
-        public PatientLogin GetPatientInfo(string guid)
+        public async Task<PatientLogin> GetPatientInfo(string guid)
         {
             PatientLogin patientLogin = null;
             string sqlQuery =
@@ -293,7 +294,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 conn.Open();
 
-                SqlDataReader reader = sqlCmd.ExecuteReader();
+                SqlDataReader reader = await sqlCmd.ExecuteReaderAsync();
                 while (reader.Read())
                 {
                     AccountModel account = new AccountModel
