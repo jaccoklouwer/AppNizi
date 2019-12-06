@@ -73,7 +73,6 @@ namespace AppNiZiAPI.Models.Repositories
                 {
                     try
                     {
-                        
                         SqlDataReader reader = await cmd.ExecuteReaderAsync();
                         while (reader.Read())
                         {
