@@ -43,6 +43,9 @@ namespace AppNiZiAPI.Functions.Account.GET
 
             IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
             PatientLogin patientLogin = patientRepository.GetPatientInfo(authLogin.Guid);
+            if (patientLogin == null)
+                return new BadRequestResult();
+
             patientLogin.AuthLogin = authLogin;
 
             return new OkObjectResult(patientLogin);

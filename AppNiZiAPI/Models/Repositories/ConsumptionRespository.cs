@@ -3,12 +3,13 @@ using AppNiZiAPI.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace AppNiZiAPI
 {
     public class ConsumptionRespository : IConsumptionRepository
     {
-        public bool AddConsumption(ConsumptionInput consumption)
+        public async Task<bool> AddConsumption(ConsumptionInput consumption)
         {
             bool added;
             var insert = $"INSERT INTO Consumption " +
@@ -21,7 +22,7 @@ namespace AppNiZiAPI
                 conn.Open();
                 try
                 {
-                    added = ConsumptionCommand(insertQuery, consumption,conn).ExecuteNonQuery() > 0;
+                    added = await ConsumptionCommand(insertQuery, consumption, conn).ExecuteNonQueryAsync() > 0;
                 }
                 catch (Exception)
                 {
@@ -32,7 +33,7 @@ namespace AppNiZiAPI
             return added;
         }
 
-        public bool DeleteConsumption(int consumptionId, int patientId)
+        public async Task<bool> DeleteConsumption(int consumptionId, int patientId)
         {
             if (patientId == 0) return false;
 
@@ -43,8 +44,7 @@ namespace AppNiZiAPI
                 conn.Open();
                 try
                 {
-                    SqlCommand command = new SqlCommand(query, conn);
-                    affected = command.ExecuteNonQuery() > 0;
+                    affected = await new SqlCommand(query, conn).ExecuteNonQueryAsync() > 0;
                 }
                 catch (Exception)
                 {
@@ -55,7 +55,7 @@ namespace AppNiZiAPI
             return affected;
         }
 
-        public ConsumptionView GetConsumptionByConsumptionId(int consumptionId)
+        public async Task<ConsumptionView> GetConsumptionByConsumptionId(int consumptionId)
         {
             var query = $"SELECT Consumption.*, WeightUnit.short, WeightUnit.unit " +
                 $"FROM Consumption " +
@@ -70,8 +70,8 @@ namespace AppNiZiAPI
                 {
                     try
                     {
-                        SqlDataReader reader = sqlCommand.ExecuteReader();
-                        while (reader.Read())
+                        SqlDataReader reader = await sqlCommand.ExecuteReaderAsync();
+                        while (await reader.ReadAsync())
                         {
                             consumption.ConsumptionId = (int)reader["id"];
                             consumption.FoodName = reader["food_name"].ToString();
@@ -101,7 +101,7 @@ namespace AppNiZiAPI
             return consumption;
         }
 
-        public List<PatientConsumptionView> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate)
+        public async Task<List<PatientConsumptionView>> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate)
         {
             string sqlStartDate = startDate.Date.ToString("yyyy-MM-dd").Replace("/", "-");
             string sqlEndDate = endDate.Date.ToString("yyyy-MM-dd").Replace("/", "-");
@@ -112,7 +112,6 @@ namespace AppNiZiAPI
                 $"WHERE Consumption.patient_id = '{patientId}' AND Consumption.date BETWEEN '{sqlStartDate}' AND '{sqlEndDate}'";
 
             List<PatientConsumptionView> consumptions = new List<PatientConsumptionView>();
-            PatientConsumptionView consumption;
 
             using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
@@ -121,29 +120,25 @@ namespace AppNiZiAPI
                 {
                     try
                     {
-
-                        SqlDataReader reader = sqlCommand.ExecuteReader();
-                        while (reader.Read())
+                        SqlDataReader reader = await sqlCommand.ExecuteReaderAsync();
+                        while (await reader.ReadAsync())
                         {
-                            consumption = new PatientConsumptionView();
-
-                            
-                                consumption.ConsumptionId = (int)reader["id"];
-                                consumption.FoodName = reader["food_name"].ToString();
-                                consumption.KCal = (float)Convert.ToDouble(reader["kcal"]);
-                                consumption.Protein = (float)Convert.ToDouble(reader["protein"]);
-                                consumption.Fiber = (float)Convert.ToDouble(reader["fiber"]);
-                                consumption.Calium = (float)Convert.ToDouble(reader["calium"]);
-                                consumption.Sodium = (float)Convert.ToDouble(reader["sodium"]);
-                                consumption.Amount = (int)reader["amount"];
-                                consumption.Weight = new WeightUnitModel
-                                {
-                                    Id = (int)reader["weight_unit_id"],
-                                    Short = (string)reader["short"],
-                                    Unit = (string)reader["unit"]
-                                };
-                                consumption.Date = Convert.ToDateTime(reader["date"]).Date;
-                     
+                            PatientConsumptionView consumption = new PatientConsumptionView();
+                            consumption.ConsumptionId = (int)reader["id"];
+                            consumption.FoodName = reader["food_name"].ToString();
+                            consumption.KCal = (float)Convert.ToDouble(reader["kcal"]);
+                            consumption.Protein = (float)Convert.ToDouble(reader["protein"]);
+                            consumption.Fiber = (float)Convert.ToDouble(reader["fiber"]);
+                            consumption.Calium = (float)Convert.ToDouble(reader["calium"]);
+                            consumption.Sodium = (float)Convert.ToDouble(reader["sodium"]);
+                            consumption.Amount = (int)reader["amount"];
+                            consumption.Weight = new WeightUnitModel
+                            {
+                                Id = (int)reader["weight_unit_id"],
+                                Short = (string)reader["short"],
+                                Unit = (string)reader["unit"]
+                            };
+                            consumption.Date = Convert.ToDateTime(reader["date"]).Date;
                             consumptions.Add(consumption);
                         }
                     }
@@ -158,7 +153,7 @@ namespace AppNiZiAPI
             return consumptions;
         }
 
-        public bool UpdateConsumption(int consumptionId, ConsumptionInput consumption)
+        public async Task<bool> UpdateConsumption(int consumptionId, ConsumptionInput consumption)
         {
             bool updated;
             var updateQuery = $"UPDATE Consumption SET " +
@@ -171,7 +166,7 @@ namespace AppNiZiAPI
                 conn.Open();
                 try
                 {
-                    updated = ConsumptionCommand(updateQuery, consumption,conn).ExecuteNonQuery() > 0;
+                    updated = await ConsumptionCommand(updateQuery, consumption, conn).ExecuteNonQueryAsync() > 0;
                 }
                 catch (Exception)
                 {
@@ -182,7 +177,7 @@ namespace AppNiZiAPI
             return updated;
         }
 
-        private SqlCommand ConsumptionCommand(string query, ConsumptionInput consumption,SqlConnection conn)
+        private SqlCommand ConsumptionCommand(string query, ConsumptionInput consumption, SqlConnection conn)
         {
             SqlCommand command = new SqlCommand(query, conn);
             command.Parameters.AddWithValue("@food_name", consumption.FoodName);

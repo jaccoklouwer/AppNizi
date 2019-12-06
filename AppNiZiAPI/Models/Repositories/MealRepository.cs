@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AppNiZiAPI.Models.Repositories
 {
     class MealRepository :IMealRepository
     {
-        public Meal AddMeal(Meal meal)
+        public async Task<Meal> AddMeal(Meal meal)
         {
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
 
@@ -42,14 +43,14 @@ namespace AppNiZiAPI.Models.Repositories
                 sqlCmd.Parameters.Add("@PORTION_SIZE", SqlDbType.Int).Value = meal.PortionSize;
                 sqlCmd.Parameters.Add("@WEIGHT_UNIT_ID", SqlDbType.Int).Value = weightunitid ;
                 sqlCmd.Parameters.Add("@PICTURE", SqlDbType.NVarChar).Value = meal.Picture;
-                int rows = sqlCmd.ExecuteNonQuery();
+                int rows = await sqlCmd.ExecuteNonQueryAsync();
                 
             }
             conn.Close();
-            return GetMealbyName(meal.Name);
+            return await GetMealbyName(meal.Name);
         }
 
-        public bool DeleteMeal(int patient_id, int meal_id)
+        public async Task<bool> DeleteMeal(int patient_id, int meal_id)
         {
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             bool success = false;
@@ -63,7 +64,7 @@ namespace AppNiZiAPI.Models.Repositories
                 SqlCommand sqlCmd = new SqlCommand(sqlQuery, conn);
                 sqlCmd.Parameters.Add("@PATIENT_ID", SqlDbType.Int).Value = patient_id;
                 sqlCmd.Parameters.Add("@MEAL_ID", SqlDbType.Int).Value = meal_id;
-                int rows = sqlCmd.ExecuteNonQuery();
+                int rows = await sqlCmd.ExecuteNonQueryAsync();
 
                 if (rows != 0)
                     success = true;
@@ -71,7 +72,7 @@ namespace AppNiZiAPI.Models.Repositories
             return success;
         }
 
-        public Meal GetMealbyName(string name)
+        public async Task<Meal> GetMealbyName(string name)
         {
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             Meal meal = new Meal();
@@ -83,7 +84,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
                     while (reader.Read())
                     {
                         // Uit lezen bijv
@@ -105,7 +106,7 @@ namespace AppNiZiAPI.Models.Repositories
             return meal;
         }
 
-        public List<Meal> GetMyMeals(int patient_id)
+        public async Task<List<Meal>> GetMyMeals(int patient_id)
         {
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
             List<Meal> meals = new List<Meal>();
@@ -117,7 +118,7 @@ namespace AppNiZiAPI.Models.Repositories
 
                 using (SqlCommand cmd = new SqlCommand(text, conn))
                 {
-                    SqlDataReader reader = cmd.ExecuteReader();
+                    SqlDataReader reader = await cmd.ExecuteReaderAsync();
                     while (reader.Read())
                     {
                         Meal meal = new Meal
@@ -143,7 +144,7 @@ namespace AppNiZiAPI.Models.Repositories
             return meals;
         }
 
-        public Meal PutMeal(Meal meal)
+        public async Task<Meal> PutMeal(Meal meal)
         {
             SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection"));
 
@@ -179,11 +180,11 @@ namespace AppNiZiAPI.Models.Repositories
                 sqlCmd.Parameters.Add("@PORTION_SIZE", SqlDbType.Int).Value = meal.PortionSize;
                 sqlCmd.Parameters.Add("@WEIGHT_UNIT_ID", SqlDbType.Int).Value = weightunitid;
                 sqlCmd.Parameters.Add("@PICTURE", SqlDbType.NVarChar).Value = meal.Picture;
-                int rows = sqlCmd.ExecuteNonQuery();
+                int rows = await sqlCmd.ExecuteNonQueryAsync();
 
             }
             conn.Close();
-            return GetMealbyName(meal.Name);
+            return await GetMealbyName(meal.Name);
         }
     }
 }

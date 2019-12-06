@@ -10,10 +10,10 @@ namespace AppNiZiAPI.Services
 
         Task<ActionResult> UpdateConsumption(HttpRequest req, string consumptionId);
 
-       Task <ActionResult> RemoveConsumption(HttpRequest req, string consumptionId);
+        Task<ActionResult> RemoveConsumption(HttpRequest req, string consumptionId);
 
-       Task <ActionResult> GetConsumptionByConsumptionId(HttpRequest req, string consumptionId);
+        Task<ActionResult> GetConsumptionByConsumptionId(HttpRequest req, string consumptionId);
 
-        Task <ActionResult> GetConsumptionsForPatientBetweenDates(HttpRequest req);
+        Task<ActionResult> GetConsumptionsForPatientBetweenDates(HttpRequest req);
     }
 }

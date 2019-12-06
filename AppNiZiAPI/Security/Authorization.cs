@@ -35,7 +35,7 @@ namespace AppNiZiAPI.Security
                 return new AuthResultModel(false, AuthStatusCode.Unauthorized);
 
             // Get Token Guid for Authorization
-            string tokenGuid = claims.FindFirst("azp").Value;
+            string tokenGuid = claims.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
 
             IAuthorizationRepository authRepository = DIContainer.Instance.GetService<IAuthorizationRepository>();
 
@@ -108,7 +108,7 @@ namespace AppNiZiAPI.Security
 
             AuthLogin authLogin = new AuthLogin
             {   Token = token,
-                Guid = claims.FindFirst("azp").Value
+                Guid = claims.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value
             };
 
             return authLogin;
@@ -133,7 +133,7 @@ namespace AppNiZiAPI.Security
                 return new AuthGUID { AuthResult = authResult };
 
             // Get Token Guid for Authorization
-            string tokenGuid = claims.FindFirst("azp").Value;
+            string tokenGuid = claims.FindFirst("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier").Value;
             authGUID.Acces = true;
             authGUID.GUID = tokenGuid;
             authGUID.AuthResult = new AuthResultModel(true, AuthStatusCode.Ok);

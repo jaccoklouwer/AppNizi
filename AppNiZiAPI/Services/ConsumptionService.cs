@@ -34,7 +34,7 @@ namespace AppNiZiAPI.Services
             // Auth check
             if (!await Authorised(req, newConsumption.PatientId, false)) return new BadRequestObjectResult(Messages.AuthNoAcces);
 
-            if (consumptionRepository.AddConsumption(newConsumption)) return new OkObjectResult(Messages.OKPost);
+            if (await consumptionRepository.AddConsumption(newConsumption)) return new OkObjectResult(Messages.OKPost);
             return new BadRequestObjectResult(Messages.ErrorPost);
         }
 
@@ -42,7 +42,7 @@ namespace AppNiZiAPI.Services
         {
             if (!int.TryParse(consumptionId, out int id)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
 
-            ConsumptionView targetConsumption = consumptionRepository.GetConsumptionByConsumptionId(id);
+            ConsumptionView targetConsumption = await consumptionRepository.GetConsumptionByConsumptionId(id);
             // Auth check
             if (!await Authorised(req, targetConsumption.PatientId, true)) return new BadRequestObjectResult(Messages.AuthNoAcces);
 
@@ -77,7 +77,7 @@ namespace AppNiZiAPI.Services
             // Auth check
             if (!await Authorised(req, patientId, true)) return new BadRequestObjectResult(Messages.AuthNoAcces);
 
-            PatientConsumptionsView consumptions = new PatientConsumptionsView(consumptionRepository.GetConsumptionsForPatientBetweenDates(patientId, startDate, endDate));
+            PatientConsumptionsView consumptions = new PatientConsumptionsView(await consumptionRepository.GetConsumptionsForPatientBetweenDates(patientId, startDate, endDate));
 
             var consumptionJson = JsonConvert.SerializeObject(consumptions);
             return consumptionJson != null
@@ -88,21 +88,23 @@ namespace AppNiZiAPI.Services
         public async Task<ActionResult> RemoveConsumption(HttpRequest req, string consumptionId)
         {
             if (!int.TryParse(consumptionId, out int Id) || Id <= 0) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
-            int patientId = consumptionRepository.GetConsumptionByConsumptionId(Id).PatientId;
+            ConsumptionView consumption = await consumptionRepository.GetConsumptionByConsumptionId(Id);
+            int patientId = consumption.PatientId;
 
             // Auth check
             if (!await Authorised(req, patientId, false)) return new BadRequestObjectResult(Messages.AuthNoAcces);
 
-            if (consumptionRepository.DeleteConsumption(Id, patientId)) return new OkObjectResult(Messages.OKDelete);
+            if (await consumptionRepository.DeleteConsumption(Id, patientId)) return new OkObjectResult(Messages.OKDelete);
 
             return new BadRequestObjectResult(Messages.ErrorDelete);
         }
 
         public async Task<ActionResult> UpdateConsumption(HttpRequest req, string consumptionId)
         {
-            if (!int.TryParse(consumptionId, out int id)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
-           
-            int targetPatientId = consumptionRepository.GetConsumptionByConsumptionId(id).PatientId;
+            if (!int.TryParse(consumptionId, out int Id)) return new BadRequestObjectResult(Messages.ErrorIncorrectId);
+
+            ConsumptionView consumption = await consumptionRepository.GetConsumptionByConsumptionId(Id);
+            int targetPatientId = consumption.PatientId;
 
             ConsumptionInput updateConsumption = new ConsumptionInput();
             string consumptionJson = await new StreamReader(req.Body).ReadToEndAsync();
@@ -116,7 +118,7 @@ namespace AppNiZiAPI.Services
             // Auth check
             if (!await Authorised(req, targetPatientId, false)) return new BadRequestObjectResult(Messages.AuthNoAcces);
 
-            if (consumptionRepository.UpdateConsumption(id, updateConsumption)) return new OkObjectResult(Messages.OKUpdate);
+            if (await consumptionRepository.UpdateConsumption(Id, updateConsumption)) return new OkObjectResult(Messages.OKUpdate);
             return new BadRequestObjectResult(Messages.ErrorPut);
         }
 
@@ -131,14 +133,15 @@ namespace AppNiZiAPI.Services
             return true;
         }
 
-        private async Task <bool> Authorised(HttpRequest req, int patientId, bool availableForDoctor)
+        private async Task<bool> Authorised(HttpRequest req, int patientId, bool availableForDoctor)
         {
             AuthResultModel authResult;
             if (availableForDoctor)
             {
-                int userId= await authorizationService.GetUserId(req); 
+                int userId = await authorizationService.GetUserId(req);
                 authResult = await authorizationService.AuthForDoctorOrPatient(req, userId);
-            } else
+            }
+            else
             {
                 authResult = await authorizationService.CheckAuthorization(req, patientId);
             }

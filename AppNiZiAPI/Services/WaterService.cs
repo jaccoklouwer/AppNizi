@@ -41,7 +41,7 @@ namespace AppNiZiAPI.Services
             if (patientId == 0)
                 return new StatusCodeResult(StatusCodes.Status401Unauthorized);
 
-            WaterConsumptionModel waterConsumptionModel = _waterRepository.GetSingleWaterConsumption(patientId, waterId);
+            WaterConsumptionModel waterConsumptionModel = await _waterRepository.GetSingleWaterConsumption(patientId, waterId);
             return waterConsumptionModel != null
                 ? (ActionResult)new OkObjectResult(waterConsumptionModel)
                 : new StatusCodeResult(StatusCodes.Status204NoContent);

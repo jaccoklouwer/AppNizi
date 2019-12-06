@@ -28,7 +28,7 @@ using AppNiZiAPI.Services.Handlers;
 
 namespace AppNiZiAPI
 {
-    public static class FoodByName
+    public static class FoodById
     {
         [FunctionName("Food")]
         [OpenApiOperation("GetFoodById", "Food", Summary = "Gets the requested FoodItem", Description = "updates the dietary management of a patient", Visibility = OpenApiVisibilityType.Important)]

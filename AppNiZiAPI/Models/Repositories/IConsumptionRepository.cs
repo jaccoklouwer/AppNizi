@@ -1,18 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AppNiZiAPI.Models.Repositories
 {
     interface IConsumptionRepository
     {
-        ConsumptionView GetConsumptionByConsumptionId(int consumptionId);
-        List<PatientConsumptionView> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate);
+        Task<ConsumptionView> GetConsumptionByConsumptionId(int consumptionId);
+        Task<List<PatientConsumptionView>> GetConsumptionsForPatientBetweenDates(int patientId, DateTime startDate, DateTime endDate);
 
-        bool AddConsumption(ConsumptionInput consumption);
+        Task<bool> AddConsumption(ConsumptionInput consumption);
 
-        bool DeleteConsumption(int consumptionId, int patientId);
+        Task<bool> DeleteConsumption(int consumptionId, int patientId);
 
-        bool UpdateConsumption(int consumptionId, ConsumptionInput consumption);
+        Task<bool> UpdateConsumption(int consumptionId, ConsumptionInput consumption);
 
     }
 }

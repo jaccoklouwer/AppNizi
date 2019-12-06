@@ -63,7 +63,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.PUT
                 return new BadRequestObjectResult(Messages.ErrorPost);
             }
 
-            model = waterRep.InsertWaterConsumption(model, true);
+            model = await waterRep.InsertWaterConsumption(model, true);
 
             return model != null
                 ? (ActionResult)new OkObjectResult(model)

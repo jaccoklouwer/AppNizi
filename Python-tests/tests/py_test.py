@@ -22,9 +22,6 @@ def defineurl():
     return os.environ["AppURL"]
 urlLocal = defineurl()
 
-
-    
-defineurl()
 food="/food"
 foodPartial="/food/partial"
 foodFavorites="/food/favorite"
