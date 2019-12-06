@@ -37,14 +37,14 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
 
-- task: VSTest@2
-  displayName: 'Test Assemblies'
-  inputs:
-    testAssemblyVer2: |
-     **\$(BuildConfiguration)\*test*.dll
-     !**\obj\**
-    platform: '$(BuildPlatform)'
-    configuration: '$(BuildConfiguration)'
+#- task: VSTest@2
+#  displayName: 'Test Assemblies'
+#  inputs:
+#    testAssemblyVer2: |
+#     **\$(BuildConfiguration)\*test*.dll
+#     !**\obj\**
+#    platform: '$(BuildPlatform)'
+#    configuration: '$(BuildConfiguration)'
 
 - task: PublishSymbols@2
   displayName: 'Publish symbols path'
