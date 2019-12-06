@@ -55,7 +55,7 @@ namespace AppNiZiAPI.Functions.WaterConsumption.GET
 
 
                 IWaterRepository waterRep = DIContainer.Instance.GetService<IWaterRepository>();
-                WaterConsumptionDaily model = waterRep.GetDailyWaterConsumption(patientIdParsed, parsedDate);
+                WaterConsumptionDaily model = await waterRep.GetDailyWaterConsumption(patientIdParsed, parsedDate);
 
                 return model != null || model.WaterConsumptions.Count != 0
                         ? (ActionResult)new OkObjectResult(model)

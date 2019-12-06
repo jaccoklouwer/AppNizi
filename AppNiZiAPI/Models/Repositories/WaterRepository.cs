@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace AppNiZiAPI.Models.Repositories
 {
@@ -14,31 +15,42 @@ namespace AppNiZiAPI.Models.Repositories
         private List<WaterConsumptionViewModel> waterConsumptions = new List<WaterConsumptionViewModel>();
         private int MinumumRestriction = 0;
 
-        public WaterConsumptionDaily GetDailyWaterConsumption(int patientId, DateTime date)
+        public async Task<WaterConsumptionDaily> GetDailyWaterConsumption(int patientId, DateTime date)
         {
-            using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            // Make empty list
+            List<WaterConsumptionViewModel> waterConsumptionViews;
+
+            // Using Async methodes and functions
+            using (SqlConnection sqlCOnnection = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
-                conn.Open();
-                string sqlQuery =
+                await sqlCOnnection.OpenAsync();
+
+                string sqlStringCommand =
                     "SELECT w.*, u.short, u.unit, dm.amount AS maxAmount " +
                     "FROM WaterConsumption AS w " +
                     "INNER JOIN WeightUnit AS u ON w.weight_unit_id = u.id " +
                     "INNER JOIN DietaryManagement AS dm ON dm.patient_id = w.patient_id " +
                     "WHERE w.patient_id = @PATIENTID AND w.date = @DATE";
 
-                SqlCommand cmd = new SqlCommand(sqlQuery, conn);
-                cmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
-                cmd.Parameters.Add("@DATE", SqlDbType.Date).Value = date;
+                using(SqlCommand sqlCommand = new SqlCommand(sqlStringCommand, sqlCOnnection))
+                {
+                    sqlCommand.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
+                    sqlCommand.Parameters.Add("@DATE", SqlDbType.Date).Value = date;
 
-                SqlDataReader reader = cmd.ExecuteReader();
-                ReadFromDataReader(reader);
-
-                conn.Close();
+                    using(SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync())
+                    {
+                        waterConsumptionViews = await ReadFromDataReaderAsync(sqlDataReader);
+                    }
+                }
+                sqlCOnnection.Close();
             }
+
+            if (waterConsumptionViews.Count == 0)
+                return null;
 
             double totalAmount = 0;
 
-            foreach (var waterConsumption in waterConsumptions)
+            foreach (var waterConsumption in waterConsumptionViews)
             {
                 totalAmount += waterConsumption.Amount;
             }
@@ -51,67 +63,70 @@ namespace AppNiZiAPI.Models.Repositories
             };
         }
 
-        public WaterConsumptionModel GetSingleWaterConsumption(int patientId, int waterId)
+        public async Task<WaterConsumptionModel> GetSingleWaterConsumption(int patientId, int waterId)
         {
             WaterConsumptionViewModel waterConsumption = null;
-            using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+
+            using (SqlConnection sqlCOnnection = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
-                conn.Open();
-                var sqlQuery = $"SELECT w.*, u.short, u.unit " +
+                await sqlCOnnection.OpenAsync();
+                var sqlStringCommand = $"SELECT w.*, u.short, u.unit " +
                     $"FROM WaterConsumption AS w " +
                     $"INNER JOIN WeightUnit AS u ON u.id = w.weight_unit_id " +
                     $"WHERE w.id = @ID AND w.patient_id = @PATIENTID";
 
-                SqlCommand cmd = new SqlCommand(sqlQuery, conn);
-                cmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
-                cmd.Parameters.Add("@ID", SqlDbType.Int).Value = waterId;
-
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                try
+                using (SqlCommand sqlCommand = new SqlCommand(sqlStringCommand, sqlCOnnection))
                 {
-                    while (reader.Read())
+                    sqlCommand.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
+                    sqlCommand.Parameters.Add("@ID", SqlDbType.Int).Value = waterId;
+
+                    using (SqlDataReader sqlDataReader = await sqlCommand.ExecuteReaderAsync())
                     {
-                        waterConsumption = new WaterConsumptionViewModel
+                        try
                         {
-                            Id = (int)reader["id"],
-                            Amount = (double)reader["amount"],
-                            Date = (DateTime)reader["date"],
-                            PatientId = (int)reader["patient_id"],
-                            WeightUnit = new WeightUnitModel
+                            while (await sqlDataReader.ReadAsync())
                             {
-                                Id = (int)reader["weight_unit_id"],
-                                Short = (string)reader["short"],
-                                Unit = (string)reader["unit"]
+                                waterConsumption = new WaterConsumptionViewModel
+                                {
+                                    Id = (int)sqlDataReader["id"],
+                                    Amount = (double)sqlDataReader["amount"],
+                                    Date = (DateTime)sqlDataReader["date"],
+                                    PatientId = (int)sqlDataReader["patient_id"],
+                                    WeightUnit = new WeightUnitModel
+                                    {
+                                        Id = (int)sqlDataReader["weight_unit_id"],
+                                        Short = (string)sqlDataReader["short"],
+                                        Unit = (string)sqlDataReader["unit"]
+                                    }
+                                };
                             }
-                        };
+                        }
+                        catch
+                        {
+                            waterConsumption = new WaterConsumptionViewModel
+                            {
+                                Error = true
+                            };
+                        }
                     }
                 }
-                catch (Exception e)
-                {
-                    waterConsumption = new WaterConsumptionViewModel
-                    {
-                        Error = true
-                    };
-                }
-
-                conn.Close();
+                sqlCOnnection.Close();
             }
             return waterConsumption;
         }
 
         public List<WaterConsumptionViewModel> GetWaterConsumptionPeriod(int patientId, DateTime beginDate, DateTime endDate)
         {
-            using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            using (SqlConnection sqlCOnnection = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
-                conn.Open();
-                var sqlQuery = $"SELECT w.*, u.short, u.unit " +
+                sqlCOnnection.Open();
+                var sqlStringCommand = $"SELECT w.*, u.short, u.unit " +
                     "FROM WaterConsumption AS w " +
                     "INNER JOIN WeightUnit AS u ON u.id = w.weight_unit_id " +
                     "WHERE w.patient_id = @PATIENTID AND w.date BETWEEN @BEGINDATE AND @ENDDATE " +
                     "ORDER BY w.date ASC";
 
-                SqlCommand cmd = new SqlCommand(sqlQuery, conn);
+                SqlCommand cmd = new SqlCommand(sqlStringCommand, sqlCOnnection);
                 cmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = patientId;
                 cmd.Parameters.Add("@BEGINDATE", SqlDbType.Date).Value = beginDate;
                 cmd.Parameters.Add("@ENDDATE", SqlDbType.Date).Value = endDate;
@@ -119,19 +134,19 @@ namespace AppNiZiAPI.Models.Repositories
                 SqlDataReader reader = cmd.ExecuteReader();
                 ReadFromDataReader(reader);
 
-                conn.Close();
+                sqlCOnnection.Close();
             }
             return waterConsumptions;
         }
 
-        public WaterConsumptionModel InsertWaterConsumption(WaterConsumptionModel model, bool update)
+        public async Task<WaterConsumptionModel> InsertWaterConsumption(WaterConsumptionModel model, bool update)
         {
-            using (SqlConnection conn = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
+            using (SqlConnection sqlConnection = new SqlConnection(Environment.GetEnvironmentVariable("sqldb_connection")))
             {
-                var sqlQuery = "";
+                string sqlStringCommand = "";
                 if (update)
                 {
-                    sqlQuery =
+                    sqlStringCommand =
                     $"UPDATE WaterConsumption " +
                     $"SET date = @DATE, amount = @AMOUNT, patient_id = @PATIENTID " +
                     $"OUTPUT Inserted.id " +
@@ -139,30 +154,30 @@ namespace AppNiZiAPI.Models.Repositories
                 }
                 else
                 {
-                    sqlQuery =
+                    sqlStringCommand =
                     $"INSERT INTO WaterConsumption(date, amount, patient_id, weight_unit_id) " +
                     $"OUTPUT Inserted.id " +
                     $"VALUES(@DATE,@AMOUNT ,@PATIENTID, 7)";
                 }
 
+                await sqlConnection.OpenAsync();
+                using (SqlCommand sqlCommand = new SqlCommand(sqlStringCommand, sqlConnection))
+                {
+                    sqlCommand.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = model.PatientId;
+                    sqlCommand.Parameters.Add("@DATE", SqlDbType.NVarChar).Value = model.Date.ToString("yyy-MM-dd");
+                    sqlCommand.Parameters.Add("@AMOUNT", SqlDbType.Int).Value = model.Amount;
+                    if (update)
+                        sqlCommand.Parameters.Add("@ID", SqlDbType.Int).Value = model.Id;
 
-                SqlCommand cmd = new SqlCommand(sqlQuery, conn);
-                cmd.Parameters.Add("@PATIENTID", SqlDbType.Int).Value = model.PatientId;
-                cmd.Parameters.Add("@DATE", SqlDbType.NVarChar).Value = model.Date.ToString("yyy-MM-dd");
-                cmd.Parameters.Add("@AMOUNT", SqlDbType.Int).Value = model.Amount;
-                if (update)
-                    cmd.Parameters.Add("@ID", SqlDbType.Int).Value = model.Id;
-
-                conn.Open();
-
-                int result = (int)cmd.ExecuteScalar();
-                model.Id = result;
-                conn.Close();
-
-                if (result != 0)
-                    return model;
+                    try
+                    {
+                        model.Id = (int)await sqlCommand.ExecuteScalarAsync();
+                        sqlConnection.Close();
+                    }
+                    catch { return null; }
+                }
+                return model;
             }
-            return null;
         }
 
         public bool RemoveWaterConsumptions(int patientId, int waterId)
@@ -186,6 +201,46 @@ namespace AppNiZiAPI.Models.Repositories
                     ? true
                     : false;
             }
+        }
+
+        private async Task<List<WaterConsumptionViewModel>> ReadFromDataReaderAsync(SqlDataReader reader)
+        {
+            List<WaterConsumptionViewModel> waterConsumptionViews = new List<WaterConsumptionViewModel>();
+            try
+            {
+                while (await reader.ReadAsync())
+                {
+                    WaterConsumptionViewModel waterConsumption = new WaterConsumptionViewModel
+                    {
+                        Id = (int)reader["id"],
+                        Amount = (double)reader["amount"],
+                        Date = (DateTime)reader["date"],
+                        PatientId = (int)reader["patient_id"],
+                        WeightUnit = new WeightUnitModel
+                        {
+                            Id = (int)reader["weight_unit_id"],
+                            Short = (string)reader["short"],
+                            Unit = (string)reader["unit"]
+                        }
+                    };
+                    waterConsumptionViews.Add(waterConsumption);
+
+                    try
+                    {
+                        MinumumRestriction = (int)reader["maxAmount"];
+                    }
+                    catch { }
+                }
+            }
+            catch 
+            {
+                WaterConsumptionViewModel waterConsumption = new WaterConsumptionViewModel
+                {
+                    Error = true
+                };
+                waterConsumptionViews.Add(waterConsumption);
+            }
+            return waterConsumptionViews;
         }
 
         private void ReadFromDataReader(SqlDataReader reader)
@@ -230,10 +285,10 @@ namespace AppNiZiAPI.Models.Repositories
 
     interface IWaterRepository
     {
-        WaterConsumptionDaily GetDailyWaterConsumption(int patientId, DateTime date);
+        Task<WaterConsumptionDaily> GetDailyWaterConsumption(int patientId, DateTime date);
         List<WaterConsumptionViewModel> GetWaterConsumptionPeriod(int patientId, DateTime beginDate, DateTime endDate);
-        WaterConsumptionModel InsertWaterConsumption(WaterConsumptionModel model, bool update);
-        WaterConsumptionModel GetSingleWaterConsumption(int patientId, int waterId);
+        Task<WaterConsumptionModel> InsertWaterConsumption(WaterConsumptionModel model, bool update);
+        Task<WaterConsumptionModel> GetSingleWaterConsumption(int patientId, int waterId);
         bool RemoveWaterConsumptions(int patientId, int waterId);
     }
 }
