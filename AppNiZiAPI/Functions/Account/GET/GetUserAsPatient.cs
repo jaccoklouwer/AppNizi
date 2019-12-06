@@ -42,7 +42,7 @@ namespace AppNiZiAPI.Functions.Account.GET
             if (authLogin == null) { return new BadRequestObjectResult(Messages.AuthNoAcces); }
 
             IPatientRepository patientRepository = DIContainer.Instance.GetService<IPatientRepository>();
-            PatientLogin patientLogin = patientRepository.GetPatientInfo(authLogin.Guid);
+            PatientLogin patientLogin = await patientRepository.GetPatientInfo(authLogin.Guid);
             if (patientLogin == null)
                 return new BadRequestResult();
 
